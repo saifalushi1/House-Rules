@@ -2,7 +2,7 @@
 
 ![House Rules poster: friends playing cards, charades, trivia and board games around a low-poly table](docs/images/house-rules-poster.png)
 
-A self-hosted TypeScript game-night sandbox. Low-poly 3D table and avatars, private hands, live shared rooms, and host-editable presets. Version 0.8 adds Trivia with 1,000 questions across ten categories and expands pair Charades to 1,900 prompts across 19 categories.
+A self-hosted TypeScript game-night sandbox. Low-poly 3D table and avatars, private hands, live shared rooms, and host-editable presets. Version 0.9 adds eleven shared chaos rules with animations and sounds. Version 0.8 added Trivia with 1,000 questions across ten categories and expands pair Charades to 1,900 prompts across 19 categories.
 
 ## Start on this machine
 
@@ -51,6 +51,34 @@ Tarneeb uses the common scoring variation: a made bid scores tricks won, an unbi
 
 Each correct answer gives one point, plays a success sound, and pops a gold star above the scorer. A timeout gives no point. After the configured questions, the scoreboard shows contestant totals and the winner or tied winners. The host can end early or restart. The full question bank is bundled with the server, so playing does not depend on an external trivia API.
 
+## Shared chaos rules (v0.9)
+
+Before starting, open **House rules → Chaos**. Enable any combination of the eleven rules, configure their parameters, and **Apply house rules** or start the game. Everything is off by default. All players share the same server-controlled outcomes and receive corresponding 3D animations and synthesized action sounds. During play, expand **✹ Chaos** beside the table for timers, the current die modifier, turn order, bonus tallies, dares, flip controls and rewind voting.
+
+| Rule | Behavior and controls | Animation and sound |
+| --- | --- | --- |
+| Hot Potato | Starting fuse, minimum fuse, shrink per turn, and penalty/forced/random expiry. A penalty randomly tries to add a card or removes a point/coin; without an available card it removes a point. Forced actions use the game's legal moves: pass, play, bid, pick trump, roll, resolve a life choice, end a turn, or time out a party prompt/question. | Shaking low-poly bomb with a burning fuse; accelerating ticks and an explosion. |
+| Seat Roulette | Swap physical seats every N completed turns. Hands either travel with their owners or stay at their old physical seat. Player identities, properties, teams and pairs remain fixed. | Avatars hop across the table in arcs; whoosh and boing. |
+| Cyclone | At round boundaries or random turn starts, pass hands left/right. In games without hands, pass the bonus chaos tallies instead. | Cards fan out and orbit; shuffle riffle and wind. |
+| Double or Nothing | A server coin flip doubles or erases each positive gain. Cash is used on boards, team points in Tarneeb, pair points in Charades, contestant points in Trivia, and bonus chaos points in Bluff/Card sandbox. Losses stay unchanged. | Giant spinning coin; ring, jackpot or descending trombone-like tones. |
+| Chaos Die | Roll a d12 each round for a shared modifier, listed below. | Oversized polygon die tumbles above the table with its numbered result; rattle and thud. |
+| Table Flip | Once per match, a lowest-scoring player can scramble score totals or future turn order. Tied lowest players are eligible; the first accepted flip consumes it. | Table flips and settles; crash and rumble. |
+| Blackout | Configurable chance at turn start; darkens the scene for ten seconds and spotlights the active player. Text, cards and gameplay controls remain usable. | Lights cut to a spotlight; power-down hum and thunder. |
+| Robin Hood | A gaining leader transfers one cash unit or point to last place, once per accepted action. Team/pair totals are treated as one score. | Coins arc between players; ka-ching. |
+| Banned Word | A random single word from the host's list changes each round. Only the host sees the active word until an offence reveals it. Chat and typed guesses are checked as whole words, ignoring case. The host reports voice slips with the player selector. | Sealed-word stamp, red X over the offender; thunk and buzzer. |
+| Dare Wheel | Penalties spin a dare from the host's list, one per line. Hot Potato and banned-word penalties, caught peeking/bluffs, skips, timeouts and rejected offers can trigger it. Dares are social instructions carried out by the group. | Descending spinning wheel and flicking pointer; slowing clicks and fanfare. |
+| Time Warp | Any player can request undo of the last accepted gameplay action within 30 seconds. A strict majority of connected players must vote yes within 12 seconds; the requester votes yes automatically. Gameplay actions pause during voting. | Scene desaturates; cards and board tokens move backward; rewind squeal. |
+
+**Chaos Die faces:** 1 double gains, 2 zero gains, 3 reverse turn direction, 4 half-length hot fuse, 5 Robin's tax, 6 blackout, 7 Cyclone left, 8 Cyclone right, 9 seat shuffle, 10 a dare for everyone, 11 bonus point for each scoring unit, 12 shield from chaos penalties and score doubling/tax for that round. Die-selected effects can run even when their individual toggle is off.
+
+**Round boundaries:** a full turn cycle in Bluff, Card sandbox and board games; each completed trick in Tarneeb; a new Charades prompt; a new Trivia question. A round-end Cyclone in Trivia also queues when the current question resolves. Seat and hand swaps wait until deal/dice animations, Bluff challenge windows, boxing, pending life choices and partially played Tarneeb tricks are clear. Physical swaps do not change who owns the current turn or which players are teammates. Scrambled turn order is separate from seat order.
+
+Card-game chaos tallies do not replace the usual victory condition. Cardless Cyclone passes a separate bonus tally rather than moving property ownership, master roles or team membership. Tarneeb still requires the final chaos-adjusted team total to reach its target. Correct-answer counts remain a count of correct answers even when points double or are erased.
+
+Time Warp restores hands, piles, positions, cash, scores, rules-derived state and remaining timer durations; it preserves chat, connection status and the current host. Undo snapshots and future questions remain private on the server. A successful rewind consumes the snapshot. Timer expiry or a new gameplay action invalidates an older snapshot; voting is cancelled if a voter disconnects. An action that ends the match can be rewound from the results screen. Rewinding cannot make players forget a card, prompt or answer already revealed. Restarting clears votes, flip usage, tallies, dares and timers.
+
+Voice is still provided by your group call, so Banned Word does not automatically transcribe microphones. On-screen effects and action audio work in both camera modes; first-person briefly pulls back for large chaos events so they remain visible. Use the header sound control to mute all action sounds.
+
 ## House rules
 
 The host can edit rules before a game or return everyone to the lobby to change them. Start Game applies the current draft. Apply House Rules shares a draft without starting.
@@ -97,6 +125,8 @@ npm start
 - `server/interactions.ts`: atomic trades, offer expiry, private boxing moves and duel outcomes.
 - `server/index.ts`: HTTP/static server, rooms, session resume, WebSocket connections, payload limits, heartbeat and rate limiting.
 - `server/engine.ts`: authoritative game rules, actions, private per-player views and timers.
+- `server/chaos.ts`: shared chaos triggers, score adapters, private undo snapshots and voting.
+- `src/chaos-ui.ts`, `src/chaos-visuals.ts`, `src/chaos-audio.ts`: chaos controls, 3D effects and synthesized audio.
 - `server/trivia.ts` and `server/trivia-bank.ts`: trivia roles, question timers, scoring, answer privacy and the bundled question bank.
 - `server/charade-prompts.ts` and `server/charade-extras.ts`: bundled charades collections.
 - `shared/types.ts`: TypeScript contracts and preset metadata.
@@ -108,7 +138,7 @@ Rooms are in memory. Restarting the server clears games. Disconnected rooms expi
 
 ## Verification
 
-62 automated tests pass, including a full 13-trick Tarneeb hand, challenge resolution, timer behavior, private views, validation, scoring, board actions and a real two-client reconnect flow. Browser checks cover room creation, joining, private deals, card selection/play, calling bluff, camera switching, enlarged board views, negotiation offers and refusals, and host rule editing.
+91 automated tests pass, including a full 13-trick Tarneeb hand, challenge resolution, timer behavior, private views, validation, scoring, board actions and a real two-client reconnect flow. Browser checks cover room creation, joining, private deals, card selection/play, calling bluff, camera switching, enlarged board views, negotiation offers and refusals, and host rule editing.
 
 ## Version 0.2: the table comes alive
 

@@ -1,3 +1,5 @@
+import {chaosFields,chaosHud} from './chaos-ui';
+import {tickChaosAudio} from './chaos-audio';
 import {triviaCategories} from "../shared/trivia";
 import {charadeCategories} from "../shared/charades";
 import { GameAudio } from './audio';
@@ -18,7 +20,7 @@ let seenEvent = 0, eventRoom = '', effectTimer: ReturnType<typeof setTimeout>;
 document.addEventListener('pointerdown', () => void audio.unlock(), {capture:true});
 document.addEventListener('keydown', () => void audio.unlock(), {capture:true});
 const app = document.querySelector<HTMLDivElement>('#app')!;
-app.innerHTML = `<div class="shell"><aside class="sidebar" id="sidebar"></aside><main><header id="header"></header><div class="workspace"><section class="table-area"><div id="intro"></div><div class="stage"><div class="stage-top" id="stage-top"></div><div id="scene" aria-label="Low polygon multiplayer game table"></div><div id="stage-bottom"></div><div id="effects-layer" aria-live="polite"></div></div><div id="play-panel"></div></section><aside class="right-rail"><button id="rules-toggle" data-action="toggleRules"></button><section class="rules-panel" id="rules-panel"></section><div id="activity"></div></aside></div><footer><span>MADE FOR GAME NIGHT. BUILT FOR YOUR RULES.</span><span>SELF-HOSTED <i></i> VERSION 0.8</span></footer></main></div><div id="toast" role="status" aria-live="polite"></div><div id="modal-root"></div>`;
+app.innerHTML = `<div class="shell"><aside class="sidebar" id="sidebar"></aside><main><header id="header"></header><div class="workspace"><section class="table-area"><div id="intro"></div><div class="stage"><div class="stage-top" id="stage-top"></div><div id="scene" aria-label="Low polygon multiplayer game table"></div><div id="stage-bottom"></div><div id="effects-layer" aria-live="polite"></div></div><div id="play-panel"></div></section><aside class="right-rail"><button id="rules-toggle" data-action="toggleRules"></button><section class="rules-panel" id="rules-panel"></section><div id="activity"></div></aside></div><footer><span>MADE FOR GAME NIGHT. BUILT FOR YOUR RULES.</span><span>SELF-HOSTED <i></i> VERSION 0.9</span></footer></main></div><div id="toast" role="status" aria-live="polite"></div><div id="modal-root"></div>`;
 try {
     scene = new GameScene(document.querySelector('#scene')!);
 }
@@ -89,6 +91,7 @@ function render() {
     scene?.update(draft.game, room, id);
     if (scene) {scene.mode = camera;scene.setSelected(selected);}
     applyLayout();
+    chaosHud(room,id);
     presentEvents();
 }
 function renderSidebar() { document.querySelector('#sidebar')!.innerHTML = `<a class="brand" href="/" aria-label="House Rules home"><span class="brand-mark">H<span>R</span></span><span>HOUSE<br>RULES<span class="brand-dot">.</span></span></a><div class="side-label">YOUR GAME SHELF <span>07</span></div><div class="filters">${['all', 'cards', 'party', 'tabletop'].map(f => `<button data-filter="${f}" class="${filter === f ? 'active' : ''}">${f === 'all' ? 'All games' : f[0].toUpperCase() + f.slice(1)}</button>`).join('')}</div><nav aria-label="Game presets">${Object.entries(games).filter(([, g]) => filter === 'all' || g.category.toLowerCase() === filter).map(([key, g]) => `<button class="game-item ${draft.game === key ? 'active' : ''}" data-game="${key}" ${room && (room.host !== id || room.phase !== 'lobby') ? 'disabled' : ''}><span class="game-icon ${key}">${g.icon}</span><span><strong>${g.name}</strong><small>${g.category} <b>·</b> ${g.players} PLAYERS</small></span><span class="game-arrow">↗</span></button>`).join('')}</nav><div class="side-bottom"><div class="tiny-dice">⚄</div><strong>The best rule?<br>Make it your own.</strong><p>Familiar games. Unfamiliar twists.<br>Entirely your table.</p><button class="text-btn" data-action="help">How to play <span>↗</span></button></div>`; }
@@ -136,9 +139,10 @@ function renderRules() {
             fields = `<div class="rules-section-title">THE BANK</div>${slider('startingCash', 'Starting cash', 100, 10000, 100, ' $')}${slider('salary', 'Pass Home bonus', 0, 2000, 50, ' $')}${slider('roundLimit', 'Round limit', 3, 50)}${draft.game === 'property' ? slider('rentMultiplier', 'Rent multiplier', .25, 5, .25, '×') + toggle('freeParking', 'Rest-stop jackpot', 'Collect taxes paid into the pot.') + toggle('allowTrading', 'Property negotiations', 'Offer cash and property to any player.') + toggle('tradeSlaps', 'Refusal slap', 'Turn down a deal with a cartoon slap.') : '<p class="rule-callout">Choose a career. Take the steady path or chance a bigger reward. Highest net worth wins.</p>'}`;
     }
     if(rulesTab==='game'&&draft.game==='trivia')fields=`<div class="rules-section-title">THE QUIZ ROUND</div>${slider('triviaQuestions','Questions per round',1,100)}${slider('triviaSeconds','Time per question',5,180,5,'s')}<label class="rule-text"><span>Answer mode</span><select data-rule="triviaMode" ${locked()?'disabled':''}><option value="ffa" ${draft.triviaMode==='ffa'?'selected':''}>Free for all</option><option value="turns" ${draft.triviaMode==='turns'?'selected':''}>Turn based</option></select></label><p class="rule-callout">A volunteer master asks the questions and chooses the category after the game starts. Typed correct answers earn the point automatically; the master can award spoken answers.</p>`;
+    if(rulesTab==='chaos')fields=chaosFields(draft,locked());
     if (rulesTab === 'notes')
         fields = `<div class="rules-section-title">YOUR HOUSE CONTRACT</div>${textfield('customNotes', 'Rules everyone agrees to', 'e.g. Winner picks the next game. No table talk after a bid.', true)}<p class="rule-callout">Written rules and funny penalties are carried out by your group. Toggles and parameters are enforced by the game.</p><div class="rules-section-title">SAVE YOUR RECIPE</div>${button('↓ Export rules', 'export', false, 'secondary full')}<label class="import-label">↑ Import rules<input type="file" id="import-rules" accept="application/json,.json" ${locked() ? 'disabled' : ''}></label>`;
-    document.querySelector('#rules-panel')!.innerHTML = `<div class="rules-heading"><span class="rules-icon">☷</span><div><h2>House rules</h2><p>A classic, with your signature.</p></div><span class="rule-count">${draft.allowPeeking ? '✦' : '◈'}</span></div><div class="rule-tabs">${['general', 'game', 'notes'].map(t => `<button data-tab="${t}" class="${rulesTab === t ? 'active' : ''}">${t === 'general' ? 'The basics' : t === 'game' ? 'Game rules' : 'Custom'}</button>`).join('')}</div><div class="rule-fields">${fields}</div><div class="rules-bottom"><span><i class="${locked() ? 'locked' : ''}"></i>${locked() ? room?.phase === 'lobby' ? 'Host controls the rules' : 'Rules locked during play' : room ? 'Changes apply to everyone' : 'Set the tone before you host'}</span>${room?.host === id && room.phase === 'lobby' ? button('Apply house rules ↗', 'apply', false, 'primary full') : !room ? '<div class="rules-tip">A little chaos makes a great story.</div>' : ''}</div>`;
+    document.querySelector('#rules-panel')!.innerHTML = `<div class="rules-heading"><span class="rules-icon">☷</span><div><h2>House rules</h2><p>A classic, with your signature.</p></div><span class="rule-count">${draft.allowPeeking ? '✦' : '◈'}</span></div><div class="rule-tabs">${['general', 'game', 'chaos', 'notes'].map(t => `<button data-tab="${t}" class="${rulesTab === t ? 'active' : ''}">${t === 'general' ? 'The basics' : t === 'game' ? 'Game rules' : t==='chaos'?'Chaos':'Custom'}</button>`).join('')}</div><div class="rule-fields">${fields}</div><div class="rules-bottom"><span><i class="${locked() ? 'locked' : ''}"></i>${locked() ? room?.phase === 'lobby' ? 'Host controls the rules' : 'Rules locked during play' : room ? 'Changes apply to everyone' : 'Set the tone before you host'}</span>${room?.host === id && room.phase === 'lobby' ? button('Apply house rules ↗', 'apply', false, 'primary full') : !room ? '<div class="rules-tip">A little chaos makes a great story.</div>' : ''}</div>`;
 }
 function cardHTML(c: Card, selectable = true) { return `<button class="playing-card ${c.suit === '♥' || c.suit === '♦' ? 'red' : ''} ${selected.has(c.id) ? 'selected' : ''}" ${selectable ? `data-card="${esc(c.id)}"` : 'disabled'} aria-label="${rank(c.rank)} ${c.suit}" aria-pressed="${selected.has(c.id)}"><span>${rank(c.rank)}<small>${c.suit}</small></span><b>${c.suit}</b><span class="card-foot">${rank(c.rank)}</span></button>`; }
 function renderPlay() {
@@ -254,6 +258,7 @@ function renderPeekQuickEvent(){
 }
 function updateTimers() { document.querySelectorAll<HTMLElement>(".peek-qte").forEach(el=>{if(Number(el.dataset.expires)<=Date.now())el.remove();}); document.querySelectorAll<HTMLElement>('[data-countdown]').forEach(el => { el.textContent = Math.max(0, Math.ceil((Number(el.dataset.countdown) - Date.now()) / 1000)) + 's'; }); }
 setInterval(updateTimers, 250);
+setInterval(()=>tickChaosAudio(audio,room),100);
 app.addEventListener('click', async (e) => {
     const el = (e.target as HTMLElement).closest<HTMLElement>('button');
     if (!el || el.hasAttribute('disabled'))
@@ -302,6 +307,7 @@ app.addEventListener('click', async (e) => {
     const action = el.dataset.action;
     if (!action)
         return;
+    if(action.startsWith('chaos')){if(action==='chaosYes'||action==='chaosNo')send({type:'chaosVote',yes:action==='chaosYes'});else if(action==='chaosReportWord')send({type:action,target:(document.querySelector('#chaos-offender') as HTMLSelectElement)?.value});else send({type:action});return;}
     if (action === 'toggleShelf'){shelfOpen=!shelfOpen;applyLayout();renderHeader();return;}
     if (action === 'toggleRules'){rulesOpen=!rulesOpen;applyLayout();return;}
     if (action === 'toggleChat'){chatOpen=!chatOpen;applyLayout();return;}
@@ -459,11 +465,11 @@ function presentEvents() {
   const fresh=room.events.filter(e=>e.id>seenEvent);if(!fresh.length)return;
   seenEvent=fresh.at(-1)!.id;
   for(const e of fresh){if(Date.now()-e.at>5000)continue;scene?.play(e);audio.play(e);}
-  const event=fresh.find(e=>e.kind==='challenge') || fresh.find(e=>e.kind==='slap') || fresh.find(e=>e.kind==='trick') || fresh.find(e=>e.kind==='win') || [...fresh].reverse().find(e=>labels[e.kind]);if(!event)return;
+  const event=[...fresh].reverse().find(e=>e.kind.startsWith('chaos')&&e.kind!=='chaosHot') || fresh.find(e=>e.kind==='challenge') || fresh.find(e=>e.kind==='slap') || fresh.find(e=>e.kind==='trick') || fresh.find(e=>e.kind==='win') || [...fresh].reverse().find(e=>labels[e.kind]);if(!event)return;
   
   const layer=document.querySelector('#effects-layer')!;clearTimeout(effectTimer);
   const actor=room.players.find(p=>p.id===event.actor)?.name;
-  const title=event.kind==="challenge"?`${room.players.find(p=>p.id===String(event.data.player))?.name}: ${event.data.liar?"BLUFF CAUGHT!":"TOLD THE TRUTH!"} · ${room.players.find(p=>p.id===String(event.data.loser))?.name} takes ${event.data.count} ${event.data.count===1?"card":"cards"}`:event.kind==="slap"&&event.data.reason==="peek"?"CAUGHT PEEKING! ✋ · 8 hands cooldown":labels[event.kind];
+  const title=event.kind==='chaosDie'?'CHAOS DIE · '+event.data.face+' · '+event.data.text:event.kind.startsWith('chaos')?String(event.data.text||event.data.reason||({chaosCoin:event.data.won?'DOUBLE OR NOTHING · DOUBLE!':'DOUBLE OR NOTHING · NOTHING!',chaosDie:'CHAOS DIE · '+event.data.face+' · '+event.data.text,chaosSeats:'SEAT ROULETTE!',chaosCyclone:'CYCLONE!',chaosFlip:'TABLE FLIP!',chaosBlackout:'BLACKOUT!',chaosRobin:'ROBIN HOOD!',chaosWord:'SECRET WORD SEALED',chaosOffender:'BANNED WORD · '+event.data.word,chaosBoom:'HOT POTATO EXPLODED!',chaosVote:'VOTE TO REWIND'} as Record<string,string>)[event.kind]||'CHAOS!'):event.kind==="challenge"?`${room.players.find(p=>p.id===String(event.data.player))?.name}: ${event.data.liar?"BLUFF CAUGHT!":"TOLD THE TRUTH!"} · ${room.players.find(p=>p.id===String(event.data.loser))?.name} takes ${event.data.count} ${event.data.count===1?"card":"cards"}`:event.kind==="slap"&&event.data.reason==="peek"?"CAUGHT PEEKING! ✋ · 8 hands cooldown":labels[event.kind];
   layer.innerHTML=`<div class="action-banner ${event.kind==='slap'||event.kind.startsWith('duel')?'comic':''}"><span>${esc(actor||'THE TABLE')}</span><strong>${esc(title)}</strong></div>`;
   effectTimer=setTimeout(()=>layer.innerHTML='',event.kind==='deal'?3400:event.kind==='roll'?2400:event.kind==='challenge'?3200:1600);
 }

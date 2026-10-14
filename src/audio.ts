@@ -1,3 +1,4 @@
+import {chaosSound} from './chaos-audio';
 import type { GameEvent } from '../shared/types';
 /** Original synthesized effects; no audio downloads or third-party assets. */
 export class GameAudio {
@@ -27,6 +28,7 @@ export class GameAudio {
     source.connect(filter).connect(gain).connect(this.master || ctx.destination); source.start(ctx.currentTime + delay);
   }
   play(e: GameEvent) {
+    if(chaosSound(this,e))return;
     switch (e.kind) {
       case 'deal':
         for (let i = 0; i < 10; i++) this.noise(.06, i * .09, .25, 1700);

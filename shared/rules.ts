@@ -1,3 +1,4 @@
+import {chaosRules} from './chaos.js';
 import {charadeCategories} from "./charades.js";
 import { defaults, type Rules } from './types.js';
 
@@ -17,7 +18,11 @@ export function validateRules(input: unknown): Rules {
   require(typeof x.charadeCategory==='string' && Object.hasOwn(charadeCategories,x.charadeCategory), 'Unknown charades category.');
   require(['ffa','turns'].includes(String(x.triviaMode)), 'Unknown trivia answer mode.');
   const r = { ...defaults, game: x.game, camera: x.camera, background:x.background, charadeCategory:x.charadeCategory, triviaMode:x.triviaMode } as Rules;
+  for(const key of [...Object.keys(chaosRules),'chaosHandsTravel']) { require(typeof x[key]==='boolean','Invalid chaos toggle.'); (r as unknown as Record<string,unknown>)[key]=x[key]; }
+  for(const [key,values] of Object.entries({chaosHotOutcome:['penalty','forced','random'],chaosDirection:['left','right'],chaosCycloneTrigger:['round','random'],chaosFlipMode:['scores','order']})){require(values.includes(String(x[key])),'Unknown chaos option.');(r as unknown as Record<string,unknown>)[key]=x[key];}
+  for(const key of ['chaosWords','chaosDares']){require(typeof x[key]==='string'&&(x[key] as string).length<=4000,'Chaos lists must be text up to 4000 characters.');const list=(x[key] as string).split('\n').map(v=>v.trim()).filter(Boolean);require(list.length>0&&list.length<=50&&list.every(v=>v.length<=120),'Use 1–50 entries, at most 120 characters each.');if(key==='chaosWords')require(list.every(v=>/^[\p{L}\p{N}]+$/u.test(v)),'Banned words must be single words.');(r as unknown as Record<string,unknown>)[key]=list.join('\n');}
   const ranges: Record<string, [number, number]> = {
+    chaosHotSeconds:[5,120],chaosMinSeconds:[2,30],chaosShrinkSeconds:[0,10],chaosSeatEvery:[1,20],chaosRandomPercent:[0,100],
     maxPlayers: [2, 8], decks: [1, 3], handSize: [1, 20], targetScore: [10, 100],
     triviaQuestions: [1,100], triviaSeconds:[5,180], charadeMatchSeconds: [30,1200], challengeSeconds: [5, 30], charadeSeconds: [15, 180], skipPenalty: [0, 5],
     startingCash: [100, 10000], salary: [0, 2000], rentMultiplier: [.25, 5], roundLimit: [3, 50],
@@ -36,8 +41,7 @@ export function validateRules(input: unknown): Rules {
     require(typeof x[key] === 'string', 'Invalid text.');
     (r as unknown as Record<string, unknown>)[key] = (x[key] as string).slice(0, key === 'charadePrompts' ? 6000 : 1000);
   }
+  require(r.chaosMinSeconds<=r.chaosHotSeconds,'Minimum fuse must not exceed starting fuse.');
   if (r.game === 'tarneeb') { r.decks = 1; r.maxPlayers = 4; }
   return r;
 }
-
-

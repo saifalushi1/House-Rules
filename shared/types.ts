@@ -1,3 +1,4 @@
+import type {ChaosState} from './chaos.js';
 import type {TriviaState,TriviaView} from "./trivia.js";
 import type {CharadeCategory} from "./charades.js";
 export type Game = 'bluff' | 'tarneeb' | 'cards' | 'charades' | 'trivia' | 'property' | 'life';
@@ -8,6 +9,10 @@ export interface Card {
     suit: Suit;
 }
 export interface Rules {
+    chaosHotPotato:boolean; chaosSeatRoulette:boolean; chaosCyclone:boolean; chaosDouble:boolean; chaosDie:boolean; chaosTableFlip:boolean; chaosBlackout:boolean; chaosRobin:boolean; chaosBanned:boolean; chaosDare:boolean; chaosWarp:boolean;
+    chaosHotSeconds:number; chaosMinSeconds:number; chaosShrinkSeconds:number; chaosSeatEvery:number; chaosRandomPercent:number;
+    chaosHotOutcome:'penalty'|'forced'|'random'; chaosHandsTravel:boolean; chaosDirection:'left'|'right'; chaosCycloneTrigger:'round'|'random'; chaosFlipMode:'scores'|'order'; chaosWords:string; chaosDares:string;
+
     allowTrading: boolean;
     tradeSlaps: boolean;
     boxingDuels: boolean;
@@ -40,7 +45,7 @@ export interface Rules {
     roundLimit: number;
     customNotes: string;
 }
-export const defaults: Rules = { allowTrading: true, tradeSlaps: true, boxingDuels: true, game: 'bluff', background: 'forest', camera: 'third', maxPlayers: 8, allowPeeking: false, catchPeeking: true, penalty: 'Speak like a pirate until your next turn', decks: 1, handSize: 7, followSuit: true, targetScore: 31, challengeSeconds: 12, reverseTurns: false, triviaQuestions: 10, triviaSeconds: 30, triviaMode: "ffa", charadeMatchSeconds: 300, charadeCategory: "animals", charadeSeconds: 60, allowSkipping: true, skipPenalty: 0, charadePrompts: '', startingCash: 1500, salary: 200, rentMultiplier: 1, freeParking: true, roundLimit: 15, customNotes: '' };
+export const defaults: Rules = {"chaosHotOutcome":"random","chaosHotPotato":false,"chaosSeatRoulette":false,"chaosCyclone":false,"chaosDouble":false,"chaosDie":false,"chaosTableFlip":false,"chaosBlackout":false,"chaosRobin":false,"chaosBanned":false,"chaosDare":false,"chaosWarp":false,"chaosHotSeconds":30,"chaosMinSeconds":5,"chaosShrinkSeconds":2,"chaosSeatEvery":3,"chaosRandomPercent":20,"chaosHandsTravel":true,"chaosDirection":"left","chaosCycloneTrigger":"round","chaosFlipMode":"order","chaosWords":"yes\nno\nokay\nliterally\nactually","chaosDares":"Speak like a pirate until your next turn\nDo a dramatic victory pose\nNarrate your next move like a sports commentator", allowTrading: true, tradeSlaps: true, boxingDuels: true, game: 'bluff', background: 'forest', camera: 'third', maxPlayers: 8, allowPeeking: false, catchPeeking: true, penalty: 'Speak like a pirate until your next turn', decks: 1, handSize: 7, followSuit: true, targetScore: 31, challengeSeconds: 12, reverseTurns: false, triviaQuestions: 10, triviaSeconds: 30, triviaMode: "ffa", charadeMatchSeconds: 300, charadeCategory: "animals", charadeSeconds: 60, allowSkipping: true, skipPenalty: 0, charadePrompts: '', startingCash: 1500, salary: 200, rentMultiplier: 1, freeParking: true, roundLimit: 15, customNotes: '' };
 export const games: Record<Game, {
     name: string;
     category: string;
@@ -84,6 +89,7 @@ export interface Tile {
     owner?: string;
 }
 export interface Room {
+    chaos?:ChaosState;
     trickCollectUntil: number;
     lastTrickTeam: number;
     triviaMaster?: string;
