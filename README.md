@@ -1,5 +1,7 @@
 # House Rules
 
+![House Rules poster: friends playing cards, charades, trivia and board games around a low-poly table](docs/images/house-rules-poster.png)
+
 A self-hosted TypeScript game-night sandbox. Low-poly 3D table and avatars, private hands, live shared rooms, and host-editable presets. Version 0.8 adds Trivia with 1,000 questions across ten categories and expands pair Charades to 1,900 prompts across 19 categories.
 
 ## Start on this machine
