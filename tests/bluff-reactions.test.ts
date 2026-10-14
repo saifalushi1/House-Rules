@@ -14,7 +14,7 @@ test('only the peeked-at player can slap within two seconds; cooldown lasts eigh
    const p=r.players[r.turn];act(r,p.id,{type:'play',cards:[p.hand[0].id],claim:r.claim});
    r.lastPlay!.expires=Date.now()-1;tick(r);
  }
- assert.equal(r.bluffPlays,8);assert.equal(act(r,'p0',{type:'peek',target:'p1'})?.peek?.length,3);
+ assert.equal(r.bluffPlays,8);assert.equal(act(r,'p0',{type:'peek',target:'p1'})?.peek,undefined);
 });
 test('late slap is rejected and repeated peeks cannot reset the reaction deadline',()=>{
  const r=setup();act(r,'p0',{type:'peek',target:'p1'});const deadline=r.players[0].catchUntil;

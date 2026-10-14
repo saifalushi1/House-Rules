@@ -40,7 +40,7 @@ export class GameAudio {
       case 'duelRound': this.noise(.1, .12, .6, 650); this.tone(85, .15, .12, 'sine', .6); break;
       case 'duelStart': case 'clash': this.tone(400, .35, 0, 'triangle'); this.tone(600, .35, .2, 'triangle'); break;
       case 'win': case 'duelEnd': [523, 659, 784, 1047].forEach((f, i) => this.tone(f, .35, i * .13, 'triangle')); break;
-      case 'correct': case 'tradeAccept': case 'trick': [523, 659, 784].forEach((f, i) => this.tone(f, .18, i * .1)); break;
+      case 'triviaCorrect': case 'correct': case 'tradeAccept': case 'trick': [523, 659, 784].forEach((f, i) => this.tone(f, .18, i * .1)); break;
       case 'buy': case 'sell': case 'lifeChoice': this.tone(800, .1); this.tone(1200, .18, .09); break;
       case 'play': case 'draw': case 'collect': this.noise(.09, 0, .4, 2200); break;
       case 'challenge': case 'catch': this.noise(.08); this.tone(220, .22, .06, 'sawtooth', .08); break;

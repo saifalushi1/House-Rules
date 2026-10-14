@@ -1,4 +1,6 @@
-export type Game = 'bluff' | 'tarneeb' | 'cards' | 'charades' | 'property' | 'life';
+import type {TriviaState,TriviaView} from "./trivia.js";
+import type {CharadeCategory} from "./charades.js";
+export type Game = 'bluff' | 'tarneeb' | 'cards' | 'charades' | 'trivia' | 'property' | 'life';
 export type Suit = '♠' | '♥' | '♦' | '♣';
 export interface Card {
     id: string;
@@ -22,6 +24,11 @@ export interface Rules {
     targetScore: number;
     challengeSeconds: number;
     reverseTurns: boolean;
+    triviaQuestions: number;
+    triviaSeconds: number;
+    triviaMode: "ffa" | "turns";
+    charadeMatchSeconds: number;
+    charadeCategory: CharadeCategory;
     charadeSeconds: number;
     allowSkipping: boolean;
     skipPenalty: number;
@@ -33,7 +40,7 @@ export interface Rules {
     roundLimit: number;
     customNotes: string;
 }
-export const defaults: Rules = { allowTrading: true, tradeSlaps: true, boxingDuels: true, game: 'bluff', background: 'forest', camera: 'third', maxPlayers: 8, allowPeeking: false, catchPeeking: true, penalty: 'Speak like a pirate until your next turn', decks: 1, handSize: 7, followSuit: true, targetScore: 31, challengeSeconds: 12, reverseTurns: false, charadeSeconds: 60, allowSkipping: true, skipPenalty: 0, charadePrompts: '', startingCash: 1500, salary: 200, rentMultiplier: 1, freeParking: true, roundLimit: 15, customNotes: '' };
+export const defaults: Rules = { allowTrading: true, tradeSlaps: true, boxingDuels: true, game: 'bluff', background: 'forest', camera: 'third', maxPlayers: 8, allowPeeking: false, catchPeeking: true, penalty: 'Speak like a pirate until your next turn', decks: 1, handSize: 7, followSuit: true, targetScore: 31, challengeSeconds: 12, reverseTurns: false, triviaQuestions: 10, triviaSeconds: 30, triviaMode: "ffa", charadeMatchSeconds: 300, charadeCategory: "animals", charadeSeconds: 60, allowSkipping: true, skipPenalty: 0, charadePrompts: '', startingCash: 1500, salary: 200, rentMultiplier: 1, freeParking: true, roundLimit: 15, customNotes: '' };
 export const games: Record<Game, {
     name: string;
     category: string;
@@ -44,7 +51,8 @@ export const games: Record<Game, {
     bluff: { name: 'Bluff', category: 'CARDS', description: 'Keep a straight face. Call their bluff. Lose all your cards.', icon: '♠', players: '2–8' },
     tarneeb: { name: 'Tarneeb', category: 'CARDS', description: 'Two teams. Thirteen tricks. One very confident bid.', icon: '♦', players: '4' },
     cards: { name: 'Card sandbox', category: 'CARDS', description: 'A deck, a table, and whatever rules your group invents.', icon: '♣', players: '1–8' },
-    charades: { name: 'Charades', category: 'PARTY', description: 'Act it out. Take a guess. Absolutely no words.', icon: '✦', players: '2–8' },
+    charades: { name: 'Charades', category: 'PARTY', description: 'Pair up. Beat the clock. Act it out without words.', icon: '✦', players: '2, 4, 6, 8' },
+    trivia: {name:'Trivia',category:'PARTY',description:'Pick a master. Ask a question. Race for the point.',icon:'★',players:'2–8'},
     property: { name: 'Block Party', category: 'TABLETOP', description: 'Buy the neighborhood. Collect rent. Make questionable deals.', icon: '⌂', players: '2–8' },
     life: { name: 'Life Paths', category: 'TABLETOP', description: 'Choose your path, chase a career, and see where life takes you.', icon: '⚑', players: '2–8' }
 };
@@ -58,6 +66,9 @@ export interface Player {
     cash: number;
     position: number;
     score: number;
+    peekRevealed: boolean;
+    peekRevealsAt: number;
+    correctAnswers: number;
     peekingUntil: number;
     peekTarget?: string;
     catchUntil: number;
@@ -75,6 +86,11 @@ export interface Tile {
 export interface Room {
     trickCollectUntil: number;
     lastTrickTeam: number;
+    triviaMaster?: string;
+    trivia?: TriviaState;
+    charadeMatchEnds: number;
+    charadeCorrect: number[];
+    charadeScores: number[];
     bluffPlays: number;
     gameInstance: number;
     endedEarly: boolean;
@@ -146,7 +162,8 @@ export interface Room {
 export type PublicPlayer = Omit<Player, 'hand'> & {
     handCount: number;
 };
-export type View = Omit<Room, 'players' | 'deck' | 'charadeBag' | 'lastPlay' | 'charade' | 'duel' | 'tradeOffers'> & {
+export type View = Omit<Room, 'players' | 'deck' | 'charadeBag' | 'lastPlay' | 'charade' | 'duel' | 'tradeOffers' | 'trivia'> & {
+    trivia?: TriviaView;
     tradeOffers: TradeOffer[];
     duel?: Omit<BoxingDuel, 'choices'> & { ready: string[] };
     players: PublicPlayer[];
@@ -176,4 +193,3 @@ export interface TradeOffer { id: string; from: string; to: string; giveCash: nu
 export interface TrumpClash { acePlayer: string; trumpPlayer: string; card: Card; expires: number }
 export interface BoxingDuel { acePlayer: string; trumpPlayer: string; card: Card; round: number; score: [number, number]; ends: number; choices: Record<string, BoxingMove> }
 export interface TableMessage { id: number; at: number; text: string }
-

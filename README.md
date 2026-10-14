@@ -1,6 +1,6 @@
 # House Rules
 
-A self-hosted TypeScript game-night sandbox. Low-poly 3D table and avatars, private hands, live shared rooms, and host-editable presets.
+A self-hosted TypeScript game-night sandbox. Low-poly 3D table and avatars, private hands, live shared rooms, and host-editable presets. Version 0.8 adds Trivia with 1,000 questions across ten categories and expands pair Charades to 1,900 prompts across 19 categories.
 
 ## Start on this machine
 
@@ -29,7 +29,8 @@ Use it with trusted friends. Room codes are lightweight invite gates, not accoun
 | Bluff / Bullshit | Deal the whole deck; claim A–K in sequence, play 1–4 hidden cards, timed challenges, liar or caller takes the pile, first empty hand wins after the challenge window. |
 | Tarneeb | Four seats, alternating partnerships, 7–13 auction, trump selection, optional follow-suit enforcement, trick winner, hand scoring, and target team score. |
 | Card sandbox | Private hands, draw, play face up, collect pile, pass turn. Your group decides the objective. |
-| Charades | Secret actor prompt, custom prompt list, timer, text guesses, actor-confirmed spoken guesses, skipping, scoring, turn rotation and round limit. Use an existing group call when apart. |
+| Charades | 2, 4, 6 or 8 players in pairs; 19 categories with 100 prompts each, custom prompts, prompt and match timers, partner guesses, spoken-answer awards, skipping and a final pair/personal recap. Use an existing group call when apart. |
+| Trivia | 2–8 players, a volunteer trivia master, ten categories with 100 questions each, timed rounds, typed or spoken answers, free-for-all or turn-based scoring, gold-star celebrations and a final scoreboard. |
 | Block Party | Original simplified property-trading game: 24 spaces, two dice, purchases, rent, tax pot, events, property sell-back, bankruptcy, and net-worth win. |
 | Life Paths | Original simplified life-path game: one die, career selection, safe/risky choices, events, cash, and round-limit win. |
 
@@ -37,17 +38,29 @@ The board presets are small original games inspired by property-trading and life
 
 Tarneeb uses the common scoring variation: a made bid scores tricks won, an unbid sweep scores 16, a made bid of 13 scores 26, a failed bid subtracts the contract, and defenders score their tricks when the contract fails. Regional rules vary. Reference: [Pagat's Tarneeb rules](https://www.pagat.com/auctionwhist/tarneeb.html).
 
+## Playing Trivia
+
+1. Select **Trivia** in the lobby and invite at least one other player (2–8 people total).
+2. One player volunteers as **Trivia master**. The master can be someone other than the room host and does not compete for points.
+3. In **House rules → Game rules**, the host chooses the number of questions, time per question, and **Free for all** or **Turn based**. Apply the rules and start the game.
+4. The master chooses the round category: General knowledge, Science & nature, Sports, History, Geography, Movies, Music, Television, Computers, or Video games.
+5. Contestants type answers while the timer runs. In free-for-all, the first correct answer wins the point. In turn-based play, only the active contestant can answer, and turns rotate each question.
+6. For answers spoken over your group call or in person, the master awards the point to the eligible contestant. The master sees the answer key, can skip questions, and advances after each result.
+
+Each correct answer gives one point, plays a success sound, and pops a gold star above the scorer. A timeout gives no point. After the configured questions, the scoreboard shows contestant totals and the winner or tied winners. The host can end early or restart. The full question bank is bundled with the server, so playing does not depend on an external trivia API.
+
 ## House rules
 
 The host can edit rules before a game or return everyone to the lobby to change them. Start Game applies the current draft. Apply House Rules shares a draft without starting.
 
 - General: player limit, default first/third-person view, reverse turns.
 - Cards: peeking, catching peekers, penalty text, deck count, hand size, challenge window, follow suit, target score.
-- Charades: custom prompts (one per line), time per prompt, skip toggle and penalty, rounds per player.
+- Charades: category, custom prompts (one per line), time per prompt, match time limit, skip toggle and penalty, rounds per player.
+- Trivia: questions per round (1–100), seconds per question (5–180), free-for-all or turn-based answers. The trivia master chooses the category after the game starts.
 - Boards: starting cash, Home bonus, round limit, rent multiplier, rest-stop jackpot.
 - Custom: written house contract and JSON rule import/export.
 
-Peeking reveals up to three cards for four seconds. Another player can catch the peeker during that window. The server announces the chosen funny penalty; the group carries it out. Text house rules are group agreements, not executable scripts. You can change your own camera during play.
+Peeking reveals up to three cards for four seconds. In Bluff with catching enabled, the target first gets a two-second slap reaction window; cards stay hidden until that window ends. A successful slap cancels the reveal and gives the peeker an eight-play cooldown. Tarneeb partners cannot peek at each other. The server announces the chosen funny penalty; the group carries it out. Text house rules are group agreements, not executable scripts. You can change your own camera during play.
 
 ## Development
 
@@ -82,6 +95,8 @@ npm start
 - `server/interactions.ts`: atomic trades, offer expiry, private boxing moves and duel outcomes.
 - `server/index.ts`: HTTP/static server, rooms, session resume, WebSocket connections, payload limits, heartbeat and rate limiting.
 - `server/engine.ts`: authoritative game rules, actions, private per-player views and timers.
+- `server/trivia.ts` and `server/trivia-bank.ts`: trivia roles, question timers, scoring, answer privacy and the bundled question bank.
+- `server/charade-prompts.ts` and `server/charade-extras.ts`: bundled charades collections.
 - `shared/types.ts`: TypeScript contracts and preset metadata.
 - `tests/`: rule, privacy and two-client integration tests.
 
@@ -91,7 +106,7 @@ Rooms are in memory. Restarting the server clears games. Disconnected rooms expi
 
 ## Verification
 
-46 automated tests pass, including a full 13-trick Tarneeb hand, challenge resolution, timer behavior, private views, validation, scoring, board actions and a real two-client reconnect flow. Browser checks cover room creation, joining, private deals, card selection/play, calling bluff, camera switching, enlarged board views, negotiation offers and refusals, and host rule editing.
+62 automated tests pass, including a full 13-trick Tarneeb hand, challenge resolution, timer behavior, private views, validation, scoring, board actions and a real two-client reconnect flow. Browser checks cover room creation, joining, private deals, card selection/play, calling bluff, camera switching, enlarged board views, negotiation offers and refusals, and host rule editing.
 
 ## Version 0.2: the table comes alive
 
@@ -153,3 +168,25 @@ Forest animals now stay at four fixed patches and repeat grazing or flower-sniff
 ## Version 0.6.1: speakeasy furniture clearance
 
 Patrons stand in open side aisles and clear patches beside the furniture. None stands inside a stool or side table. Collision verification samples every 100 ms across 90 seconds, checking each animated body against every static fixture with 20 cm clearance and against other patrons with 10 cm clearance. The existing table/player exclusion checks remain in place.
+
+
+## Version 0.7: pair charades and safe peeking
+
+Charades accepts 2, 4, 6 or 8 players. Adjacent lobby seats form pairs: 1+2, 3+4, 5+6, 7+8. Only the actor's partner may submit guesses or be awarded a spoken answer. Roles alternate through the seats. Correct answers count once for the pair and once for the guesser's personal correct-answer count. Skip penalties affect pair points without reducing the count of correct answers.
+
+Before starting, select one of ten categories under House rules → Game rules. Each category has 100 prompts (50 distinct scenes and 50 specific scenario twists), for a total of 1,000. Categories cover animals, jobs, sports, everyday life, food, travel, fantasy, objects, emotions, and celebrations. Custom prompts may override the category collection. The whole-match timer defaults to five minutes and can be set from 30 seconds to 20 minutes; the prompt timer is bounded by the match deadline. Skipping cannot extend the whole match. The recap lists your correct guesses and each pair's correct-answer total and points, including when the host ends early.
+
+In Bluff with catching enabled, peeking begins with a two-second reaction window. No target cards are sent to the peeker during that window. If the target does not slap, the server starts a fresh four-second reveal window. A slap cancels the reveal and retains the eight-play cooldown. During a slap involving your seat, first-person view briefly pulls back to show both characters and the impact, then returns to your seat. Other card games retain their four-second peek rules.
+
+
+## Version 0.8: expanded charades and Trivia
+
+Charades now has 19 categories with 100 prompts each (1,900 total). New categories: Countries, Brands, Fictional characters, Accents, Superheroes & villains, Cars, Anime, Historical figures, Movies & TV shows. Sports already had 100 prompts and remains available. The accents category is a voice round, with 50 accent settings and two performance scenarios each. Spoken guesses can be awarded by the actor to their partner. Other charades categories retain the normal pantomime rules.
+
+Trivia supports 2–8 people, including one master and at least one contestant. In the lobby, a player volunteers as the master; host and master may be different people. The host sets 1–100 questions per round, 5–180 seconds per question, and Free for all or Turn based under Game rules. Start the game, then the master chooses one of ten round categories, with 100 questions each: General knowledge, Science & nature, Sports, History, Geography, Movies, Music, Television, Computers, Video games.
+
+The master reads the question and sees the private answer key. Contestants see the question and shuffled answer choices. A correct typed answer earns one point automatically; capitalization, punctuation, accents and leading articles are normalized. Other phrasing may require a spoken-answer award. In Free for all, the first correct submission closes the question. In Turn based, only the active contestant can answer or receive a spoken-answer award; answering turns rotate each question, excluding the master. The master can award a point for a spoken answer, skip a question, or advance after resolution. Timeouts close without a point. Every correct answer pops a gold star above the scorer's model and plays a success sound. The final scoreboard excludes the master and names the highest scorer or a tie.
+
+Questions are bundled locally from [Open Trivia DB](https://opentdb.com/) and work without a live API. The imported data uses [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/); attribution and changes are documented in [server/TRIVIA-DATA-LICENSE.md](server/TRIVIA-DATA-LICENSE.md) and linked inside Trivia. The source is user-contributed. Seven dated or law-related questions were replaced during preparation. The master can review the key and skip an unsuitable question. The full question bank is never sent to clients. Only the master receives the answer key while a question is open; contestants see the answer after the question resolves.
+
+Implementation: server/trivia.ts owns roles, timers, scoring and private views; server/trivia-bank.ts contains 1,000 questions; shared/trivia.ts contains public category names and contracts; server/charade-extras.ts contains the new charades collections. Automated tests cover every category count, question-bank uniqueness and structure, role permissions, answer privacy, duplicate scoring, timeouts, turn rules, spoken awards, skips and game lifecycle. Browser checks cover guest master selection, typed and spoken scoring, active-player controls, star animation, results and the accents voice round.

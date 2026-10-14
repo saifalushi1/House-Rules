@@ -1,3 +1,4 @@
+import {charadeCategories} from "./charades.js";
 import { defaults, type Rules } from './types.js';
 
 /** Shared display order: Tarneeb aces are high within each suit. */
@@ -10,13 +11,15 @@ export function validateRules(input: unknown): Rules {
   const require = (ok: unknown, message: string) => { if (!ok) throw new Error(message); };
   require(input && typeof input === 'object', 'Invalid rules.');
   const x: Record<string, unknown> = { ...defaults, ...(input as Record<string, unknown>) };
-  require(['bluff', 'tarneeb', 'cards', 'charades', 'property', 'life'].includes(String(x.game)), 'Unknown game.');
+  require(['bluff', 'tarneeb', 'cards', 'charades', 'trivia', 'property', 'life'].includes(String(x.game)), 'Unknown game.');
   require(['first', 'third'].includes(String(x.camera)), 'Unknown camera.');
   require(['garage','forest','speakeasy'].includes(String(x.background)), 'Unknown background.');
-  const r = { ...defaults, game: x.game, camera: x.camera, background:x.background } as Rules;
+  require(typeof x.charadeCategory==='string' && Object.hasOwn(charadeCategories,x.charadeCategory), 'Unknown charades category.');
+  require(['ffa','turns'].includes(String(x.triviaMode)), 'Unknown trivia answer mode.');
+  const r = { ...defaults, game: x.game, camera: x.camera, background:x.background, charadeCategory:x.charadeCategory, triviaMode:x.triviaMode } as Rules;
   const ranges: Record<string, [number, number]> = {
     maxPlayers: [2, 8], decks: [1, 3], handSize: [1, 20], targetScore: [10, 100],
-    challengeSeconds: [5, 30], charadeSeconds: [15, 180], skipPenalty: [0, 5],
+    triviaQuestions: [1,100], triviaSeconds:[5,180], charadeMatchSeconds: [30,1200], challengeSeconds: [5, 30], charadeSeconds: [15, 180], skipPenalty: [0, 5],
     startingCash: [100, 10000], salary: [0, 2000], rentMultiplier: [.25, 5], roundLimit: [3, 50],
   };
   for (const [key, [min, max]] of Object.entries(ranges)) {

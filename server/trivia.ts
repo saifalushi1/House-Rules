@@ -1,0 +1,29 @@
+import {randomInt} from 'node:crypto';
+import {triviaCategories,type TriviaQuestion,type TriviaView} from '../shared/trivia.js';
+import type {Room,Player,Action} from '../shared/types.js';
+import {triviaBank} from './trivia-bank.js';
+import {emit} from './interactions.js';
+import {recordMessage} from './messages.js';
+function need(ok:unknown,message:string):asserts ok{if(!ok)throw Error(message);}
+function shuffle<T>(values:T[]):T[]{for(let i=values.length-1;i>0;i--){const j=randomInt(i+1);[values[i],values[j]]=[values[j],values[i]];}return values;}
+export const normalizeAnswer=(text:string)=>text.normalize('NFKD').replace(/\p{M}/gu,'').toLowerCase().replace(/^\s*(the|an|a)\s+/,'').replace(/&/g,'and').replace(/[^\p{L}\p{N}]/gu,'');
+export function initializeTrivia(r:Room){need(r.players.length>=2,'Trivia needs at least two people.');need(r.players.some(p=>p.id===r.triviaMaster&&p.connected),'Choose a trivia master in the lobby first.');r.trivia={master:r.triviaMaster!,phase:'choose',index:0,total:r.rules.triviaQuestions,ends:0,questions:[]};r.turn=r.players.findIndex(p=>p.id===r.triviaMaster);}
+export function triviaView(r:Room,id:string):TriviaView|undefined{const t=r.trivia;if(!t)return;const {questions:_,current,...publicState}=t;return {...publicState,current:current?{id:current.id,question:current.question,choices:[...current.choices],difficulty:current.difficulty,...(id===t.master||t.phase==='result'||r.phase==='finished'?{answer:current.answer}:{})}:undefined};}
+function finish(r:Room){const contestants=r.players.filter(p=>p.id!==r.trivia!.master),best=Math.max(...contestants.map(p=>p.score)),winners=contestants.filter(p=>p.score===best);r.phase='finished';r.winner=winners.map(p=>p.name).join(' + ')+(winners.length>1?' (tie)':'');emit(r,'win',undefined,undefined,{winner:r.winner});recordMessage(r,`Trivia complete. ${r.winner} wins with ${best} ${best===1?'point':'points'}.`);}
+function ask(r:Room){const t=r.trivia!;t.current=t.questions[t.index];t.phase='question';t.winner=undefined;t.reason=undefined;t.ends=Date.now()+r.rules.triviaSeconds*1000;const contestants=r.players.filter(p=>p.id!==t.master);t.activePlayer=r.rules.triviaMode==='turns'?contestants[t.index%contestants.length].id:undefined;r.turn=r.players.findIndex(p=>p.id===(t.activePlayer||t.master));emit(r,'triviaQuestion',t.master,undefined,{number:t.index+1,total:t.total});recordMessage(r,`Trivia question ${t.index+1} of ${t.total} · ${triviaCategories[t.category!]}.`);}
+function resolve(r:Room,winner:string|undefined,reason:'correct'|'awarded'|'timeout'|'skipped'){const t=r.trivia!;t.phase='result';t.ends=0;t.winner=winner;t.reason=reason;if(winner){const p=r.players.find(p=>p.id===winner)!;p.score++;p.correctAnswers++;emit(r,'triviaCorrect',p.id,undefined,{points:p.score});recordMessage(r,`${p.name} gets the point! Answer: ${t.current!.answer}.`);}else{emit(r,'triviaResult',t.master,undefined,{reason});recordMessage(r,`${reason==='timeout'?'Time is up':'Question skipped'}. Answer: ${t.current!.answer}.`);}if(t.index+1>=t.total)finish(r);}
+export function tickTrivia(r:Room){if(r.rules.game==='trivia'&&r.phase==='playing'&&r.trivia?.phase==='question'&&Date.now()>=r.trivia.ends){resolve(r,undefined,'timeout');return true;}return false;}
+export function handleTrivia(r:Room,p:Player,a:Action){
+ if(!['triviaVolunteer','triviaBegin','triviaAnswer','triviaAward','triviaNext','triviaSkip'].includes(a.type))return false;
+ need(r.rules.game==='trivia','Choose Trivia first.');
+ if(a.type==='triviaVolunteer'){need(r.phase==='lobby','Choose the master before starting.');if(r.triviaMaster&&!r.players.some(q=>q.id===r.triviaMaster))r.triviaMaster=undefined;need(!r.triviaMaster||r.triviaMaster===p.id,'Someone else is already the trivia master.');r.triviaMaster=r.triviaMaster===p.id?undefined:p.id;recordMessage(r,r.triviaMaster?`${p.name} volunteers as trivia master.`:`${p.name} releases the trivia master seat.`);return true;}
+ need(r.phase==='playing'&&r.trivia,'Start Trivia first.');const t=r.trivia;
+ if(a.type==='triviaBegin'){need(p.id===t.master&&t.phase==='choose','Only the master can select the round category.');need(typeof a.category==='string'&&Object.hasOwn(triviaCategories,a.category),'Choose a trivia category.');t.category=a.category as keyof typeof triviaCategories;t.questions=shuffle(triviaBank[t.category].map(q=>({id:q.id,question:q.question,answer:q.answer,choices:shuffle([...q.choices]),difficulty:q.difficulty} satisfies TriviaQuestion))).slice(0,t.total);ask(r);return true;}
+ if(a.type==='triviaNext'){need(p.id===t.master&&t.phase==='result','Only the master can advance a resolved question.');need(t.index+1<t.total,'The round is complete.');t.index++;ask(r);return true;}
+ need(t.phase==='question'&&t.current,'This question is already closed.');if(Date.now()>=t.ends){resolve(r,undefined,'timeout');return true;}
+ if(a.type==='triviaSkip'){need(p.id===t.master,'Only the master can skip a question.');resolve(r,undefined,'skipped');return true;}
+ if(a.type==='triviaAward'){need(p.id===t.master,'Only the master can award spoken answers.');const winner=r.players.find(q=>q.id===a.target&&q.id!==t.master&&q.connected);need(winner&&(!t.activePlayer||winner.id===t.activePlayer),'Choose an eligible contestant.');resolve(r,winner.id,'awarded');return true;}
+ need(a.type==='triviaAnswer'&&p.id!==t.master,'The master cannot compete.');need(!t.activePlayer||t.activePlayer===p.id,'Wait for your answering turn.');need(typeof a.text==='string'&&a.text.trim().length>0&&a.text.length<=300,'Type an answer up to 300 characters.');
+ if(normalizeAnswer(a.text)===normalizeAnswer(t.current.answer)){resolve(r,p.id,'correct');}else{recordMessage(r,`${p.name} guesses: ${a.text.trim()} — try again.`);}
+ return true;
+}

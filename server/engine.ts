@@ -1,3 +1,5 @@
+import {handleTrivia,initializeTrivia,tickTrivia,triviaView} from "./trivia.js";
+import {charadePrompts} from "./charade-prompts.js";
 import { emit, handleInteraction, tickInteractions } from './interactions.js';
 import { recordMessage } from './messages.js';
 import { validateRules } from '../shared/rules.js';
@@ -12,8 +14,8 @@ export function shuffle<T>(list: T[]): T[] { for (let i = list.length - 1; i > 0
     [list[i], list[j]] = [list[j], list[i]];
 } return list; }
 export function makeDeck(count = 1): Card[] { return shuffle(Array.from({ length: count }, (_, d) => suits.flatMap(suit => Array.from({ length: 13 }, (_, i) => ({ id: `${d}-${suit}-${i + 1}`, rank: i + 1, suit })))).flat()); }
-export function player(id: string, name: string, index: number): Player { return { id, name: name.trim().slice(0, 24) || 'Guest', color: colors[index % 8], connected: true, ready: false, hand: [], cash: 0, position: 0, score: 0, peekingUntil: 0, catchUntil: 0, peekBlockedUntil: 0, bankrupt: false, career: '' }; }
-export function makeRoom(code: string, host: string): Room { return { trickCollectUntil:0, lastTrickTeam:0, bluffPlays: 0, gameInstance: 0, endedEarly: false, messageSequence: 1, messages: [{id:1, at:Date.now(), text:'A new table. A fresh set of rules.'}], events: [], eventSequence: 0, busyUntil: 0, rollDice: [], tradeOffers: [], deniedTrumps: [], code, host, players: [], rules: { ...defaults }, phase: 'lobby', turn: 0, deck: [], pile: [], log: ['A new table. A fresh set of rules.'], round: 1, claim: 1, trick: [], tricks: [0, 0], teamScores: [0, 0], bid: 6, passes: 0, bidPassed: [], tarneebPhase: 'bid', trump: '♠', tiles: [], rolled: false, lastRoll: 0, charadeBag: [], boardPot: 0 }; }
+export function player(id: string, name: string, index: number): Player { return { id, name: name.trim().slice(0, 24) || 'Guest', color: colors[index % 8], connected: true, ready: false, hand: [], cash: 0, position: 0, score: 0, peekRevealed: false, peekRevealsAt: 0, correctAnswers: 0, peekingUntil: 0, catchUntil: 0, peekBlockedUntil: 0, bankrupt: false, career: '' }; }
+export function makeRoom(code: string, host: string): Room { return { charadeMatchEnds:0, charadeCorrect:[], charadeScores:[], trickCollectUntil:0, lastTrickTeam:0, bluffPlays: 0, gameInstance: 0, endedEarly: false, messageSequence: 1, messages: [{id:1, at:Date.now(), text:'A new table. A fresh set of rules.'}], events: [], eventSequence: 0, busyUntil: 0, rollDice: [], tradeOffers: [], deniedTrumps: [], code, host, players: [], rules: { ...defaults }, phase: 'lobby', turn: 0, deck: [], pile: [], log: ['A new table. A fresh set of rules.'], round: 1, claim: 1, trick: [], tricks: [0, 0], teamScores: [0, 0], bid: 6, passes: 0, bidPassed: [], tarneebPhase: 'bid', trump: '♠', tiles: [], rolled: false, lastRoll: 0, charadeBag: [], boardPot: 0 }; }
 export function note(r: Room, msg: string) { recordMessage(r, msg); }
 export function next(r: Room) { const dir = r.rules.reverseTurns ? -1 : 1; for (let i = 0; i < r.players.length; i++) {
     r.turn = (r.turn + dir + r.players.length) % r.players.length;
@@ -25,15 +27,21 @@ function need(ok: unknown, msg: string): asserts ok { if (!ok)
     throw new Error(msg); }
 function num(x: unknown, min: number, max: number) { need(typeof x === 'number' && Number.isFinite(x) && x >= min && x <= max, 'Parameter outside its allowed range.'); return x; }
 function dealTarneeb(r: Room) { r.deck = makeDeck(); r.players.forEach(p => { p.hand = r.deck.splice(0, 13); }); r.bid = 6; r.bidder = undefined; r.bidPassed = []; r.passes = 0; r.tarneebPhase = 'bid'; r.tricks = [0, 0]; r.trick = []; r.lastTrick = undefined; r.trickCollectUntil=0; r.lastTrickTeam=0; }
-const prompts = ['Walking on the moon', 'A penguin at a job interview', 'Making a pizza', 'A knight afraid of a dragon', 'Trying to catch a bus', 'An invisible dog', 'A very dramatic chef', 'Getting stuck in an elevator', 'A robot learning to dance', 'A cat knocking over a glass', 'Winning the lottery', 'A pirate doing yoga', 'A magician losing a rabbit', 'Building a sandcastle', 'A sleepy superhero', 'Riding a roller coaster', 'Finding a spider in your shoe', 'An astronaut making tea', 'A dinosaur at the dentist', 'Carrying too many groceries', 'Bowling', 'Swimming through jelly', 'A broken umbrella', 'A detective finding a clue'];
+const pairOf=(r:Room,id:string)=>Math.floor(r.players.findIndex(p=>p.id===id)/2);
+function finishCharades(r:Room){const high=Math.max(...r.charadeScores),winners=r.charadeScores.flatMap((score,i)=>score===high?[i+1]:[]);r.charade=undefined;finish(r,winners.length===1?'Pair '+winners[0]:'Pairs '+winners.join(' + ')+' (tie)');}
+function advanceCharades(r:Room){next(r);if(Date.now()>=r.charadeMatchEnds || r.round>r.rules.roundLimit)finishCharades(r);else newPrompt(r);}
 function newPrompt(r: Room) { if (!r.charadeBag.length)
-    r.charadeBag = shuffle(r.rules.charadePrompts.trim() ? r.rules.charadePrompts.split('\n').map(s => s.trim()).filter(Boolean) : [...prompts]); r.charade = { prompt: r.charadeBag.pop()!, ends: Date.now() + r.rules.charadeSeconds * 1000, actor: r.players[r.turn].id }; }
+    r.charadeBag = shuffle(r.rules.charadePrompts.trim() ? r.rules.charadePrompts.split('\n').map(s => s.trim()).filter(Boolean) : [...charadePrompts[r.rules.charadeCategory]]); r.charade = { prompt: r.charadeBag.pop()!, ends: Math.min(r.charadeMatchEnds,Date.now() + r.rules.charadeSeconds * 1000), actor: r.players[r.turn].id }; }
 export function start(r: Room) {
     need(r.phase === 'lobby', 'Return to the lobby before starting.');
     const min = r.rules.game === 'cards' ? 1 : 2;
     need(r.players.length >= min, `This game needs at least ${min} players.`);
     need(r.players.every(p => p.connected), 'Wait for disconnected players or remove them.');
     need(r.rules.game !== 'tarneeb' || r.players.length === 4, 'Tarneeb needs exactly four players, with partners across the table.');
+    need(r.rules.game !== 'charades' || [2,4,6,8].includes(r.players.length), 'Charades needs 2, 4, 6 or 8 players in pairs.');
+    need(r.rules.game!=='trivia'||r.players.some(p=>p.id===r.triviaMaster&&p.connected),'Choose a trivia master before starting.');
+    r.trivia=undefined;
+    r.charadeMatchEnds=r.rules.game==='charades'?Date.now()+r.rules.charadeMatchSeconds*1000:0;r.charadeCorrect=Array(r.players.length/2|0).fill(0);r.charadeScores=Array(r.players.length/2|0).fill(0);
     r.bluffPlays = 0; r.tradeOffers = []; r.clash = undefined; r.duel = undefined; r.deniedTrumps = []; r.busyUntil = 0; r.rollDice = [];
     r.gameInstance++;
     r.endedEarly = false;
@@ -53,7 +61,7 @@ export function start(r: Room) {
     r.boardPot = 0;
     r.pendingLife = undefined;
     r.charadeBag = [];
-    r.players.forEach(p => { p.hand = []; p.score = 0; p.cash = r.rules.startingCash; p.position = 0; p.bankrupt = false; p.career = ''; p.peekingUntil = 0; p.catchUntil = 0; p.peekTarget = undefined; p.peekBlockedUntil = 0; });
+    r.players.forEach(p => { p.hand = []; p.score = 0; p.cash = r.rules.startingCash; p.position = 0; p.bankrupt = false; p.career = ''; p.peekRevealed=false; p.peekRevealsAt = 0; p.correctAnswers = 0; p.peekingUntil = 0; p.catchUntil = 0; p.peekTarget = undefined; p.peekBlockedUntil = 0; });
     if (r.rules.game === 'tarneeb')
         dealTarneeb(r);
     else if (r.rules.game === 'bluff') {
@@ -69,6 +77,7 @@ export function start(r: Room) {
     }
     else if (r.rules.game === 'charades')
         newPrompt(r);
+    if(r.rules.game==='trivia')initializeTrivia(r);
     r.tiles = Array.from({ length: 24 }, (_, i) => ({ name: i === 0 ? 'Home' : i % 6 === 0 ? 'Rest stop' : i % 5 === 0 ? 'Plot twist' : i % 7 === 0 ? 'Taxes' : ['Maple Lane', 'Moon Market', 'Cedar Grove', 'Sunset Row', 'King’s Court', 'Cloud Corner'][i % 6], type: i === 0 ? 'start' : i % 6 === 0 ? 'rest' : i % 5 === 0 ? 'event' : i % 7 === 0 ? 'tax' : 'property', price: 100 + Math.floor(i / 3) * 50, rent: 20 + Math.floor(i / 3) * 10 }));
     note(r, `${r.players[0].name} opens the game. House rules are locked for this round.`);
 }
@@ -80,11 +89,13 @@ else if (r.round > r.rules.roundLimit) {
     finish(r, winner.name);
 } }
 export function worth(r: Room, p: Player) { return p.cash + r.tiles.filter(t => t.owner === p.id).reduce((n, t) => n + t.price, 0); }
-export function view(r: Room, id: string): View { const { deck, players, lastPlay, charadeBag: _, charade, duel, tradeOffers, ...publicRoom } = r; return { ...publicRoom, tradeOffers: tradeOffers.filter(t => t.from === id || t.to === id), duel: duel ? { acePlayer: duel.acePlayer, trumpPlayer: duel.trumpPlayer, card: duel.card, round: duel.round, score: duel.score, ends: duel.ends, ready: Object.keys(duel.choices) } : undefined, players: players.map(({ hand, ...p }) => ({ ...p, handCount: hand.length })), hand: players.find(p => p.id === id)?.hand || [], deckCount: deck.length, pileCount: r.pile.length, lastPlay: lastPlay ? { player: lastPlay.player, count: lastPlay.cards.length, claim: lastPlay.claim, expires: lastPlay.expires } : undefined, charade: charade ? { actor: charade.actor, ends: charade.ends, ...(id === charade.actor ? { prompt: charade.prompt } : {}) } : undefined, pile: r.rules.game === 'bluff' ? [] : r.pile }; }
+export function view(r: Room, id: string): View { const { deck, players, lastPlay, charadeBag: _, charade, duel, tradeOffers, trivia: privateTrivia, ...publicRoom } = r; const me=players.find(p=>p.id===id);const visiblePeek=r.phase==='playing'&&me&&me.peekTarget&&me.peekRevealed&&me.peekRevealsAt<=Date.now()&&me.peekingUntil>Date.now()?players.find(p=>p.id===me.peekTarget)?.hand.slice(0,3):undefined;return { ...publicRoom, trivia:triviaView(r,id), peek:visiblePeek, tradeOffers: tradeOffers.filter(t => t.from === id || t.to === id), duel: duel ? { acePlayer: duel.acePlayer, trumpPlayer: duel.trumpPlayer, card: duel.card, round: duel.round, score: duel.score, ends: duel.ends, ready: Object.keys(duel.choices) } : undefined, players: players.map(({ hand, ...p }) => ({ ...p, handCount: hand.length })), hand: players.find(p => p.id === id)?.hand || [], deckCount: deck.length, pileCount: r.pile.length, lastPlay: lastPlay ? { player: lastPlay.player, count: lastPlay.cards.length, claim: lastPlay.claim, expires: lastPlay.expires } : undefined, charade: charade ? { actor: charade.actor, ends: charade.ends, ...(id === charade.actor ? { prompt: charade.prompt } : {}) } : undefined, pile: r.rules.game === 'bluff' ? [] : r.pile }; }
 export function tick(r: Room) {
     if (r.phase !== 'playing')
         return false;
-    let peekChanged=false;if(r.trickCollectUntil && r.trickCollectUntil<=Date.now()){r.trickCollectUntil=0;peekChanged=true;}for(const p of r.players){if(p.peekingUntil && p.peekingUntil<=Date.now()){p.peekingUntil=0;p.catchUntil=0;p.peekTarget=undefined;peekChanged=true;}}
+    if(tickTrivia(r))return true;
+    if(r.rules.game==='charades' && Date.now()>=r.charadeMatchEnds){finishCharades(r);return true;}
+    let peekChanged=false;if(r.trickCollectUntil && r.trickCollectUntil<=Date.now()){r.trickCollectUntil=0;peekChanged=true;}for(const p of r.players){if(p.peekTarget&&!p.peekRevealed&&p.peekRevealsAt<=Date.now()&&p.peekingUntil>Date.now()){p.peekRevealed=true;p.peekingUntil=Date.now()+4000;peekChanged=true;}if(p.catchUntil && p.catchUntil<=Date.now()){p.catchUntil=0;peekChanged=true;}if(p.peekingUntil && p.peekingUntil<=Date.now()){p.peekingUntil=0;p.catchUntil=0;p.peekTarget=undefined;peekChanged=true;}}
     const interactionChanged = tickInteractions(r, commitTarneeb);
     if (r.rules.game === 'bluff' && r.lastPlay && Date.now() >= r.lastPlay.expires) {
         const p = r.players.find(p => p.id === r.lastPlay!.player)!;
@@ -96,11 +107,7 @@ export function tick(r: Room) {
     if (r.rules.game === 'charades' && r.charade && Date.now() >= r.charade.ends) {
         emit(r, 'timeout', r.charade.actor);
         note(r, `Time! The prompt was “${r.charade.prompt}”.`);
-        next(r);
-        if (r.round > r.rules.roundLimit)
-            finish(r, [...r.players].sort((a, b) => b.score - a.score)[0].name);
-        else
-            newPrompt(r);
+        advanceCharades(r);
         return true;
     }
     return interactionChanged || peekChanged;
@@ -110,10 +117,12 @@ function actInternal(r: Room, id: string, a: Action): {
 } | void {
     const p = r.players.find(p => p.id === id);
     need(p, 'Join this room first.');
+    if(handleTrivia(r,p,a))return;
     if (a.type === 'endGame') {
         need(r.host === id && r.phase === 'playing', 'Only the host can end an active game.');
         r.phase = 'finished'; r.endedEarly = true; r.winner = undefined;
         r.clash = undefined; r.duel = undefined; r.tradeOffers = []; r.lastPlay = undefined;
+        if(r.trivia){r.trivia.phase="result";r.trivia.ends=0;}
         r.charade = undefined; r.pendingLife = undefined; r.busyUntil = 0;
         note(r, `${p.name} ended the game early. No winner was declared.`);
         return;
@@ -124,6 +133,8 @@ function actInternal(r: Room, id: string, a: Action): {
         need(r.players.length >= (r.rules.game === 'cards' ? 1 : 2), 'Invite enough players first.');
         need(r.rules.game !== 'tarneeb' || r.players.length === 4, 'Tarneeb needs four players.');
         need(r.rules.game !== 'cards' || r.rules.handSize * r.players.length <= 52 * r.rules.decks, 'The deck is too small.');
+        need(r.rules.game !== 'charades' || [2,4,6,8].includes(r.players.length), 'Charades needs 2, 4, 6 or 8 players in pairs.');
+        need(r.rules.game!=='trivia'||r.players.some(q=>q.id===r.triviaMaster&&q.connected),'Choose a trivia master in the lobby.');
         r.phase = 'lobby'; start(r);
         note(r, `${p.name} restarted the game with the same house rules.`);
         return;
@@ -153,6 +164,8 @@ function actInternal(r: Room, id: string, a: Action): {
             need(r.players.length >= (proposed.game === 'cards' ? 1 : 2), 'Invite more players before starting.');
             need(r.players.every(p => p.connected), 'Wait for disconnected players or remove them.');
             need(proposed.game !== 'tarneeb' || r.players.length === 4, 'Tarneeb needs exactly four players.');
+            need(proposed.game !== "charades" || [2,4,6,8].includes(r.players.length), "Charades needs 2, 4, 6 or 8 players in pairs.");
+            need(proposed.game!=="trivia"||r.players.some(q=>q.id===r.triviaMaster&&q.connected),"Choose a trivia master before starting.");
             r.rules = proposed;
         }
         if (r.rules.game === 'cards')
@@ -163,6 +176,7 @@ function actInternal(r: Room, id: string, a: Action): {
     if (a.type === 'lobby') {
         need(r.host === id, 'Only the host can return to the lobby.');
         r.tradeOffers = []; r.clash = undefined; r.duel = undefined; r.busyUntil = 0;
+        r.trivia=undefined;
         r.phase = 'lobby';
         r.players.forEach(p => { p.hand = []; p.ready = false; });
         r.deck = [];
@@ -184,6 +198,7 @@ function actInternal(r: Room, id: string, a: Action): {
         return;
     }
     need(r.phase === 'playing', 'Start a game first.');
+    if(r.rules.game==='charades' && Date.now()>=r.charadeMatchEnds){finishCharades(r);return;}
     if (a.type === 'peek') {
         need(r.rules.allowPeeking && ['bluff', 'tarneeb', 'cards'].includes(r.rules.game), 'Peeking is disabled.');
         const target = r.players.find(q => q.id === a.target);
@@ -193,9 +208,12 @@ function actInternal(r: Room, id: string, a: Action): {
         need(p.peekingUntil <= Date.now(), "Finish your current peek first.");
         need(r.rules.game !== "bluff" || p.peekBlockedUntil <= r.bluffPlays, `Peek cooldown: ${p.peekBlockedUntil-r.bluffPlays} hands left.`);
         p.peekTarget = target.id;
-        p.catchUntil = Date.now() + (r.rules.game === "bluff" ? 2000 : 4000);
-        p.peekingUntil = Date.now() + 4000;
-        return { peek: target.hand.slice(0, 3) };
+        const delay=r.rules.game==='bluff'&&r.rules.catchPeeking?2000:0;
+        p.peekRevealed=!delay;
+        p.peekRevealsAt=Date.now()+delay;
+        p.catchUntil=delay?p.peekRevealsAt:r.rules.game==='bluff'?0:Date.now()+4000;
+        p.peekingUntil=p.peekRevealsAt+4000;
+        if(!delay)return { peek: target.hand.slice(0, 3) };return;
     }
     if (a.type === 'catch') {
         need(r.rules.allowPeeking && r.rules.catchPeeking, 'Catching peekers is disabled.');
@@ -203,7 +221,7 @@ function actInternal(r: Room, id: string, a: Action): {
         need(target && target.id !== id, 'Choose another player.');
         need(target.peekingUntil > Date.now(), 'They are not peeking right now.');
         need(r.rules.game !== "bluff" || (target.peekTarget === id && target.catchUntil > Date.now()), "Your two-second slap opportunity has closed.");
-        target.peekingUntil = 0; target.catchUntil = 0; target.peekTarget = undefined;
+        target.peekRevealed=false; target.peekRevealsAt=0; target.peekingUntil = 0; target.catchUntil = 0; target.peekTarget = undefined;
         if(r.rules.game === "bluff") { target.peekBlockedUntil = r.bluffPlays + 8; emit(r,"slap",id,target.id,{reason:"peek",hands:8}); }
         note(r, `${p.name} caught ${target.name} peeking! Penalty: ${r.rules.penalty || 'Do your best victory dance'}.`);
         return;
@@ -229,34 +247,29 @@ function actInternal(r: Room, id: string, a: Action): {
     if (a.type === 'guess') {
         need(r.rules.game === 'charades' && r.charade, 'No active prompt.');
         need(id !== r.charade.actor, 'The actor cannot guess.');
+        need(pairOf(r,id)===pairOf(r,r.charade.actor),'Only the actor’s partner can guess.');
+        need(Date.now()<r.charade.ends,'The prompt timer has ended.');
         need(typeof a.text === 'string' && a.text.trim(), 'Enter a guess.');
         const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, '');
         const correct = norm(a.text) === norm(r.charade.prompt);
         note(r, `${p.name} guesses: ${a.text.slice(0, 100)}${correct ? ' ✓' : ''}`);
         if (correct) {
-            p.score++;
+            p.score++; p.correctAnswers++;r.charadeCorrect[pairOf(r,id)]++;r.charadeScores[pairOf(r,id)]++;
             r.players[r.turn].score++;
             note(r, `Correct! The prompt was “${r.charade.prompt}”.`);
-            next(r);
-            if (r.round > r.rules.roundLimit)
-                finish(r, [...r.players].sort((a, b) => b.score - a.score)[0].name);
-            else
-                newPrompt(r);
+            advanceCharades(r);
         }
         return;
     }
     if (a.type === 'award') {
         need(r.rules.game === 'charades' && r.charade && id === r.charade.actor, 'Only the actor can confirm a spoken answer.');
         const guesser = r.players.find(q => q.id === a.target);
-        need(guesser && guesser.id !== id, 'Choose the player who guessed.');
-        guesser.score++;
+        need(guesser && guesser.id !== id && pairOf(r,guesser.id)===pairOf(r,id), 'Choose your partner who guessed.');
+        need(Date.now()<r.charade.ends,'The prompt timer has ended.');
+        guesser.score++;guesser.correctAnswers++;r.charadeCorrect[pairOf(r,id)]++;r.charadeScores[pairOf(r,id)]++;
         p.score++;
         note(r, `${guesser.name} guessed “${r.charade.prompt}”!`);
-        next(r);
-        if (r.round > r.rules.roundLimit)
-            finish(r, [...r.players].sort((a, b) => b.score - a.score)[0].name);
-        else
-            newPrompt(r);
+        advanceCharades(r);
         return;
     }
     need(!r.clash && !r.duel, 'Resolve the boxing challenge first.');
@@ -264,7 +277,7 @@ function actInternal(r: Room, id: string, a: Action): {
     need(r.players[r.turn]?.id === id, 'It is not your turn.');
     if (a.type === 'skip') {
         need(r.rules.game === 'charades' && r.rules.allowSkipping, 'Skipping is disabled.');
-        p.score -= r.rules.skipPenalty;
+        p.score -= r.rules.skipPenalty; r.charadeScores[pairOf(r,id)]-=r.rules.skipPenalty;
         note(r, `${p.name} skipped “${r.charade?.prompt}”.`);
         newPrompt(r);
         return;
@@ -502,6 +515,7 @@ export function act(r: Room, id: string, a: Action): { peek?: Card[] } | void {
     const challenged = a.type === "challenge" && r.lastPlay ? {player:r.lastPlay.player, liar:r.lastPlay.cards.some(c=>c.rank!==r.lastPlay!.claim), cards:r.lastPlay.cards.map(c=>({...c})), count:r.pile.length} : undefined;
     const allPassed = a.type === 'bid' && a.value === 0 && r.bidPassed.length === 3 && !r.bidder;
     const result = actInternal(r, id, a);
+    if(a.type.startsWith('trivia'))return result;
     if (['tradeOffer','tradeAccept','tradeReject','tradeCancel','box','allowTrump','punch'].includes(a.type)) return result;
     let kind = a.type === 'bid' && a.value === 0 && !allPassed ? 'bidPass' : a.type;
     const data: Record<string, unknown> = {};
@@ -523,7 +537,3 @@ export function act(r: Room, id: string, a: Action): { peek?: Card[] } | void {
     emit(r, kind, id, typeof a.target === 'string' ? a.target : undefined, data);
     return result;
 }
-
-
-
-
