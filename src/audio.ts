@@ -30,6 +30,15 @@ export class GameAudio {
   play(e: GameEvent) {
     if(chaosSound(this,e))return;
     switch (e.kind) {
+      case 'scribbleInk':this.noise(.035,0,.08,2400);break;
+      case 'rpgRoll': case 'rpgInitiative':for(let i=0;i<8;i++)this.noise(.08,i*.11,.3,700);this.tone(110,.2,.9);break;
+      case 'rpgAttack':case 'raidBeat':this.noise(.12,0,.5,600);this.tone(90,.2);break;
+      case 'rpgSpell':[440,660,880,1320].forEach((f,i)=>this.tone(f,.2,i*.08));this.noise(.4,0,.2,3000);break;
+      case 'rpgHeal':case 'scribbleCorrect':case 'rpgVictory':case 'raidEnd':[523,659,784,1047].forEach((f,i)=>this.tone(f,.2,i*.1));break;
+      case 'rpgMove':this.tone(200,.05);this.tone(260,.05,.15);break;
+      case 'solitaireDraw':case 'solitaireMove':case 'scribbleClear':this.noise(.12,0,.25,1800);break;
+      case 'raidStart':this.tone(500,.3);this.tone(750,.3,.2);break;
+      case 'raidDecline':case 'rpgDefeat':this.tone(330,.25);this.tone(220,.3,.2);break;
       case 'deal':
         for (let i = 0; i < 10; i++) this.noise(.06, i * .09, .25, 1700);
         for (let i = 0; i < 18; i++) this.noise(.04, 1.1 + i * .095, .18, 2400);

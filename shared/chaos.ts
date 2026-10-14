@@ -1,4 +1,5 @@
 export const chaosRules = {
+  chaosRaid:['Winner Takes It','Challenge an opponent to a three-beat duel. Winner takes their hand (swap), score or money.'],
   chaosHotPotato:['Hot Potato','A shrinking turn timer; expiry gives a random penalty or forces a legal action.'],
   chaosSeatRoulette:['Seat Roulette','Swap physical seats every N turns; keep hands or leave them at the seat.'],
   chaosCyclone:['Cyclone','Pass hands at safe round boundaries; other games pass chaos points.'],

@@ -1,3 +1,7 @@
+import {initSolitaire,solitaireView,handleSolitaire} from './solitaire.js';
+import {initScribble,scribbleView,handleScribble,tickScribble} from './scribble.js';
+import {initRpg,handleRpg} from './rpg.js';
+import {handleRaid,tickRaid} from './raid.js';
 import {initChaos,chaosWord,chaosBefore,chaosAfter,tickChaos,handleChaos,saveChaosAction,commitChaosAction,checkBanned,chaosGuard,invalidateChaos,chaosPenaltiesForAction,takeChaosForcedAction,chaosPenalty} from './chaos.js';
 import {handleTrivia,initializeTrivia,tickTrivia,triviaView} from "./trivia.js";
 import {charadePrompts} from "./charade-prompts.js";
@@ -35,13 +39,14 @@ function newPrompt(r: Room) { if (!r.charadeBag.length)
     r.charadeBag = shuffle(r.rules.charadePrompts.trim() ? r.rules.charadePrompts.split('\n').map(s => s.trim()).filter(Boolean) : [...charadePrompts[r.rules.charadeCategory]]); r.charade = { prompt: r.charadeBag.pop()!, ends: Math.min(r.charadeMatchEnds,Date.now() + r.rules.charadeSeconds * 1000), actor: r.players[r.turn].id }; }
 export function start(r: Room) {
     need(r.phase === 'lobby', 'Return to the lobby before starting.');
-    const min = r.rules.game === 'cards' ? 1 : 2;
+    const min = ['cards','rpg'].includes(r.rules.game) ? 1 : 2;
+    need(r.rules.game!=='cards'||r.rules.cardLayout!=='solitaire'||r.players.length===1,'Solitaire needs exactly one player.');
     need(r.players.length >= min, `This game needs at least ${min} players.`);
     need(r.players.every(p => p.connected), 'Wait for disconnected players or remove them.');
     need(r.rules.game !== 'tarneeb' || r.players.length === 4, 'Tarneeb needs exactly four players, with partners across the table.');
     need(r.rules.game !== 'charades' || [2,4,6,8].includes(r.players.length), 'Charades needs 2, 4, 6 or 8 players in pairs.');
-    need(r.rules.game!=='trivia'||r.players.some(p=>p.id===r.triviaMaster&&p.connected),'Choose a trivia master before starting.');
-    r.trivia=undefined;
+    need(r.rules.game!=='trivia'||r.rules.triviaHostMode==='everyone'||r.players.some(p=>p.id===r.triviaMaster&&p.connected),'Choose a trivia master before starting.');
+    r.trivia=undefined;r.solitaire=undefined;r.scribble=undefined;r.raid=undefined;
     r.charadeMatchEnds=r.rules.game==='charades'?Date.now()+r.rules.charadeMatchSeconds*1000:0;r.charadeCorrect=Array(r.players.length/2|0).fill(0);r.charadeScores=Array(r.players.length/2|0).fill(0);
     r.bluffPlays = 0; r.tradeOffers = []; r.clash = undefined; r.duel = undefined; r.deniedTrumps = []; r.busyUntil = 0; r.rollDice = [];
     r.gameInstance++;
@@ -74,11 +79,13 @@ export function start(r: Room) {
     else if (r.rules.game === 'cards') {
         r.deck = makeDeck(r.rules.decks);
         need(r.rules.handSize * r.players.length <= r.deck.length, 'The deck is too small for these starting hands.');
-        r.players.forEach(p => p.hand = r.deck.splice(0, r.rules.handSize));
+        if(r.rules.cardLayout==='solitaire')initSolitaire(r,r.deck);else r.players.forEach(p => p.hand = r.deck.splice(0, r.rules.handSize));
     }
     else if (r.rules.game === 'charades')
         newPrompt(r);
     if(r.rules.game==='trivia')initializeTrivia(r);
+    if(r.rules.game==='scribble')initScribble(r);
+    if(r.rules.game==='rpg')initRpg(r);
     r.tiles = Array.from({ length: 24 }, (_, i) => ({ name: i === 0 ? 'Home' : i % 6 === 0 ? 'Rest stop' : i % 5 === 0 ? 'Plot twist' : i % 7 === 0 ? 'Taxes' : ['Maple Lane', 'Moon Market', 'Cedar Grove', 'Sunset Row', 'King’s Court', 'Cloud Corner'][i % 6], type: i === 0 ? 'start' : i % 6 === 0 ? 'rest' : i % 5 === 0 ? 'event' : i % 7 === 0 ? 'tax' : 'property', price: 100 + Math.floor(i / 3) * 50, rent: 20 + Math.floor(i / 3) * 10 }));
     initChaos(r);
     note(r, `${r.players[0].name} opens the game. House rules are locked for this round.`);
@@ -91,10 +98,13 @@ else if (r.round > r.rules.roundLimit) {
     finish(r, winner.name);
 } }
 export function worth(r: Room, p: Player) { return p.cash + r.tiles.filter(t => t.owner === p.id).reduce((n, t) => n + t.price, 0); }
-export function view(r: Room, id: string): View { const { deck, players, lastPlay, charadeBag: _, charade, duel, tradeOffers, trivia: privateTrivia, ...publicRoom } = r; const me=players.find(p=>p.id===id);const visiblePeek=r.phase==='playing'&&me&&me.peekTarget&&me.peekRevealed&&me.peekRevealsAt<=Date.now()&&me.peekingUntil>Date.now()?players.find(p=>p.id===me.peekTarget)?.hand.slice(0,3):undefined;return { ...publicRoom, chaos:r.chaos?{...r.chaos,word:chaosWord(r,id)}:undefined, trivia:triviaView(r,id), peek:visiblePeek, tradeOffers: tradeOffers.filter(t => t.from === id || t.to === id), duel: duel ? { acePlayer: duel.acePlayer, trumpPlayer: duel.trumpPlayer, card: duel.card, round: duel.round, score: duel.score, ends: duel.ends, ready: Object.keys(duel.choices) } : undefined, players: players.map(({ hand, ...p }) => ({ ...p, handCount: hand.length })), hand: players.find(p => p.id === id)?.hand || [], deckCount: deck.length, pileCount: r.pile.length, lastPlay: lastPlay ? { player: lastPlay.player, count: lastPlay.cards.length, claim: lastPlay.claim, expires: lastPlay.expires } : undefined, charade: charade ? { actor: charade.actor, ends: charade.ends, ...(id === charade.actor ? { prompt: charade.prompt } : {}) } : undefined, pile: r.rules.game === 'bluff' ? [] : r.pile }; }
+export function view(r: Room, id: string): View { const { deck, players, lastPlay, charadeBag: _, charade, duel, tradeOffers, trivia: privateTrivia, solitaire:privateSolitaire,scribble:privateScribble,raid:privateRaid, ...publicRoom } = r; const me=players.find(p=>p.id===id);const visiblePeek=r.phase==='playing'&&me&&me.peekTarget&&me.peekRevealed&&me.peekRevealsAt<=Date.now()&&me.peekingUntil>Date.now()?players.find(p=>p.id===me.peekTarget)?.hand.slice(0,3):undefined;return { ...publicRoom,rpg:r.rules.game==='rpg'?r.rpg:undefined,solitaire:solitaireView(r),scribble:scribbleView(r,id),raid:r.raid?{from:r.raid.from,to:r.raid.to,stake:r.raid.stake,phase:r.raid.phase,pausedAt:r.raid.pausedAt,ends:r.raid.ends,round:r.raid.round,wins:r.raid.wins,ready:Object.keys(r.raid.choices)}:undefined, chaos:r.chaos?{...r.chaos,word:chaosWord(r,id)}:undefined, trivia:triviaView(r,id), peek:visiblePeek, tradeOffers: tradeOffers.filter(t => t.from === id || t.to === id), duel: duel ? { acePlayer: duel.acePlayer, trumpPlayer: duel.trumpPlayer, card: duel.card, round: duel.round, score: duel.score, ends: duel.ends, ready: Object.keys(duel.choices) } : undefined, players: players.map(({ hand, ...p }) => ({ ...p, handCount: hand.length })), hand: players.find(p => p.id === id)?.hand || [], deckCount: deck.length, pileCount: r.pile.length, lastPlay: lastPlay ? { player: lastPlay.player, count: lastPlay.cards.length, claim: lastPlay.claim, expires: lastPlay.expires } : undefined, charade: charade ? { actor: charade.actor, ends: charade.ends, ...(id === charade.actor ? { prompt: charade.prompt } : {}) } : undefined, pile: r.rules.game === 'bluff' ? [] : r.pile }; }
 function tickInternal(r: Room) {
     if (r.phase !== 'playing')
         return false;
+    if(tickRaid(r))return true;
+    if(r.raid)return false;
+    if(tickScribble(r))return true;
     if(tickTrivia(r))return true;
     if(r.rules.game==='charades' && Date.now()>=r.charadeMatchEnds){finishCharades(r);return true;}
     let peekChanged=false;if(r.trickCollectUntil && r.trickCollectUntil<=Date.now()){r.trickCollectUntil=0;peekChanged=true;}for(const p of r.players){if(p.peekTarget&&!p.peekRevealed&&p.peekRevealsAt<=Date.now()&&p.peekingUntil>Date.now()){p.peekRevealed=true;p.peekingUntil=Date.now()+4000;peekChanged=true;}if(p.catchUntil && p.catchUntil<=Date.now()){p.catchUntil=0;peekChanged=true;}if(p.peekingUntil && p.peekingUntil<=Date.now()){p.peekingUntil=0;p.catchUntil=0;p.peekTarget=undefined;peekChanged=true;}}
@@ -120,24 +130,26 @@ function actInternal(r: Room, id: string, a: Action): {
 } | void {
     const p = r.players.find(p => p.id === id);
     need(p, 'Join this room first.');
+    if(handleSolitaire(r,id,a)||handleScribble(r,id,a)||handleRpg(r,id,a))return;
     if(handleTrivia(r,p,a))return;
     if (a.type === 'endGame') {
         need(r.host === id && r.phase === 'playing', 'Only the host can end an active game.');
         r.phase = 'finished'; r.endedEarly = true; r.winner = undefined;
-        r.clash = undefined; r.duel = undefined; r.tradeOffers = []; r.lastPlay = undefined;
+        r.clash = undefined; r.duel = undefined; r.tradeOffers = []; r.lastPlay = undefined;r.raid=undefined;
         if(r.trivia){r.trivia.phase="result";r.trivia.ends=0;}
         r.charade = undefined; r.pendingLife = undefined; r.busyUntil = 0;
         note(r, `${p.name} ended the game early. No winner was declared.`);
         return;
     }
     if (a.type === 'restart') {
+        need(r.rules.game!=='cards'||r.rules.cardLayout!=='solitaire'||r.players.length===1,'Solitaire needs exactly one player.');
         need(r.host === id && r.phase !== 'lobby', 'Only the host can restart a started game.');
         need(r.players.every(q => q.connected), 'Wait for disconnected players or return to the lobby to remove them.');
-        need(r.players.length >= (r.rules.game === 'cards' ? 1 : 2), 'Invite enough players first.');
+        need(r.players.length >= (['cards','rpg'].includes(r.rules.game) ? 1 : 2), 'Invite enough players first.');
         need(r.rules.game !== 'tarneeb' || r.players.length === 4, 'Tarneeb needs four players.');
         need(r.rules.game !== 'cards' || r.rules.handSize * r.players.length <= 52 * r.rules.decks, 'The deck is too small.');
         need(r.rules.game !== 'charades' || [2,4,6,8].includes(r.players.length), 'Charades needs 2, 4, 6 or 8 players in pairs.');
-        need(r.rules.game!=='trivia'||r.players.some(q=>q.id===r.triviaMaster&&q.connected),'Choose a trivia master in the lobby.');
+        need(r.rules.game!=='trivia'||r.rules.triviaHostMode==='everyone'||r.players.some(q=>q.id===r.triviaMaster&&q.connected),'Choose a trivia master in the lobby.');
         r.phase = 'lobby'; start(r);
         note(r, `${p.name} restarted the game with the same house rules.`);
         return;
@@ -164,11 +176,12 @@ function actInternal(r: Room, id: string, a: Action): {
             need(proposed.maxPlayers >= r.players.length, 'Remove players before lowering room capacity.');
             if (proposed.game === 'cards')
                 need(proposed.handSize * r.players.length <= 52 * proposed.decks, 'The deck is too small for these starting hands.');
-            need(r.players.length >= (proposed.game === 'cards' ? 1 : 2), 'Invite more players before starting.');
+            need(r.players.length >= (['cards','rpg'].includes(proposed.game) ? 1 : 2), 'Invite more players before starting.');
             need(r.players.every(p => p.connected), 'Wait for disconnected players or remove them.');
             need(proposed.game !== 'tarneeb' || r.players.length === 4, 'Tarneeb needs exactly four players.');
             need(proposed.game !== "charades" || [2,4,6,8].includes(r.players.length), "Charades needs 2, 4, 6 or 8 players in pairs.");
-            need(proposed.game!=="trivia"||r.players.some(q=>q.id===r.triviaMaster&&q.connected),"Choose a trivia master before starting.");
+            need(proposed.game!=="trivia"||proposed.triviaHostMode==='everyone'||r.players.some(q=>q.id===r.triviaMaster&&q.connected),"Choose a trivia master before starting.");
+            need(proposed.game!=='cards'||proposed.cardLayout!=='solitaire'||r.players.length===1,'Solitaire needs exactly one player.');
             r.rules = proposed;
         }
         if (r.rules.game === 'cards')
@@ -178,7 +191,7 @@ function actInternal(r: Room, id: string, a: Action): {
     }
     if (a.type === 'lobby') {
         need(r.host === id, 'Only the host can return to the lobby.');
-        r.tradeOffers = []; r.clash = undefined; r.duel = undefined; r.busyUntil = 0;
+        r.tradeOffers = []; r.clash = undefined; r.duel = undefined; r.busyUntil = 0;r.raid=undefined;
         r.trivia=undefined;
         r.phase = 'lobby';
         r.players.forEach(p => { p.hand = []; p.ready = false; });
@@ -201,6 +214,7 @@ function actInternal(r: Room, id: string, a: Action): {
         return;
     }
     need(r.phase === 'playing', 'Start a game first.');
+    need(!r.solitaire||!['play','draw','collect','pass','peek'].includes(a.type),'Use the Solitaire tableau and stock controls.');
     if(r.rules.game==='charades' && Date.now()>=r.charadeMatchEnds){finishCharades(r);return;}
     if (a.type === 'peek') {
         need(r.rules.allowPeeking && ['bluff', 'tarneeb', 'cards'].includes(r.rules.game), 'Peeking is disabled.');
@@ -515,7 +529,10 @@ function commitTarneeb(r: Room, id: string, card: Card) {
 export function act(r: Room, id: string, a: Action): { peek?: Card[] } | void {
     const p = r.players.find(p => p.id === id);
     need(p&&p.connected,'Join this room first.');
+    if(handleRaid(r,id,a))return;
+    need(!r.raid||!a.type.startsWith('chaos'),'Finish the challenge before using other chaos controls.');
     if(handleChaos(r,id,a))return;
+    need(!r.raid||['chat','endGame','lobby','restart'].includes(a.type),'Finish the challenge first.');
     chaosGuard(r,a);
     const chaosBeforeAction=chaosBefore(r),snapshot=saveChaosAction(r,a);
     const from = p?.position, oldScore = p?.score;
@@ -526,11 +543,12 @@ export function act(r: Room, id: string, a: Action): { peek?: Card[] } | void {
       const gained=chaosBeforeAction.units.some(u=>u.value<(chaosBefore(r).units.find(n=>n.id===u.id)?.value??u.value));
       if(a.type==='play'||a.type==='endTurn'||gained)r.chaos.points[id]=(r.chaos.points[id]||0)+1;
     }
-    if(['chat','guess','triviaAnswer'].includes(a.type)&&typeof a.text==='string')checkBanned(r,id,a.text,chaosBeforeAction.phase==='playing');
+    if(['chat','guess','triviaAnswer','scribbleGuess'].includes(a.type)&&typeof a.text==='string')checkBanned(r,id,a.text,chaosBeforeAction.phase==='playing');
     chaosAfter(r,chaosBeforeAction,a.type);
     commitChaosAction(r,a,snapshot);
 
     if(['endGame','restart','lobby'].includes(a.type))invalidateChaos(r);
+    if(a.type==='scribbleStroke')return result;
     if(a.type.startsWith('trivia'))return result;
     if (['tradeOffer','tradeAccept','tradeReject','tradeCancel','box','allowTrump','punch'].includes(a.type)) return result;
     let kind = a.type === 'bid' && a.value === 0 && !allPassed ? 'bidPass' : a.type;
@@ -558,13 +576,15 @@ export function act(r: Room, id: string, a: Action): { peek?: Card[] } | void {
 function forceChaosAction(r:Room,id:string){
  if(r.phase!=='playing'||r.players[r.turn]?.id!==id)return;
  const p=r.players[r.turn];let action:Action|undefined;
- if(r.rules.game==='cards')action={type:'pass'};
+ if(r.rules.game==='cards')action={type:r.solitaire?'solitaireDraw':'pass'};
  if(r.rules.game==='bluff'&&p.hand.length&&!r.lastPlay)action={type:'play',cards:[p.hand[randomInt(p.hand.length)].id],claim:r.claim};
  if(r.rules.game==='tarneeb'){
   if(r.tarneebPhase==='bid')action={type:'bid',value:0};
   else if(r.tarneebPhase==='trump')action={type:'trump',suit:suits[randomInt(4)]};
   else if(r.tarneebPhase==='play'){const led=r.trick[0]?.card.suit,legal=r.rules.followSuit&&led&&p.hand.some(c=>c.suit===led)?p.hand.filter(c=>c.suit===led):p.hand;if(legal.length)action={type:'play',cards:[legal[randomInt(legal.length)].id]};}
  }
+ if(r.rules.game==='scribble'&&r.scribble){r.scribble.ends=Date.now();tick(r);return;}
+ if(r.rules.game==='rpg'){action=r.rpg?.combat?{type:'rpgEndTurn',pawn:r.rpg.initiative[r.rpg.index]?.id}:{type:'rpgRoll',sides:20,ability:'none'};}
  if(r.rules.game==='charades'&&r.charade){r.charade.ends=Date.now();tick(r);return;}
  if(r.rules.game==='trivia'&&r.trivia?.phase==='question'){r.trivia.ends=Date.now();tick(r);return;}
  if(['property','life'].includes(r.rules.game))action=r.pendingLife?{type:'lifeChoice',choice:0}:r.rolled?{type:'endTurn'}:{type:'roll'};

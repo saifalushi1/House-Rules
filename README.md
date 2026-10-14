@@ -2,7 +2,7 @@
 
 ![House Rules poster: friends playing cards, charades, trivia and board games around a low-poly table](docs/images/house-rules-poster.png)
 
-A self-hosted TypeScript game-night sandbox. Low-poly 3D table and avatars, private hands, live shared rooms, and host-editable presets. Version 0.9 adds eleven shared chaos rules with animations and sounds. Version 0.8 added Trivia with 1,000 questions across ten categories and expands pair Charades to 1,900 prompts across 19 categories.
+A self-hosted TypeScript game-night sandbox. Low-poly 3D table and avatars, private hands, live shared rooms, and host-editable presets. Version 0.10 adds Scribble, a D&D-style tabletop RPG, Klondike Solitaire, optional-master Trivia, a challenge-and-steal chaos rule, and four more environments. Trivia has 1,000 questions across ten categories; pair Charades has 1,900 prompts across 19 categories.
 
 ## Start on this machine
 
@@ -30,9 +30,11 @@ Use it with trusted friends. Room codes are lightweight invite gates, not accoun
 | --- | --- |
 | Bluff / Bullshit | Deal the whole deck; claim A–K in sequence, play 1–4 hidden cards, timed challenges, liar or caller takes the pile, first empty hand wins after the challenge window. |
 | Tarneeb | Four seats, alternating partnerships, 7–13 auction, trump selection, optional follow-suit enforcement, trick winner, hand scoring, and target team score. |
-| Card sandbox | Private hands, draw, play face up, collect pile, pass turn. Your group decides the objective. |
+| Card sandbox | Private hands and shared piles, or a one-player Klondike Solitaire layout with stock, waste, tableau runs and suit foundations. |
 | Charades | 2, 4, 6 or 8 players in pairs; 19 categories with 100 prompts each, custom prompts, prompt and match timers, partner guesses, spoken-answer awards, skipping and a final pair/personal recap. Use an existing group call when apart. |
-| Trivia | 2–8 players, a volunteer trivia master, ten categories with 100 questions each, timed rounds, typed or spoken answers, free-for-all or turn-based scoring, gold-star celebrations and a final scoreboard. |
+| Trivia | 2–8 players; everyone competes with automatic questions, or a volunteer trivia master hosts. Ten categories with 100 questions each, timed rounds and free-for-all/turn-based answers. |
+| Scribble | 2–8 players; rotating drawers choose secret words, share a live drawing canvas, and score points for timed guesses. |
+| D&D tabletop | 1–8 people; original simplified d20 adventure with a dungeon master, four classes, character sheets, an 8×8 battle map, dice, initiative, spells, combat, XP and gold. |
 | Block Party | Original simplified property-trading game: 24 spaces, two dice, purchases, rent, tax pot, events, property sell-back, bankruptcy, and net-worth win. |
 | Life Paths | Original simplified life-path game: one die, career selection, safe/risky choices, events, cash, and round-limit win. |
 
@@ -41,6 +43,8 @@ The board presets are small original games inspired by property-trading and life
 Tarneeb uses the common scoring variation: a made bid scores tricks won, an unbid sweep scores 16, a made bid of 13 scores 26, a failed bid subtracts the contract, and defenders score their tricks when the contract fails. Regional rules vary. Reference: [Pagat's Tarneeb rules](https://www.pagat.com/auctionwhist/tarneeb.html).
 
 ## Playing Trivia
+
+In **House rules → Game rules → Who plays?**, choose **Everyone plays** to let every person, including the host, compete. Pick the automatic category before starting. No player receives the answer key while a question is open; questions and timers run automatically, with a four-second result pause. Both free-for-all and turn-based answers work. Typed answers are checked by the server. Choose **With a trivia master** for a person to read questions and award spoken answers; the setup below applies to that mode.
 
 1. Select **Trivia** in the lobby and invite at least one other player (2–8 people total).
 2. One player volunteers as **Trivia master**. The master can be someone other than the room host and does not compete for points.
@@ -51,9 +55,9 @@ Tarneeb uses the common scoring variation: a made bid scores tricks won, an unbi
 
 Each correct answer gives one point, plays a success sound, and pops a gold star above the scorer. A timeout gives no point. After the configured questions, the scoreboard shows contestant totals and the winner or tied winners. The host can end early or restart. The full question bank is bundled with the server, so playing does not depend on an external trivia API.
 
-## Shared chaos rules (v0.9)
+## Shared chaos rules (v0.10)
 
-Before starting, open **House rules → Chaos**. Enable any combination of the eleven rules, configure their parameters, and **Apply house rules** or start the game. Everything is off by default. All players share the same server-controlled outcomes and receive corresponding 3D animations and synthesized action sounds. During play, expand **✹ Chaos** beside the table for timers, the current die modifier, turn order, bonus tallies, dares, flip controls and rewind voting.
+Before starting, open **House rules → Chaos**. Enable any combination of the twelve rules, configure their parameters, and **Apply house rules** or start the game. Everything is off by default. All players share the same server-controlled outcomes and receive corresponding 3D animations and synthesized action sounds. During play, expand **✹ Chaos** beside the table for timers, the current die modifier, turn order, bonus tallies, dares, flip controls and rewind voting.
 
 | Rule | Behavior and controls | Animation and sound |
 | --- | --- | --- |
@@ -138,7 +142,7 @@ Rooms are in memory. Restarting the server clears games. Disconnected rooms expi
 
 ## Verification
 
-91 automated tests pass, including a full 13-trick Tarneeb hand, challenge resolution, timer behavior, private views, validation, scoring, board actions and a real two-client reconnect flow. Browser checks cover room creation, joining, private deals, card selection/play, calling bluff, camera switching, enlarged board views, negotiation offers and refusals, and host rule editing.
+123 automated tests pass, including a full 13-trick Tarneeb hand, challenge resolution, timer behavior, private views, validation, scoring, board actions and a real two-client reconnect flow. Browser checks cover room creation, joining, private deals, card selection/play, calling bluff, camera switching, enlarged board views, negotiation offers and refusals, and host rule editing.
 
 ## Version 0.2: the table comes alive
 
@@ -222,3 +226,42 @@ The master reads the question and sees the private answer key. Contestants see t
 Questions are bundled locally from [Open Trivia DB](https://opentdb.com/) and work without a live API. The imported data uses [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/); attribution and changes are documented in [server/TRIVIA-DATA-LICENSE.md](server/TRIVIA-DATA-LICENSE.md) and linked inside Trivia. The source is user-contributed. Seven dated or law-related questions were replaced during preparation. The master can review the key and skip an unsuitable question. The full question bank is never sent to clients. Only the master receives the answer key while a question is open; contestants see the answer after the question resolves.
 
 Implementation: server/trivia.ts owns roles, timers, scoring and private views; server/trivia-bank.ts contains 1,000 questions; shared/trivia.ts contains public category names and contracts; server/charade-extras.ts contains the new charades collections. Automated tests cover every category count, question-bank uniqueness and structure, role permissions, answer privacy, duplicate scoring, timeouts, turn rules, spoken awards, skips and game lifecycle. Browser checks cover guest master selection, typed and spoken scoring, active-player controls, star animation, results and the accents voice round.
+
+
+## Version 0.10: drawing, adventures and solo cards
+
+### Scribble
+
+Choose **Scribble** on the shelf and invite 2–8 players. Game rules set 20–180 seconds per drawing and 1–8 drawing turns per person. The drawer has 15 seconds to choose one of three secret words; an absent drawer gets an automatic choice. Only the drawer sees the live word. Everyone else sees the shared canvas and letter count. Draw with a mouse or touch, choose a brush color/size, and clear the canvas when needed. Correct guesses are normalized for case and punctuation, score once per person, reward the drawer, and pop a gold star with a success sound. The word is revealed after everyone guesses or the clock runs out, then the next drawer starts after four seconds. Final scores include every player.
+
+The server validates stroke colors, sizes, coordinates, ownership and bounded canvas capacity. Drawing survives page refresh within the same seat. Time Warp can undo a word choice or scored guess, but individual pen segments do not replace the undo snapshot; use Clear drawing for ink. No live word or choice list is sent to guessers.
+
+### Klondike Solitaire
+
+Select **Card sandbox → Game rules → Card table layout → Klondike Solitaire** and start with exactly one player. This is a real one-deck Klondike layout, rather than a private hand pretending to be Solitaire. Seven tableau piles contain 1–7 cards with only their tops initially face up; the remaining 24 cards form the stock. Draw one card at a time to waste, or recycle exhausted stock. Select a face-up card/run, then a Column or Foundation destination. Tableau runs descend in alternating colors, empty columns require kings, and four foundations build ace through king by suit. A newly uncovered tableau card flips face up. All four completed foundations win the game. The move count is shared with the server. Illegal moves and face-down selection are rejected without changing piles; covered identities and stock are never sent to the browser. Restart reshuffles; Time Warp can undo a move.
+
+### Winner Takes It
+
+Enable **House rules → Chaos → Winner Takes It**. Challenge another player using the table control. The recipient can accept or refuse within 15 seconds. Accepted duels run three simultaneous-choice beats: jab beats hook, hook beats block, block beats jab. Each beat lasts eight seconds and choices remain private until both players submit or the timer expires. Missed input loses to a submitted move. Tied duels transfer nothing; a participant who disconnects forfeits an accepted duel. Existing prompt/question timers pause and resume with the remaining time.
+
+The game chooses the stake dynamically: card hands in Bluff/Tarneeb/free card sandbox, cash in the board games, gold in the RPG, or points in party games. Winning a hand wager **exchanges the two hands** so the winner gets the opponent's hand while preserving the number of players and the deck; it does not leave a Tarneeb seat empty or accidentally give a Bluff opponent an empty-hand win. Tarneeb partners cannot challenge each other. Charades wagers use personal points and preserve pair totals. Other point wagers transfer the loser's positive scoring total, cash/gold wagers transfer their available positive balance, and a draw leaves ownership unchanged. Solitaire is single-player and has no opponent to challenge.
+
+Duels show avatar impacts, hand/coin transfer feedback and corresponding sounds. Only participants choose moves; all players watch. Offers and challenges are cleared on restart, early end or return to the lobby.
+
+### D&D-style tabletop adventure
+
+Choose **D&D tabletop** and 1–8 players. After changing from another preset, apply the house rules to open character setup before starting. The host assigns a dungeon master in the lobby; the DM may also play a hero. Each player names an adventurer and picks Fighter, Rogue, Wizard or Cleric, with editable inventory text and character notes. Sheets show level, XP, gold, HP, armor, six ability scores and remaining spell slots. Saving a character is allowed in the lobby or outside combat. Class presets determine bounded starting statistics; choices and notes survive starting/restarting the session while health, resources and progress reset.
+
+Game rules select a Crypt, Ruins or Cavern battle map. The DM describes scenes, loads encounters, places named enemies with chosen HP/armor, rolls initiative, adjusts health and rests the party. Adventurers control their own minis; the DM controls enemy minis. Click an empty square to move up to three orthogonal steps, with walls and occupied tiles blocking the path. Initiative selects a living pawn's turn. Each combat turn allows one move and one attack/spell, followed by End pawn turn. Melee requires adjacency; Wizard/Cleric spells and Cleric healing reach four squares and consume one of three spell slots. Server dice resolve attack versus armor and damage. Any player can roll d4, d6, d8, d10, d12, d20 or d100 with an optional ability bonus. Cleared encounters grant each adventurer 25 XP and 20 gold; every 100 XP increases the displayed level. Rest heals the party and restores spells outside combat.
+
+The 3D table shows an enlarged battle grid, class-colored hero minis, enemies, health labels and a ring around the active pawn. Movement hops, attacks launch impact effects, spells fly, healing sparkles, dice tumble, and victories pop stars with action sounds. Character details and DM tools fold away to keep the map usable. This is an original simplified d20 sandbox for a D&D-style game night; full official character creation, spells and campaign rules are not automated. The group and DM supply the story and additional rules. Sessions remain in server memory as with the other games.
+
+### Seven environments
+
+In lobby **House rules → The basics → Game background**, choose the existing Garage, Forest or Speakeasy, or new **Sunset beach**, **City rooftop**, **Space lounge** and **Dungeon hall**. New scenery includes palm trees and moving water, a rooftop skyline and twinkling lights, space windows with rotating planets, and dungeon columns/torches with flickering flames. Scenery is generated from original polygon geometry; no external models are required. The shared choice applies to everyone and stays locked during play.
+
+### Trivia content update
+
+The Battle Cats/Moneko critical-percentage question (`general-3`) was replaced with a general-knowledge question asking for the imaginary line separating Earth's Northern and Southern Hemispheres. The answer is Equator. The bank still contains exactly 100 questions per category and 1,000 in total. Attribution and the original replacement are recorded in [server/TRIVIA-DATA-LICENSE.md](server/TRIVIA-DATA-LICENSE.md).
+
+Implementation lives in `server/solitaire.ts`, `server/scribble.ts`, `server/rpg.ts`, `server/raid.ts`, `shared/expansion.ts`, and the corresponding interface/visual/theme modules. Automated checks cover all new game modes, settings, privacy, scoring, timer transitions, card conservation, consent and payouts, RPG authority/turns, state switching and lifecycle. Browser checks cover shared drawing and correct guesses, optional-master controls, a complete cash duel, legal Solitaire moves/stock draws, RPG setup/initiative/dice and compact battle-map controls.

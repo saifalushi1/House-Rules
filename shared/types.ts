@@ -1,7 +1,8 @@
+import type {SolitaireState,SolitaireView,ScribbleState,ScribbleView,RpgState,Raid,RaidView} from './expansion.js';
 import type {ChaosState} from './chaos.js';
 import type {TriviaState,TriviaView} from "./trivia.js";
 import type {CharadeCategory} from "./charades.js";
-export type Game = 'bluff' | 'tarneeb' | 'cards' | 'charades' | 'trivia' | 'property' | 'life';
+export type Game = 'bluff' | 'tarneeb' | 'cards' | 'charades' | 'trivia' | 'property' | 'life' | 'scribble' | 'rpg';
 export type Suit = '♠' | '♥' | '♦' | '♣';
 export interface Card {
     id: string;
@@ -9,6 +10,7 @@ export interface Card {
     suit: Suit;
 }
 export interface Rules {
+    triviaHostMode:'everyone'|'master'; triviaCategory:keyof typeof import('./trivia.js').triviaCategories; cardLayout:'free'|'solitaire'; scribbleSeconds:number; scribbleRounds:number; rpgMap:'crypt'|'ruins'|'cavern'; chaosRaid:boolean;
     chaosHotPotato:boolean; chaosSeatRoulette:boolean; chaosCyclone:boolean; chaosDouble:boolean; chaosDie:boolean; chaosTableFlip:boolean; chaosBlackout:boolean; chaosRobin:boolean; chaosBanned:boolean; chaosDare:boolean; chaosWarp:boolean;
     chaosHotSeconds:number; chaosMinSeconds:number; chaosShrinkSeconds:number; chaosSeatEvery:number; chaosRandomPercent:number;
     chaosHotOutcome:'penalty'|'forced'|'random'; chaosHandsTravel:boolean; chaosDirection:'left'|'right'; chaosCycloneTrigger:'round'|'random'; chaosFlipMode:'scores'|'order'; chaosWords:string; chaosDares:string;
@@ -17,7 +19,7 @@ export interface Rules {
     tradeSlaps: boolean;
     boxingDuels: boolean;
     game: Game;
-    background: 'garage' | 'forest' | 'speakeasy';
+    background: keyof typeof import('./expansion.js').backgrounds;
     camera: 'third' | 'first';
     maxPlayers: number;
     allowPeeking: boolean;
@@ -45,7 +47,7 @@ export interface Rules {
     roundLimit: number;
     customNotes: string;
 }
-export const defaults: Rules = {"chaosHotOutcome":"random","chaosHotPotato":false,"chaosSeatRoulette":false,"chaosCyclone":false,"chaosDouble":false,"chaosDie":false,"chaosTableFlip":false,"chaosBlackout":false,"chaosRobin":false,"chaosBanned":false,"chaosDare":false,"chaosWarp":false,"chaosHotSeconds":30,"chaosMinSeconds":5,"chaosShrinkSeconds":2,"chaosSeatEvery":3,"chaosRandomPercent":20,"chaosHandsTravel":true,"chaosDirection":"left","chaosCycloneTrigger":"round","chaosFlipMode":"order","chaosWords":"yes\nno\nokay\nliterally\nactually","chaosDares":"Speak like a pirate until your next turn\nDo a dramatic victory pose\nNarrate your next move like a sports commentator", allowTrading: true, tradeSlaps: true, boxingDuels: true, game: 'bluff', background: 'forest', camera: 'third', maxPlayers: 8, allowPeeking: false, catchPeeking: true, penalty: 'Speak like a pirate until your next turn', decks: 1, handSize: 7, followSuit: true, targetScore: 31, challengeSeconds: 12, reverseTurns: false, triviaQuestions: 10, triviaSeconds: 30, triviaMode: "ffa", charadeMatchSeconds: 300, charadeCategory: "animals", charadeSeconds: 60, allowSkipping: true, skipPenalty: 0, charadePrompts: '', startingCash: 1500, salary: 200, rentMultiplier: 1, freeParking: true, roundLimit: 15, customNotes: '' };
+export const defaults: Rules = {triviaHostMode:'master',triviaCategory:'general',cardLayout:'free',scribbleSeconds:60,scribbleRounds:2,rpgMap:'crypt',chaosRaid:false,"chaosHotOutcome":"random","chaosHotPotato":false,"chaosSeatRoulette":false,"chaosCyclone":false,"chaosDouble":false,"chaosDie":false,"chaosTableFlip":false,"chaosBlackout":false,"chaosRobin":false,"chaosBanned":false,"chaosDare":false,"chaosWarp":false,"chaosHotSeconds":30,"chaosMinSeconds":5,"chaosShrinkSeconds":2,"chaosSeatEvery":3,"chaosRandomPercent":20,"chaosHandsTravel":true,"chaosDirection":"left","chaosCycloneTrigger":"round","chaosFlipMode":"order","chaosWords":"yes\nno\nokay\nliterally\nactually","chaosDares":"Speak like a pirate until your next turn\nDo a dramatic victory pose\nNarrate your next move like a sports commentator", allowTrading: true, tradeSlaps: true, boxingDuels: true, game: 'bluff', background: 'forest', camera: 'third', maxPlayers: 8, allowPeeking: false, catchPeeking: true, penalty: 'Speak like a pirate until your next turn', decks: 1, handSize: 7, followSuit: true, targetScore: 31, challengeSeconds: 12, reverseTurns: false, triviaQuestions: 10, triviaSeconds: 30, triviaMode: "ffa", charadeMatchSeconds: 300, charadeCategory: "animals", charadeSeconds: 60, allowSkipping: true, skipPenalty: 0, charadePrompts: '', startingCash: 1500, salary: 200, rentMultiplier: 1, freeParking: true, roundLimit: 15, customNotes: '' };
 export const games: Record<Game, {
     name: string;
     category: string;
@@ -53,11 +55,13 @@ export const games: Record<Game, {
     icon: string;
     players: string;
 }> = {
+    scribble:{name:'Scribble',category:'PARTY',description:'Draw a secret word. Guess your friends’ doodles.',icon:'✎',players:'2–8'},
+    rpg:{name:'D&D tabletop',category:'TABLETOP',description:'Character sheets, dice and a dungeon master. Your adventure.',icon:'⚔',players:'1–8'},
     bluff: { name: 'Bluff', category: 'CARDS', description: 'Keep a straight face. Call their bluff. Lose all your cards.', icon: '♠', players: '2–8' },
     tarneeb: { name: 'Tarneeb', category: 'CARDS', description: 'Two teams. Thirteen tricks. One very confident bid.', icon: '♦', players: '4' },
     cards: { name: 'Card sandbox', category: 'CARDS', description: 'A deck, a table, and whatever rules your group invents.', icon: '♣', players: '1–8' },
     charades: { name: 'Charades', category: 'PARTY', description: 'Pair up. Beat the clock. Act it out without words.', icon: '✦', players: '2, 4, 6, 8' },
-    trivia: {name:'Trivia',category:'PARTY',description:'Pick a master. Ask a question. Race for the point.',icon:'★',players:'2–8'},
+    trivia: {name:'Trivia',category:'PARTY',description:'Everyone plays, or choose a master. Race for the point.',icon:'★',players:'2–8'},
     property: { name: 'Block Party', category: 'TABLETOP', description: 'Buy the neighborhood. Collect rent. Make questionable deals.', icon: '⌂', players: '2–8' },
     life: { name: 'Life Paths', category: 'TABLETOP', description: 'Choose your path, chase a career, and see where life takes you.', icon: '⚑', players: '2–8' }
 };
@@ -89,6 +93,7 @@ export interface Tile {
     owner?: string;
 }
 export interface Room {
+    solitaire?:SolitaireState; scribble?:ScribbleState; rpg?:RpgState; rpgDm?:string; raid?:Raid;
     chaos?:ChaosState;
     trickCollectUntil: number;
     lastTrickTeam: number;
@@ -168,7 +173,8 @@ export interface Room {
 export type PublicPlayer = Omit<Player, 'hand'> & {
     handCount: number;
 };
-export type View = Omit<Room, 'players' | 'deck' | 'charadeBag' | 'lastPlay' | 'charade' | 'duel' | 'tradeOffers' | 'trivia'> & {
+export type View = Omit<Room, 'players' | 'deck' | 'charadeBag' | 'lastPlay' | 'charade' | 'duel' | 'tradeOffers' | 'trivia' | 'solitaire' | 'scribble' | 'raid'> & {
+    solitaire?:SolitaireView; scribble?:ScribbleView; raid?:RaidView;
     trivia?: TriviaView;
     tradeOffers: TradeOffer[];
     duel?: Omit<BoxingDuel, 'choices'> & { ready: string[] };

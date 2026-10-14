@@ -27,15 +27,15 @@ export const triviaBank = {
     },
     {
       "id": "general-3",
-      "question": "In \"Battle Cats\", what is Moneko / MISS Moneko's critical percentage rate?",
-      "answer": "15%",
+      "question": "What is the imaginary line that divides Earth into the Northern and Southern Hemispheres?",
+      "answer": "Equator",
       "choices": [
-        "15%",
-        "20%",
-        "10%",
-        "25%"
+        "Equator",
+        "Prime Meridian",
+        "Tropic of Cancer",
+        "Arctic Circle"
       ],
-      "difficulty": "hard"
+      "difficulty": "easy"
     },
     {
       "id": "general-4",

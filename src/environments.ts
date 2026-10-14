@@ -1,17 +1,19 @@
+import {extraTheme,animateDecor} from './extra-themes';
 import * as THREE from 'three';
 import type { Rules } from '../shared/types';
 
 /** Procedural scenery shared by every seat; no downloaded models or textures. */
 export class TableEnvironment {
-  group=new THREE.Group(); key=''; walkers:THREE.Group[]=[];
-  constructor(private scene:THREE.Scene){scene.add(this.group);}
+  decor:THREE.Object3D[]=[];group=new THREE.Group(); key=''; walkers:THREE.Group[]=[];
+  constructor(public scene:THREE.Scene){scene.add(this.group);}
   mesh(shape:THREE.BufferGeometry,color:number,x=0,y=0,z=0){const m=new THREE.Mesh(shape,new THREE.MeshStandardMaterial({color,flatShading:true,roughness:.85}));m.position.set(x,y,z);m.castShadow=true;m.receiveShadow=true;return m;}
   box(w:number,h:number,d:number,c:number,x:number,y:number,z:number,parent:THREE.Group=this.group){const m=this.mesh(new THREE.BoxGeometry(w,h,d),c,x,y,z);parent.add(m);return m;}
   update(theme:Rules['background']){
-    if(theme===this.key)return;this.key=theme;this.walkers=[];
+    if(theme===this.key)return;this.key=theme;this.walkers=[];this.decor=[];
     for(const child of [...this.group.children]){child.traverse(o=>{if(o instanceof THREE.Mesh){o.geometry.dispose();for(const m of Array.isArray(o.material)?o.material:[o.material])m.dispose();}});child.removeFromParent();}
     const forest=theme==='forest',garage=theme==='garage';this.scene.background=new THREE.Color(forest?0x9bb5a1:garage?0x6c797b:0x251b27);this.scene.fog=new THREE.Fog(this.scene.background,18,38);
     this.box(30,.2,30,forest?0x536c42:garage?0x606766:0x422b30,0,-.55,0);
+    if(extraTheme(this,theme))return;
     if(forest){
       for(let i=0;i<30;i++){const a=i*2.399,r=6+(i%5)*1.7,x=Math.sin(a)*r,z=Math.cos(a)*r;this.group.add(this.mesh(new THREE.CylinderGeometry(.14,.24,2,5),0x725339,x,.4,z));for(let j=0;j<3;j++)this.group.add(this.mesh(new THREE.ConeGeometry(1.2-j*.23,2.3,5),[0x284a38,0x3c6142,0x638252][j],x,1.6+j*.65,z));}
       for(let i=0;i<18;i++)this.group.add(this.mesh(new THREE.DodecahedronGeometry(.25+(i%4)*.1),0x869482,Math.sin(i*1.3)*7,-.2,Math.cos(i*1.3)*7));
@@ -58,6 +60,7 @@ export class TableEnvironment {
     }
   }
   animate(time:number){
+    animateDecor(this,time);
     for(const actor of this.walkers){
       const t=(time*.001+actor.userData.phase)%9,head=actor.userData.head as THREE.Group;
       if(actor.userData.kind==='animal'){
