@@ -17,7 +17,7 @@ export class BoxingVisuals {
  update(){
   const s=this.s,d=s.room?.phase==='playing'?s.room.raid:undefined,on=!!d&&d.phase!=='offer';
   this.ring.visible=on;if(on)this.arenaLight.intensity=2.5;if(!on&&!this.active)return;this.active=on;
-  s.environment.group.visible=!on;s.group.visible=!on;s.pieces.visible=!on&&!s.room?.solitaire&&s.game!=='rpg';s.tokens.visible=!on&&!s.room?.solitaire&&s.game!=='rpg';s.dice.visible=!on;s.expansionFX.group.visible=!on;s.pokerFX.group.visible=!on;
+  s.environment.group.visible=!on;s.group.visible=!on;s.pieces.visible=!on&&!s.room?.solitaire&&s.game!=='rpg';s.tokens.visible=!on&&!s.room?.solitaire&&s.game!=='rpg';s.dice.visible=!on;s.expansionFX.group.visible=!on;s.pokerFX.group.visible=!on;s.clubFX.group.visible=!on&&['werewolf','blackjack','darts','beerpong'].includes(s.game);
   if(!on){s.actorKey='';s.handKey='';return;}s.ownHand.visible=false;
   const fighters=[d!.from,d!.to],spectators=[...s.actorMap.keys()].filter(id=>!fighters.includes(id));
   for(const [id,g] of s.actorMap){g.visible=true;g.userData.chairParts.forEach((o:THREE.Object3D)=>o.visible=false);g.rotation.set(0,0,0);const side=fighters.indexOf(id);

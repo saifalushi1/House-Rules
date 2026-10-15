@@ -29,6 +29,11 @@ export class GameAudio {
   }
   play(e: GameEvent) {
     if(chaosSound(this,e))return;
+    if(e.kind.startsWith('wolf')){if(e.kind==='wolfPhase'){const night=e.data.phase==='night';[night?220:523,night?330:659,night?440:784].forEach((f,i)=>this.tone(f,.4,i*.2,'triangle',.2));}else if(e.kind==='wolfVote'){this.noise(.08,0,.3,500);this.tone(160,.1);}else {this.tone(330,.4);this.tone(220,.5,.2);}return;}
+    if(e.kind.startsWith('bj')){if(e.kind==='bjShuffle'){for(let i=0;i<10;i++)this.noise(.06,i*.07,.25,1900);}else if(['bjDeal','bjHit','bjDealerHit'].includes(e.kind)){for(let i=0;i<(e.kind==='bjDeal'?5:1);i++)this.noise(.07,i*.12,.3,2400);}else if(e.kind==='bjResult'){[523,659,784].forEach((f,i)=>this.tone(f,.16,i*.1));}else {this.tone(1000,.06);this.noise(.03,.07,.3,2800);}return;}
+    if(e.kind==='dartThrow'){this.noise(.11,0,.25,2500);this.noise(.08,.5,.4,600);this.tone(e.data.bust?180:e.data.points===50?1047:350,.2,.55);return;}
+    if(e.kind==='pongThrow'){this.tone(480,.07);this.tone(370,.06,.4);this.noise(.25,.9,.3,e.data.hit?1400:650);if(e.data.hit)this.tone(880,.16,1);return;}
+    if(e.kind.startsWith('pong')||e.kind==='dartStart'){this.tone(523,.15);this.tone(784,.2,.15);return;}
     switch (e.kind) {
       case 'rooftopJump':this.noise(.8,0,.3,800);this.tone(500,.3);this.tone(350,.4,.3);this.noise(.3,4.1,.3,1500);break;
       case 'soreLoserShot':this.noise(.12,0,.5,1400);this.tone(200,.1);this.noise(.15,.65,.5,500);this.tone(700,.15,1);break;

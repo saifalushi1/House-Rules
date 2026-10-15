@@ -30,6 +30,10 @@ export function blackoutView(r:Room,id:string,current:View,raw:(r:Room,id:string
  if(current.scribble&&old.scribble){current.scribble={...current.scribble,strokes:current.scribble.drawer===r.chaos.blackoutPlayer?current.scribble.strokes:old.scribble.strokes,scores:{...old.scribble.scores,[id]:current.scribble.scores[id]},guessed:current.scribble.guessed.filter(p=>p===id||old.scribble!.guessed.includes(p)),lastAward:current.scribble.lastAward?.guesser===id?current.scribble.lastAward:old.scribble.lastAward};}
  if(current.trivia&&current.trivia.winner!==id&&current.trivia.winner!==r.chaos.blackoutPlayer){current.trivia={...current.trivia,winner:undefined,reason:undefined};}
  if(current.clash&&![id,r.chaos.blackoutPlayer].includes(current.clash.trumpPlayer)&&current.clash.acePlayer!==id)current.clash=undefined;
+ if(current.werewolf&&old.werewolf)current.werewolf.voteCounts=old.werewolf.voteCounts;
+ if(current.blackjack&&old.blackjack){current.blackjack.dealer=old.blackjack.dealer;current.blackjack.seats=current.blackjack.seats.map(s=>s.id===id?s:old.blackjack!.seats.find(o=>o.id===s.id)||{...s,cards:[]});}
+ if(current.darts&&old.darts){current.darts={...current.darts,remaining:{...old.darts.remaining,[id]:current.darts.remaining[id]},recent:current.darts.recent.filter(h=>h.player===id||h.player===r.chaos!.blackoutPlayer||old.darts!.recent.some(o=>o.at===h.at))};}
+ if(current.pong&&old.pong){current.pong={...current.pong,cups:old.pong.cups,recent:current.pong.recent.filter(h=>h.player===id||h.player===r.chaos!.blackoutPlayer||old.pong!.recent.some(o=>o.at===h.at))};}
  if(current.rpg&&old.rpg)current.rpg=old.rpg;
  if(current.solitaire&&old.solitaire)current.solitaire=old.solitaire;
  if(current.chaos&&old.chaos){current.chaos.points={...old.chaos.points};current.chaos.lastDare=old.chaos.lastDare;}
