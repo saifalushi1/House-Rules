@@ -1,0 +1,6 @@
+import type {Action,Room} from '../shared/types.js';
+import {canRetaliate,resultLosers} from '../shared/aftermath.js';
+import {emit} from './interactions.js';
+import {recordMessage} from './messages.js';
+export function handleAftermath(r:Room,id:string,a:Action){if(a.type!=='soreLoserShot')return false;if(r.busyUntil>Date.now())throw Error('Wait for the end-of-game animation.');if(!canRetaliate(r,id))throw Error('Available once after a heavy loss: at least half the winning total, and 3 points, 10 cards or half a starting stack.');const target=r.players.find(p=>p.id===a.target&&p.id!==id&&p.connected);if(!target)throw Error('Choose another connected player.');r.retaliated.push(id);emit(r,'soreLoserShot',id,target.id,{text:'SORE LOSER · PAINTBALL!'});recordMessage(r,`${r.players.find(p=>p.id===id)!.name} tags ${target.name} with a paintball. Scores stay final.`);return true;}
+export function finishEffects(r:Room){if(r.phase!=='finished'||r.finishEffectsDone)return;r.finishEffectsDone=true;if(r.rules.background==='rooftop'&&r.rules.rooftopAntics){const losers=resultLosers(r);if(losers.length)r.busyUntil=Math.max(r.busyUntil,Date.now()+7000);for(const id of losers)emit(r,'rooftopJump',id,undefined,{text:'Rooftop exit · parachute deployed'});}}

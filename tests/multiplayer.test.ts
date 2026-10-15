@@ -71,8 +71,9 @@ test('real server: two clients join, private deal, reconnect, host controls, lob
         a.send({ type: 'start' });
         const c1 = (await a.wait('state', v => v.room.phase === 'playing' && v.room.rules.game === 'charades')).room;
         const c2 = (await back.wait('state', v => v.room.phase === 'playing' && v.room.rules.game === 'charades')).room;
-        assert.equal(c1.charade.prompt, 'A dancing robot');
-        assert.ok(!c2.charade.prompt);
+        assert.ok(!c1.charade.prompt);
+        assert.equal(c2.charade.prompt, 'A dancing robot');
+        assert.equal(c1.charade.guesser, c1.players[0].id);
     }
     finally {
         clients.forEach(ws => ws.terminate());

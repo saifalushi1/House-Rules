@@ -27,7 +27,7 @@ export function validateRules(input: unknown): Rules {
   const ranges: Record<string, [number, number]> = {
     chaosHotSeconds:[5,120],chaosMinSeconds:[2,30],chaosShrinkSeconds:[0,10],chaosSeatEvery:[1,20],chaosRandomPercent:[0,100],
     pokerStack:[100,10000],pokerSmallBlind:[1,100],pokerBigBlind:[2,200],pokerSeconds:[10,120],pokerHands:[0,100],
-    scribbleSeconds:[20,180],scribbleRounds:[1,8],
+    charadeRounds:[1,5],scribbleSeconds:[20,180],scribbleRounds:[1,8],
     maxPlayers: [2, 8], decks: [1, 3], handSize: [1, 20], targetScore: [10, 100],
     triviaQuestions: [1,100], triviaSeconds:[5,180], charadeMatchSeconds: [30,1200], challengeSeconds: [5, 30], charadeSeconds: [15, 180], skipPenalty: [0, 5],
     startingCash: [100, 10000], salary: [0, 2000], rentMultiplier: [.25, 5], roundLimit: [3, 50],
@@ -38,7 +38,7 @@ export function validateRules(input: unknown): Rules {
     require(key === 'rentMultiplier' || Number.isInteger(value), 'Use a whole number.');
     (r as unknown as Record<string, unknown>)[key] = value;
   }
-  for (const key of ['allowTrading', 'tradeSlaps', 'boxingDuels', 'allowPeeking', 'catchPeeking', 'followSuit', 'reverseTurns', 'allowSkipping', 'freeParking']) {
+  for (const key of ['rooftopAntics','soreLoser','allowTrading', 'tradeSlaps', 'boxingDuels', 'allowPeeking', 'catchPeeking', 'followSuit', 'reverseTurns', 'allowSkipping', 'freeParking']) {
     require(typeof x[key] === 'boolean', 'Invalid toggle.');
     (r as unknown as Record<string, unknown>)[key] = x[key];
   }

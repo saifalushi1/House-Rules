@@ -30,6 +30,9 @@ export class GameAudio {
   play(e: GameEvent) {
     if(chaosSound(this,e))return;
     switch (e.kind) {
+      case 'rooftopJump':this.noise(.8,0,.3,800);this.tone(500,.3);this.tone(350,.4,.3);this.noise(.3,4.1,.3,1500);break;
+      case 'soreLoserShot':this.noise(.12,0,.5,1400);this.tone(200,.1);this.noise(.15,.65,.5,500);this.tone(700,.15,1);break;
+      case 'charadeTurn':this.tone(523,.15);this.tone(784,.2,.18);break;
       case 'pokerAction':if(e.data.move==='fold')this.noise(.13,0,.25,2000);else if(e.data.move==='check'){this.tone(140,.05);this.tone(140,.05,.12);}else for(let i=0;i<5;i++){this.noise(.025,i*.07,.25,3000);this.tone(1100+i*130,.055,i*.07,'triangle',.12);}break;
       case 'pokerStreet':for(let i=0;i<Number(e.data.count);i++)this.noise(.08,i*.14,.3,1800);break;
       case 'pokerWin':[523,659,784,1047].forEach((f,i)=>this.tone(f,.22,i*.09));break;

@@ -1,3 +1,6 @@
+import {rooftopAudio} from './rooftop-audio';
+import {charadeLobby,charadePlay,charadeRecap,peekControls,aftermathControls,bindParty} from './party-ui';
+import './party.css';
 import {pokerSettings,pokerPlay,bindPoker} from './poker-ui';
 import './poker.css';
 import {backgrounds,expansionSettings,expansionPlay,expansionLobby,mountExpansion,bindExpansion,raidHtml,rpgPick} from './expansion-ui';
@@ -23,7 +26,7 @@ let seenEvent = 0, eventRoom = '', effectTimer: ReturnType<typeof setTimeout>;
 document.addEventListener('pointerdown', () => void audio.unlock(), {capture:true});
 document.addEventListener('keydown', () => void audio.unlock(), {capture:true});
 const app = document.querySelector<HTMLDivElement>('#app')!;
-app.innerHTML = `<div class="shell"><aside class="sidebar" id="sidebar"></aside><main><header id="header"></header><div class="workspace"><section class="table-area"><div id="intro"></div><div class="stage"><div class="stage-top" id="stage-top"></div><div id="scene" aria-label="Low polygon multiplayer game table"></div><div id="stage-bottom"></div><div id="effects-layer" aria-live="polite"></div></div><div id="play-panel"></div></section><aside class="right-rail"><button id="rules-toggle" data-action="toggleRules"></button><section class="rules-panel" id="rules-panel"></section><div id="activity"></div></aside></div><footer><span>MADE FOR GAME NIGHT. BUILT FOR YOUR RULES.</span><span>SELF-HOSTED <i></i> VERSION 0.11</span></footer></main></div><div id="toast" role="status" aria-live="polite"></div><div id="modal-root"></div>`;
+app.innerHTML = `<div class="shell"><aside class="sidebar" id="sidebar"></aside><main><header id="header"></header><div class="workspace"><section class="table-area"><div id="intro"></div><div class="stage"><div class="stage-top" id="stage-top"></div><div id="scene" aria-label="Low polygon multiplayer game table"></div><div id="stage-bottom"></div><div id="effects-layer" aria-live="polite"></div></div><div id="play-panel"></div></section><aside class="right-rail"><button id="rules-toggle" data-action="toggleRules"></button><section class="rules-panel" id="rules-panel"></section><div id="activity"></div></aside></div><footer><span>MADE FOR GAME NIGHT. BUILT FOR YOUR RULES.</span><span>SELF-HOSTED <i></i> VERSION 0.12</span></footer></main></div><div id="toast" role="status" aria-live="polite"></div><div id="modal-root"></div>`;
 try {
     scene = new GameScene(document.querySelector('#scene')!);
 }
@@ -78,7 +81,7 @@ function render() {
     const focus = document.activeElement as HTMLInputElement | HTMLTextAreaElement | null;
     const focusId = focus?.id;
     const position = focus && 'selectionStart' in focus ? focus.selectionStart : null;
-    const drafts = new Map(['poker-raise','chat','guess','trivia-answer','player-name','room-code','scribble-guess','rpg-name','rpg-inventory','rpg-notes','rpg-narrative','rpg-enemy-name','rpg-enemy-x','rpg-enemy-y','rpg-enemy-hp','rpg-enemy-ac','rpg-target','rpg-die','rpg-ability'].map(key => [key, (document.getElementById(key) as HTMLInputElement | null)?.value]));
+    const drafts = new Map(['scribble-award-target','sore-loser-target','poker-raise','chat','guess','trivia-answer','player-name','room-code','scribble-guess','rpg-name','rpg-inventory','rpg-notes','rpg-narrative','rpg-enemy-name','rpg-enemy-x','rpg-enemy-y','rpg-enemy-hp','rpg-enemy-ac','rpg-target','rpg-die','rpg-ability'].map(key => [key, (document.getElementById(key) as HTMLInputElement | null)?.value]));
     if(room?.phase==='lobby') resetTradeDraft();
     applyLayout();
     renderSidebar(); renderHeader(); renderIntro(); renderStage(); renderRules(); renderPlay(); renderActivity();
@@ -131,15 +134,15 @@ const slider = (key: keyof Rules, title: string, min: number, max: number, step 
 const textfield = (key: keyof Rules, title: string, placeholder: string, multiline = false) => `<label class="rule-text"><span>${title}</span>${multiline ? `<textarea data-rule="${key}" placeholder="${placeholder}" ${locked() ? 'disabled' : ''}>${esc(draft[key])}</textarea>` : `<input data-rule="${key}" value="${esc(draft[key])}" placeholder="${placeholder}" ${locked() ? 'disabled' : ''}>`}</label>`;
 function locked() { return !!room && (room.host !== id || room.phase !== 'lobby'); }
 function renderRules() {
-    const card = ['bluff', 'tarneeb', 'cards'].includes(draft.game);
+    const card = ['bluff', 'tarneeb', 'cards','poker'].includes(draft.game);
     let fields = '';
     if (rulesTab === 'general')
-        fields = `<div class="rules-section-title">THE TABLE</div>${slider('maxPlayers', 'Player limit', 2, 8)}<label class="rule-text"><span>Game background</span><select data-rule="background" ${locked()?'disabled':''}>${Object.entries(backgrounds).map(([value,title])=>`<option value="${value}" ${draft.background===value?'selected':''}>${title}</option>`).join('')}</select></label><label class="rule-text"><span>Default perspective</span><select data-rule="camera" ${locked() ? 'disabled' : ''}><option value="third" ${draft.camera === 'third' ? 'selected' : ''}>Third person · Overview</option><option value="first" ${draft.camera === 'first' ? 'selected' : ''}>First person · Your seat</option></select></label>${toggle('reverseTurns', 'Reverse turn order', 'Go against the grain. Literally.')}<div class="rules-section-title">A LITTLE MISCHIEF</div>${card ? toggle('allowPeeking', 'Allow card peeking', 'A sneaky look at up to 3 cards.') + toggle('catchPeeking', 'Catch a peeker', 'Bluff: 2-second slap · 8-hand cooldown.') + textfield('penalty', 'Caught-peeking penalty', 'Speak like a pirate until your next turn') : draft.game==='poker'?'<p class="muted">Hole cards stay private until showdown. Poker chaos uses bonus points and between-hand chip challenges.</p>':'<p class="muted">Peeking rules are available in card games. Switch to a card preset to try them.</p>'}`;
+        fields = `<div class="rules-section-title">THE TABLE</div>${slider('maxPlayers', 'Player limit', 2, 8)}<label class="rule-text"><span>Game background</span><select data-rule="background" ${locked()?'disabled':''}>${Object.entries(backgrounds).map(([value,title])=>`<option value="${value}" ${draft.background===value?'selected':''}>${title}</option>`).join('')}</select></label><label class="rule-text"><span>Default perspective</span><select data-rule="camera" ${locked() ? 'disabled' : ''}><option value="third" ${draft.camera === 'third' ? 'selected' : ''}>Third person · Overview</option><option value="first" ${draft.camera === 'first' ? 'selected' : ''}>First person · Your seat</option></select></label>${toggle('reverseTurns', 'Reverse turn order', 'Go against the grain. Literally.')}${toggle('rooftopAntics','Rooftop loser exits','Losing avatars jump off the roof and parachute back.')}${toggle('soreLoser','Sore loser paintball','After a heavy loss, tag a rival once with a cartoon paintball.')}<div class="rules-section-title">A LITTLE MISCHIEF</div>${card ? toggle('allowPeeking', 'Allow card peeking', 'A sneaky look at up to 3 cards.') + toggle('catchPeeking', 'Catch a peeker', '2-second slap window · 4-second reveal · 8-play cooldown.') + textfield('penalty', 'Caught-peeking penalty', 'Speak like a pirate until your next turn') : draft.game==='poker'?'<p class="muted">Hole cards stay private until showdown. Poker chaos uses bonus points and between-hand chip challenges.</p>':'<p class="muted">Peeking rules are available in card games. Switch to a card preset to try them.</p>'}`;
     if (rulesTab === 'game') {
         if (card)
             fields = `<div class="rules-section-title">THE DECK</div>${draft.game === 'tarneeb' ? '<p class="muted">One 52-card deck. Four players. Partners sit in alternating seats.</p>' : slider('decks', 'Number of decks', 1, 3)}${draft.game === 'cards' ? `<label class="rule-text"><span>Card table layout</span><select data-rule="cardLayout" ${locked()?'disabled':''}><option value="free" ${draft.cardLayout==='free'?'selected':''}>Free card sandbox</option><option value="solitaire" ${draft.cardLayout==='solitaire'?'selected':''}>Klondike Solitaire · one player</option></select></label>`+slider('handSize', 'Starting hand', 1, 20) : ''}${draft.game === 'bluff' ? slider('challengeSeconds', 'Challenge window', 5, 30, 1, 's') : ''}${draft.game === 'tarneeb' ? toggle('followSuit', 'Must follow suit', 'Play the led suit if you have it.') + toggle('boxingDuels', 'Box for your ace', 'Fight when an opponent trumps your ace.') + slider('challengeSeconds','Challenge countdown',5,30,1,'s') + slider('targetScore', 'Winning team score', 10, 100) : ''}<p class="rule-callout">${draft.game === 'bluff' ? 'The rank advances A → K. You can play 1–4 cards face down and claim the current rank.' : draft.game === 'tarneeb' ? 'Bid 7–13 tricks. The highest bidder picks trump. Seats 1 + 3 face seats 2 + 4.' : 'Draw, play, collect, and pass. Your group decides the objective.'}</p>`;
         if (draft.game === 'charades')
-            fields = `<div class="rules-section-title">THE SPOTLIGHT</div><label class="rule-text"><span>Charades category · 100 prompts each</span><select data-rule="charadeCategory" ${locked()?'disabled':''}>${Object.entries(charadeCategories).map(([value,title])=>`<option value="${value}" ${draft.charadeCategory===value?'selected':''}>${title}</option>`).join('')}</select></label>${slider('charadeMatchSeconds','Match time limit',30,1200,30,'s')}${slider('charadeSeconds', 'Time per prompt', 15, 180, 5, 's')}${toggle('allowSkipping', 'Allow skipping', 'Sometimes a prompt just isn’t it.')}${slider('skipPenalty', 'Points lost per skip', 0, 5)}${textfield('charadePrompts', 'Your own prompts', 'One prompt per line. Leave blank for the house collection.', true)}`;
+            fields = `<div class="rules-section-title">THE SPOTLIGHT</div><label class="rule-text"><span>Charades category · 100 prompts each</span><select data-rule="charadeCategory" ${locked()?'disabled':''}>${Object.entries(charadeCategories).map(([value,title])=>`<option value="${value}" ${draft.charadeCategory===value?'selected':''}>${title}</option>`).join('')}</select></label>${slider('charadeSeconds', 'Guessing time per teammate', 15, 180, 5, 's')}${slider('charadeRounds','Rounds per pair',1,5)}<p class="rule-callout">Each person guesses for the full timer. Their partner acts, then they swap roles for another full timer. Both turns count toward the pair’s total. Choose partners in the lobby.</p>${toggle('allowSkipping', 'Allow skipping', 'Sometimes a prompt just isn’t it.')}${slider('skipPenalty', 'Points lost per skip', 0, 5)}${textfield('charadePrompts', 'Your own prompts', 'One prompt per line. Leave blank for the house collection.', true)}`;
         if (['property', 'life'].includes(draft.game))
             fields = `<div class="rules-section-title">THE BANK</div>${slider('startingCash', 'Starting cash', 100, 10000, 100, ' $')}${slider('salary', 'Pass Home bonus', 0, 2000, 50, ' $')}${slider('roundLimit', 'Round limit', 3, 50)}${draft.game === 'property' ? slider('rentMultiplier', 'Rent multiplier', .25, 5, .25, '×') + toggle('freeParking', 'Rest-stop jackpot', 'Collect taxes paid into the pot.') + toggle('allowTrading', 'Property negotiations', 'Offer cash and property to any player.') + toggle('tradeSlaps', 'Refusal slap', 'Turn down a deal with a cartoon slap.') : '<p class="rule-callout">Choose a career. Take the steady path or chance a bigger reward. Highest net worth wins.</p>'}`;
     }
@@ -154,6 +157,7 @@ function renderRules() {
 function cardHTML(c: Card, selectable = true) { return `<button class="playing-card ${c.suit === '♥' || c.suit === '♦' ? 'red' : ''} ${selected.has(c.id) ? 'selected' : ''}" ${selectable ? `data-card="${esc(c.id)}"` : 'disabled'} aria-label="${rank(c.rank)} ${c.suit}" aria-pressed="${selected.has(c.id)}"><span>${rank(c.rank)}<small>${c.suit}</small></span><b>${c.suit}</b><span class="card-foot">${rank(c.rank)}</span></button>`; }
 function renderPlay() {
     const el = document.querySelector('#play-panel')!;
+    renderPeekQuickEvent();
     const g = games[draft.game];
     if (!room) {
         const invite = new URLSearchParams(location.search).get('room') || '';
@@ -162,17 +166,19 @@ function renderPlay() {
     }
     const me = room.players.find(p => p.id === id), myTurn = room.players[room.turn]?.id === id, host = room.host === id;
     if (room.phase === 'lobby') {
-        el.innerHTML = `<div class="lobby-panel"><div><small class="eyebrow">INVITE YOUR PEOPLE</small><div class="invite-code">${room.code} ${button('⧉ Copy invite', 'invite', false, 'text-btn')}</div><p>${g.name} · ${room.players.length} at the table · ${draft.game === 'tarneeb' ? '4 needed' : draft.game === 'cards'||draft.game==='rpg' ? '1–8 players' : draft.game==='charades'?'2, 4, 6 or 8 · adjacent seats form pairs':'2–8 players'}</p></div><div class="lobby-actions">${button(host ? 'Start game →' : me?.ready ? 'Ready ✓' : 'I’m ready', '' + (host ? 'start' : 'ready'), !connected || (host && draft.game==='trivia' && (room.players.length<2||draft.triviaHostMode==='master'&&!room.triviaMaster)) || (host&&draft.game==='cards'&&draft.cardLayout==='solitaire'&&room.players.length!==1)||(host && draft.game==='charades' && ![2,4,6,8].includes(room.players.length)), 'primary')}${button('Leave table', 'leave', false, 'text-btn')}</div></div>${draft.game==='trivia'&&draft.triviaHostMode==='master'?`<div class="trivia-lobby"><h3>Trivia master</h3><p>${room.triviaMaster?esc(room.players.find(p=>p.id===room!.triviaMaster)?.name)+' will ask the questions.':'One person volunteers to ask questions; everyone else competes.'}</p>${room.rules.game!=='trivia'?host?button('Apply Trivia rules','apply',false,'primary'):'Waiting for the host to apply Trivia rules.':button(room.triviaMaster===id?'Release master seat':'Volunteer as trivia master','triviaVolunteer',!!room.triviaMaster&&room.players.some(p=>p.id===room!.triviaMaster)&&room.triviaMaster!==id,'secondary')}</div>`:''}${expansionLobby(room,id)}${draft.customNotes ? `<div class="house-contract"><strong>Tonight’s house contract</strong><p>${esc(draft.customNotes)}</p></div>` : ''}`;
+        el.innerHTML = `<div class="lobby-panel"><div><small class="eyebrow">INVITE YOUR PEOPLE</small><div class="invite-code">${room.code} ${button('⧉ Copy invite', 'invite', false, 'text-btn')}</div><p>${g.name} · ${room.players.length} at the table · ${draft.game === 'tarneeb' ? '4 needed' : draft.game === 'cards'||draft.game==='rpg' ? '1–8 players' : draft.game==='charades'?'2, 4, 6 or 8 · choose your pair below':'2–8 players'}</p></div><div class="lobby-actions">${button(host ? 'Start game →' : me?.ready ? 'Ready ✓' : 'I’m ready', '' + (host ? 'start' : 'ready'), !connected || (host && draft.game==='trivia' && (room.players.length<2||draft.triviaHostMode==='master'&&!room.triviaMaster)) || (host&&draft.game==='cards'&&draft.cardLayout==='solitaire'&&room.players.length!==1)||(host && draft.game==='charades' && ![2,4,6,8].includes(room.players.length)), 'primary')}${button('Leave table', 'leave', false, 'text-btn')}</div></div>${draft.game==='trivia'&&draft.triviaHostMode==='master'?`<div class="trivia-lobby"><h3>Trivia master</h3><p>${room.triviaMaster?esc(room.players.find(p=>p.id===room!.triviaMaster)?.name)+' will ask the questions.':'One person volunteers to ask questions; everyone else competes.'}</p>${room.rules.game!=='trivia'?host?button('Apply Trivia rules','apply',false,'primary'):'Waiting for the host to apply Trivia rules.':button(room.triviaMaster===id?'Release master seat':'Volunteer as trivia master','triviaVolunteer',!!room.triviaMaster&&room.players.some(p=>p.id===room!.triviaMaster)&&room.triviaMaster!==id,'secondary')}</div>`:''}${charadeLobby(room,id)}${expansionLobby(room,id)}${draft.customNotes ? `<div class="house-contract"><strong>Tonight’s house contract</strong><p>${esc(draft.customNotes)}</p></div>` : ''}`;
         return;
     }
     if (room.phase === 'finished') {
-        el.innerHTML = `<div class="winner-panel"><span>✦</span><div><small>THE HOUSE HAS SPOKEN</small><h2>${room.endedEarly?'Game ended early.':esc(room.winner)+' wins.'}</h2><p>${room.endedEarly?'No winner was declared. Ready for another round?':'Good game. Questionable decisions.'}</p></div>${host ? button('Restart game →', 'restartAsk', false, 'primary')+button('Edit rules / lobby', 'lobby', false, 'secondary') : '<p>Waiting for the host to open a new game.</p>'}</div>`;
+        el.innerHTML = `<div class="winner-panel"><span>✦</span><div><small>THE HOUSE HAS SPOKEN</small><h2>${room.endReason==='tableFlip'?'Table flipped. Nobody wins.':room.endedEarly?'Game ended early.':esc(room.winner)+' wins.'}</h2><p>${room.endedEarly?'No winner was declared. Ready for another round?':'Good game. Questionable decisions.'}</p></div>${host ? button('Restart game →', 'restartAsk', false, 'primary')+button('Edit rules / lobby', 'lobby', false, 'secondary') : '<p>Waiting for the host to open a new game.</p>'}</div>`;
         if(draft.game==='poker')el.insertAdjacentHTML('beforeend',pokerPlay(room,id));
         if(draft.game==='trivia')el.insertAdjacentHTML('beforeend',`<div class="charades-recap"><h3>Trivia results · ${room.trivia?.category?esc(triviaCategories[room.trivia.category]):'Round ended'}</h3>${room.trivia?.current?`<p>Final question: ${esc(room.trivia.current.question)}<br>Answer: <strong>${esc(room.trivia.current.answer)}</strong></p>`:''}${room.players.filter(p=>p.id!==room!.trivia?.master).sort((a,b)=>b.score-a.score).map(p=>`<div><strong>${esc(p.name)}${p.id===id?' (you)':''}</strong><b>${p.score} ${p.score===1?'point':'points'}</b><span>${p.correctAnswers} correct</span></div>`).join('')}</div>`);
-        if(draft.game==='charades')el.insertAdjacentHTML('beforeend',`<div class="charades-recap"><h3>Match results · ${esc(charadeCategories[draft.charadeCategory])}</h3><p>You guessed <strong>${me?.correctAnswers||0}</strong> correctly · ${room.charadeCorrect.reduce((a,b)=>a+b,0)} total correct</p>${room.charadeCorrect.map((correct,i)=>`<div><strong>Pair ${i+1} · ${room!.players.slice(i*2,i*2+2).map(p=>esc(p.name)).join(' + ')}</strong><b>${correct} correct</b><span>${room!.charadeScores[i]} points</span></div>`).join('')}</div>`);
+        if(draft.game==='charades')el.insertAdjacentHTML('beforeend',charadeRecap(room,id));
+        el.insertAdjacentHTML('beforeend',aftermathControls(room,id));
         return;
     }
-    const poker=pokerPlay(room,id);if(poker){el.innerHTML=poker;return;}
+    const charade=charadePlay(room,id);if(charade){el.innerHTML=charade;return;}
+    const poker=pokerPlay(room,id);if(poker){el.innerHTML=poker+peekControls(room,id);return;}
     const extra=expansionPlay(room,id);if(extra){el.innerHTML=extra;if(room.busyUntil>Date.now()||room.raid)el.querySelectorAll<HTMLButtonElement>('button').forEach(b=>b.disabled=true);return;}
     let controls = '', content = '';
     if (['cards', 'bluff', 'tarneeb'].includes(draft.game)) {
@@ -193,24 +199,7 @@ function renderPlay() {
                 controls += button('Deal next hand →', 'nextHand', !myTurn, 'primary');
             content += `<div class="trick-cards">${(room.trick.length ? room.trick : room.lastTrick || []).map(t => `<div>${cardHTML(t.card, false)}<small>${esc(room!.players.find(p => p.id === t.player)?.name)}</small></div>`).join('')}</div>`;
         }
-        if (draft.allowPeeking) {
-            content += `<div class="peek-controls"><span>Feeling sneaky?</span>${room.players.filter(p => p.id !== id).map(p => `<div>${button('Peek ' + esc(p.name), '', ((draft.game==='tarneeb' && room!.players.findIndex(q=>q.id===id)%2===room!.players.indexOf(p)%2) || room!.players.find(q=>q.id===id)!.peekingUntil>Date.now() || (draft.game==='bluff' && room!.players.find(q=>q.id===id)!.peekBlockedUntil>room!.bluffPlays)), 'secondary peek-btn').replace('data-action=""', `data-kind="peek" data-target="${p.id}"`)}${draft.catchPeeking && draft.game!=='bluff' ? `<button class="text-btn" data-kind="catch" data-target="${p.id}">Catch${p.peekingUntil > Date.now() ? ' 👀' : ''}</button>` : ''}</div>`).join('')}</div>`;
-        }
-        const cooldown=Math.max(0,(room.players.find(p=>p.id===id)?.peekBlockedUntil||0)-room.bluffPlays);
-        if(draft.game==="bluff" && cooldown)content+=`<small class="peek-cooldown">Peek cooldown · ${cooldown} hands remaining</small>`;
-        const attempt=room.players.find(p=>p.id===id);if(attempt && !attempt.peekRevealed && attempt.peekingUntil>Date.now())content+=`<div class="peek-pending">Leaning in… cards stay hidden for <b data-countdown="${attempt.peekRevealsAt}"></b></div>`;
-        if (peek.length)
-            content += `<div class="peek-window"><strong>Quick peek · 4 seconds</strong><div class="hand">${peek.map(c => cardHTML(c, false)).join('')}</div></div>`;
-    }
-    if (draft.game === 'charades' && room.charade) {
-        const actor = room.charade.actor === id, pair=Math.floor(room.players.findIndex(p=>p.id===id)/2), actorPair=Math.floor(room.players.findIndex(p=>p.id===room!.charade!.actor)/2), partner=room.players[pair*2+(room.players.findIndex(p=>p.id===id)%2===0?1:0)];
-        content = `<div class="charade-panel"><div><small class="eyebrow">${actor ? 'YOUR SECRET PROMPT' : 'IN THE SPOTLIGHT'}</small><h2>${actor ? esc(room.charade.prompt) : esc(room.players.find(p => p.id === room!.charade!.actor)?.name) + ' is acting…'}</h2><p>${actor ? draft.charadeCategory==='accents'?'Voice round: perform the accent for your partner.':'Keep quiet. Let your performance do the talking.' : 'Watch their performance in person or on your group call.'}</p></div><div class="timer" data-countdown="${room.charade.ends}"></div></div>`;
-        content+=`<div class="charade-match"><span>${esc(charadeCategories[draft.charadeCategory])} · Pair ${actorPair+1} acting</span><strong>Match ends in <b data-countdown="${room.charadeMatchEnds}"></b></strong><span>Your pair: ${room.charadeCorrect[pair]} correct · ${room.charadeScores[pair]} points</span></div>`;
-        if (actor)
-            controls = `${button('Skip prompt', 'skip', !draft.allowSkipping, 'secondary')}<label class="bid-label">Who got it?<select id="award-target">${[partner].filter(Boolean).map(p => `<option value="${p.id}">${esc(p.name)}</option>`).join('')}</select></label>${button('Confirm correct answer ✓', 'award', false, 'primary')}`;
-        else if(pair===actorPair)
-            controls = `<form id="guess-form"><input id="guess" placeholder="Type the full prompt or guess out loud…" aria-label="Your guess" maxlength="180" required><button class="primary">Guess →</button></form>`;
-        else controls=`<p class="muted">Watching Pair ${actorPair+1}. Only the actor’s partner guesses this prompt.</p>`;
+        content+=peekControls(room,id);
     }
     if(draft.game==='trivia'&&room.trivia){
       const t=room.trivia,master=t.master===id,eligible=room.players.filter(p=>p.id!==t.master&&p.connected&&(!t.activePlayer||p.id===t.activePlayer)),mine=!master&&(!t.activePlayer||t.activePlayer===id);
@@ -263,12 +252,12 @@ function renderActivity() {
 function renderPeekQuickEvent(){
     let layer=document.querySelector<HTMLElement>("#peek-quick-event");
     if(!layer){layer=document.createElement("div");layer.id="peek-quick-event";document.querySelector(".stage")?.append(layer);}
-    const peeker=room?.phase==="playing" && room.rules.game==="bluff" && room.rules.catchPeeking ? room.players.find(p=>p.peekTarget===id && p.catchUntil>Date.now() && p.peekingUntil>Date.now()) : undefined;
+    const peeker=room?.phase==="playing" && ["bluff","tarneeb","cards","poker"].includes(room.rules.game) && room.rules.catchPeeking ? room.players.find(p=>p.peekTarget===id && p.catchUntil>Date.now() && p.peekingUntil>Date.now()) : undefined;
     layer.innerHTML=peeker?`<div class="peek-qte" data-expires="${peeker.catchUntil}" role="alert"><strong>${esc(peeker.name)} is peeking at YOUR cards!</strong><button class="danger" data-kind="catch" data-target="${peeker.id}">Slap the peeker ✋ <b data-countdown="${peeker.catchUntil}"></b></button><small>Catch them now · 8-hand peek cooldown</small></div>`:"";
 }
 function updateTimers() { document.querySelectorAll<HTMLElement>(".peek-qte").forEach(el=>{if(Number(el.dataset.expires)<=Date.now())el.remove();}); document.querySelectorAll<HTMLElement>('[data-countdown]').forEach(el => { el.textContent = Math.max(0, Math.ceil((Number(el.dataset.countdown) - Date.now()) / 1000)) + 's'; }); }
 setInterval(updateTimers, 250);
-setInterval(()=>tickChaosAudio(audio,room),100);
+setInterval(()=>{tickChaosAudio(audio,room);rooftopAudio(audio,room);},100);
 app.addEventListener('click', async (e) => {
     const el = (e.target as HTMLElement).closest<HTMLElement>('button');
     if (!el || el.hasAttribute('disabled'))
@@ -463,6 +452,7 @@ function showHelp() { document.querySelector('#modal-root')!.innerHTML = `<div c
 const labels: Record<string, string> = {
   deal:'Shuffle up. Cards coming your way…',roll:'Dice rolling · follow your token',play:'Card on the table',draw:'One card coming your way',collect:'Picking up the pile',
   bid:'A bold bid',bidPass:'Passing the bid',trump:'Trump has been chosen',trick:'Trick won',challenge:'Calling that bluff!',peek:'A sneaky peek',catch:'Caught red-handed!',
+  charadeTurn:'Partners, get ready!',soreLoserShot:'SORE LOSER · PAINTBALL!',rooftopJump:'Rooftop exit · parachute deployed',
   pokerAction:'Poker action',pokerStreet:'Community cards dealt',pokerWin:'Pot awarded!',
   triviaCorrect:'Correct! ★ One point earned',triviaQuestion:'Next question · get ready',triviaResult:'Question resolved',
   start:'Game on!',correct:'That’s it! Points on the board',skip:'Next prompt!',timeout:'Time’s up!',buy:'A new property owner',sell:'Back to the bank',
@@ -527,6 +517,7 @@ if(scene)scene.onPick=(pick)=>{
   if(pick.action==='play'){if(!selected.size){toast('Pick your card on the table first.');return;}send({type:'play',cards:[...selected],claim:room.claim});}
   else if(pick.action)send({type:pick.action});
 };
+bindParty(app,send);
 bindPoker(app,()=>room,send);
 bindExpansion(app,()=>room,()=>id,send,render);
 render();

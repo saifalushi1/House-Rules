@@ -5,7 +5,7 @@ export const chaosRules = {
   chaosCyclone:['Cyclone','Pass hands at safe round boundaries; other games pass chaos points.'],
   chaosDouble:['Double or Nothing','Flip a coin to double or erase each positive score/cash gain.'],
   chaosDie:['Chaos Die','A d12 chooses a shared modifier for each round.'],
-  chaosTableFlip:['Table Flip','The lowest scorer gets one table flip per match.'],
+  chaosTableFlip:['Table Flip','The lowest scorer rolls a d6, flips the table and ends the game. Nobody wins.'],
   chaosBlackout:['Blackout','Random turn-start blackouts spotlight only the active player for 10 seconds.'],
   chaosRobin:['Robin Hood','A gaining leader pays one point or coin to last place.'],
   chaosBanned:['Banned Word','A secret host-visible word changes each round; chat slips cost a point/coin.'],

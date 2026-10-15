@@ -47,6 +47,7 @@ function settle(r:Room){
       winners.forEach((s,i)=>payout(r,s.id,share+(i<odd?1:0),handLabel(ranked.get(s.id)!)));g.pots.push({amount,winners:winners.map(s=>s.id)});
     }
   }
+  r.bluffPlays++;for(const p of r.players){p.peekTarget=undefined;p.peekingUntil=0;p.catchUntil=0;p.peekRevealed=false;}
   g.pot=0;g.ends=0;g.street='handEnd';g.seats.forEach(s=>{s.bet=0;s.total=0;});r.players.forEach(p=>p.bankrupt=p.cash<=0);
   r.busyUntil=Math.max(r.busyUntil,Date.now()+1600);
   const wins=g.payouts.filter(p=>!p.refund);for(const id of new Set(wins.map(w=>w.player))){r.players.find(p=>p.id===id)!.score++;if(r.chaos)r.chaos.points[id]=(r.chaos.points[id]||0)+1;}emit(r,'pokerWin',wins[0]?.player,undefined,{payouts:wins,pot:g.lastPot,text:wins.map(w=>`${r.players.find(p=>p.id===w.player)!.name} +${w.amount}`).join(' · ')});

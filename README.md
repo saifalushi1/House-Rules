@@ -2,7 +2,7 @@
 
 ![House Rules poster: friends playing cards, charades, trivia and board games around a low-poly table](docs/images/house-rules-poster.png)
 
-A self-hosted TypeScript game-night sandbox. Low-poly 3D table and avatars, private hands, live shared rooms, and host-editable presets. Version 0.11 adds multiplayer no-limit Texas Hold’em poker, with configurable stacks/blinds, private hole cards, betting rounds, all-ins, side pots, showdown rankings, and animated cards/chips with action sounds. Also includes Scribble, a D&D-style tabletop RPG, Klondike Solitaire, optional-master Trivia, a challenge-and-steal chaos rule, and seven environments. Trivia has 1,000 questions across ten categories; pair Charades has 1,900 prompts across 19 categories.
+A self-hosted TypeScript game-night sandbox. Low-poly 3D table and avatars, private hands, live shared rooms, and host-editable presets. Version 0.12 adds chosen Charades teammates and full timed turns, four-player Scribble scoring receipts, shared peek/slap rules for all multiplayer card presets, a game-ending d6 Table Flip, and rooftop animations with cosmetic paintball retaliation. No-limit Texas Hold’em includes private cards, betting rounds, side pots and showdown. Also includes Scribble, a D&D-style tabletop RPG, Klondike Solitaire, optional-master Trivia, a challenge-and-steal chaos rule, and seven environments. Trivia has 1,000 questions across ten categories; pair Charades has 1,900 prompts across 19 categories.
 
 ## Start on this machine
 
@@ -24,6 +24,36 @@ Use a private VPN connection such as [Tailscale machine sharing](https://tailsca
 
 Use it with trusted friends. Room codes are lightweight invite gates, not account authentication. No router or firewall changes have been made automatically. For an internet deployment, put the server behind HTTPS and authentication rather than exposing HTTP directly.
 
+## Version 0.12: team turns, shared peeking and rooftop antics
+
+### Charades: choose partners, then play full timed turns
+
+Choose **Charades**, apply its rules, and invite 2, 4, 6 or 8 players. In the lobby, each person clicks **Join pair** to choose a teammate; a pair holds exactly two people. The host can use **Automatic random pairs** instead. Starting fills open slots with unassigned players without breaking chosen partnerships. Team numbers and partnerships remain fixed through chaos seat changes.
+
+Set **Game rules → Guessing time per teammate**, a category, and **Rounds per pair** before starting. At 120 seconds, Pair 1’s first member gets two uninterrupted minutes to guess while their teammate acts. Correct answers and skips replace the prompt without changing or extending the timer. When it expires, the teammates swap roles and the second member gets another full two minutes. Pair 2 then receives the same two turns, followed by any remaining pairs. With more than one round, repeat that schedule. For four people, one round at 120 seconds is eight minutes total. The server gives each new turn its full allowance even if a timer tick arrives late. The former whole-match cutoff is no longer used.
+
+Only the active guesser can type answers. The actor sees the private prompt, skips if allowed, and confirms spoken answers. A correct answer gives one point to the current guesser; both teammates’ personal totals combine into the pair score. Skip penalties apply to that turn’s guesser and pair. The highest pair total wins after all scheduled turns; ties are shared. The results show combined pair points and personal correct-answer counts. These rules replace the older immediate-rotation behavior described in historical version notes below.
+
+### Scribble: four-player scoring and spoken guesses
+
+Drawing turns now follow a fixed roster so a changing chaos order cannot skip someone’s drawing turn. All four players are covered by regression checks: each guesses three drawings and earns drawer points on their own. Every correct guess awards the guesser **5 + one point per ten full seconds remaining**, and the drawer **2 points**, exactly once per guesser per drawing. The score panel lists each person’s earned guessing and drawing totals; chat records both awards. Enabled score-changing chaos rules can still change the final point total, while the earned totals explain the original credits. Delayed guesses from an older drawing are rejected.
+
+For voice play, the drawer selects a player under **Spoken correct guess** and clicks **Award spoken guess**. This uses the same points and duplicate protection as typing. Only the current drawer can award; they cannot award themselves. Secret words stay private until the drawing resolves.
+
+### Shared peeking and the d6 Table Flip
+
+Enable **Allow card peeking** and **Catch a peeker** for Bluff, Tarneeb, free card sandbox or Poker. All use the same lean, two-second victim-only slap event, delayed four-second reveal, and eight-play/hand cooldown after a successful catch. The slap animation briefly pulls first-person cameras back so both characters are visible. Tarneeb partners remain protected. Time Warp votes and challenge offers cannot start during a victim’s reaction window. Disabling catching permits an immediate four-second peek; disabling peeking prevents the feature entirely.
+
+**Table Flip** now rolls an actual six-sided die, flips the table and immediately ends the entire match with **no winner**, for every result. Final score/order totals are left as they were; outstanding gameplay, guesses, prompt timers, votes and duels cannot resume the match. The eligible lowest scorer uses it once per match at a clear table boundary; Poker permits it between hands. Restart resets it. The previous score/order-scramble selector is retained only for old imported recipes and has no effect on this rule.
+
+### City rooftop
+
+The rooftop skyline now has two distant polygon towers and a looping plane/impact sequence, with low-poly smoke and distant impact sounds. The action stays outside the table area. At a normally completed game, losing avatars run to the edge, jump off and parachute back; the camera widens for the seven-second exit. Winners, all-player ties, manual early endings and Table Flip’s no-winner ending do not trigger loser exits. **The basics → Rooftop loser exits** toggles this easter egg.
+
+Enable **Sore loser paintball** under The basics for a once-per-match postgame action in any background. A lowest-scoring losing player may tag another connected avatar after a heavy loss: a gap of at least half the winning total and at least three points, ten remaining cards, or half a starting chip/cash stack as appropriate. Team games compare team results. A colorful paintball flies, splats and briefly knocks the target over; scores and ownership remain final. The button appears only for eligible players and waits for rooftop exits to finish. All effects have synthesized sounds and respect the header mute control.
+
+The v0.12 checks include four-player Scribble rotation/awards, custom teammates, full 120-second turns, eight-player schedules, pair-score conservation, all card peek timings and cooldowns, no-winner endings for every game, rooftop result eligibility and one-use paintball authority. Source modules include server/charades.ts, server/peek.ts, server/aftermath.ts, shared/aftermath.ts and the party/rooftop interface and animation modules.
+
 ## Included games
 
 | Preset | Playable behavior |
@@ -32,7 +62,7 @@ Use it with trusted friends. Room codes are lightweight invite gates, not accoun
 | Bluff / Bullshit | Deal the whole deck; claim A–K in sequence, play 1–4 hidden cards, timed challenges, liar or caller takes the pile, first empty hand wins after the challenge window. |
 | Tarneeb | Four seats, alternating partnerships, 7–13 auction, trump selection, optional follow-suit enforcement, trick winner, hand scoring, and target team score. |
 | Card sandbox | Private hands and shared piles, or a one-player Klondike Solitaire layout with stock, waste, tableau runs and suit foundations. |
-| Charades | 2, 4, 6 or 8 players in pairs; 19 categories with 100 prompts each, custom prompts, prompt and match timers, partner guesses, spoken-answer awards, skipping and a final pair/personal recap. Use an existing group call when apart. |
+| Charades | 2, 4, 6 or 8 players in pairs; 19 categories with 100 prompts each, custom prompts, chosen lobby teammates, a full guessing timer for each member, combined pair scores, spoken-answer awards, skipping and a final recap. Use an existing group call when apart. |
 | Trivia | 2–8 players; everyone competes with automatic questions, or a volunteer trivia master hosts. Ten categories with 100 questions each, timed rounds and free-for-all/turn-based answers. |
 | Scribble | 2–8 players; rotating drawers choose secret words, share a live drawing canvas, and score points for timed guesses. |
 | D&D tabletop | 1–8 people; original simplified d20 adventure with a dungeon master, four classes, character sheets, an 8×8 battle map, dice, initiative, spells, combat, XP and gold. |
@@ -82,7 +112,7 @@ Before starting, open **House rules → Chaos**. Enable any combination of the t
 | Cyclone | At round boundaries or random turn starts, pass hands left/right. In games without hands, pass the bonus chaos tallies instead. | Cards fan out and orbit; shuffle riffle and wind. |
 | Double or Nothing | A server coin flip doubles or erases each positive gain. Cash is used on boards, team points in Tarneeb, pair points in Charades, contestant points in Trivia, and bonus chaos points in Bluff/Card sandbox. Losses stay unchanged. | Giant spinning coin; ring, jackpot or descending trombone-like tones. |
 | Chaos Die | Roll a d12 each round for a shared modifier, listed below. | Oversized polygon die tumbles above the table with its numbered result; rattle and thud. |
-| Table Flip | Once per match, a lowest-scoring player can scramble score totals or future turn order. Tied lowest players are eligible; the first accepted flip consumes it. | Table flips and settles; crash and rumble. |
+| Table Flip | Once per match, a lowest-scoring player rolls a d6 and ends the entire game. Every result (1–6) ends with nobody winning. Ties for lowest qualify. | Six-sided die tumbles, then the table flips; rattle, crash and rumble. |
 | Blackout | Configurable chance at turn start; darkens the scene for ten seconds and spotlights the active player. Text, cards and gameplay controls remain usable. | Lights cut to a spotlight; power-down hum and thunder. |
 | Robin Hood | A gaining leader transfers one cash unit or point to last place, once per accepted action. Team/pair totals are treated as one score. | Coins arc between players; ka-ching. |
 | Banned Word | A random single word from the host's list changes each round. Only the host sees the active word until an offence reveals it. Chat and typed guesses are checked as whole words, ignoring case. The host reports voice slips with the player selector. | Sealed-word stamp, red X over the offender; thunk and buzzer. |
@@ -105,12 +135,12 @@ The host can edit rules before a game or return everyone to the lobby to change 
 
 - General: player limit, default first/third-person view, reverse turns.
 - Cards: peeking, catching peekers, penalty text, deck count, hand size, challenge window, follow suit, target score.
-- Charades: category, custom prompts (one per line), time per prompt, match time limit, skip toggle and penalty, rounds per player.
+- Charades: category, custom prompts (one per line), guessing time per teammate (15–180 seconds), rounds per pair (1–5), skip toggle/penalty and chosen or automatic lobby teams.
 - Trivia: questions per round (1–100), seconds per question (5–180), free-for-all or turn-based answers. The trivia master chooses the category after the game starts.
 - Boards: starting cash, Home bonus, round limit, rent multiplier, rest-stop jackpot.
 - Custom: written house contract and JSON rule import/export.
 
-Peeking reveals up to three cards for four seconds. In Bluff with catching enabled, the target first gets a two-second slap reaction window; cards stay hidden until that window ends. A successful slap cancels the reveal and gives the peeker an eight-play cooldown. Tarneeb partners cannot peek at each other. The server announces the chosen funny penalty; the group carries it out. Text house rules are group agreements, not executable scripts. You can change your own camera during play.
+In Bluff, Tarneeb, free card sandbox and Poker, peeking reveals up to three held cards (two in Poker). With catching enabled, the victim first gets two seconds to slap; cards remain private until that window ends, then a fresh four-second reveal begins. A successful slap cancels the reveal and blocks the peeker for eight accepted card plays, or eight completed Poker hands. Tarneeb partners cannot peek at each other; folded Poker hands and Solitaire cannot be peeked at. The server announces the chosen funny penalty; the group carries it out. Text house rules are group agreements, not executable scripts. You can change your own camera during play.
 
 ## Development
 
@@ -158,7 +188,7 @@ Rooms are in memory. Restarting the server clears games. Disconnected rooms expi
 
 ## Verification
 
-149 automated tests pass, including a full 13-trick Tarneeb hand, challenge resolution, timer behavior, private views, validation, scoring, board actions and a real two-client reconnect flow. Browser checks cover room creation, joining, private deals, card selection/play, calling bluff, camera switching, enlarged board views, negotiation offers and refusals, and host rule editing.
+169 automated tests pass, including a full 13-trick Tarneeb hand, challenge resolution, timer behavior, private views, validation, scoring, board actions and a real two-client reconnect flow. Browser checks cover room creation, joining, private deals, card selection/play, calling bluff, camera switching, enlarged board views, negotiation offers and refusals, and host rule editing.
 
 ## Version 0.2: the table comes alive
 
@@ -196,7 +226,7 @@ Tarneeb shows the ace-versus-trump challenge countdown. The ace holder can choos
 
 Bluff hands sort A (1) through K (13), then by suit. Calling bluff preserves the already-selected next seat in either outcome. The reveal banner names the accused, the result and the pile recipient. The caller throws cards toward the accused, then the pile flies into the recipient's hand; inputs briefly pause for this animation.
 
-When peeking is enabled, the character leans toward the target. With catching enabled, only that target receives a two-second Slap the peeker event. A successful slap stops the peek immediately, plays the cartoon slap, and blocks the peeker for eight subsequent Bluff plays. The server validates the target, deadline and cooldown. Failed/late reactions do not apply a cooldown. Restart clears it. Peeks otherwise last four seconds.
+When peeking is enabled, the character leans toward the target. With catching enabled, only that target receives a two-second Slap the peeker event. A successful slap stops the peek immediately, plays the cartoon slap, and blocks the peeker for eight subsequent card plays (completed hands in Poker). The server validates the target, deadline and cooldown. Failed/late reactions do not apply a cooldown. Restart clears it. Peeks otherwise last four seconds.
 
 First-person hands sit closer to the player, with smaller cards and rows for large Bluff hands, leaving the center pile visible. Selected cards glow with a minimal lift; hand-list selection stays inside its card footprint so adjacent cards remain accessible.
 
@@ -224,7 +254,7 @@ Patrons stand in open side aisles and clear patches beside the furniture. None s
 
 ## Version 0.7: pair charades and safe peeking
 
-Charades accepts 2, 4, 6 or 8 players. Adjacent lobby seats form pairs: 1+2, 3+4, 5+6, 7+8. Only the actor's partner may submit guesses or be awarded a spoken answer. Roles alternate through the seats. Correct answers count once for the pair and once for the guesser's personal correct-answer count. Skip penalties affect pair points without reducing the count of correct answers.
+Charades accepts 2, 4, 6 or 8 players. The lobby supports chosen teammates or automatic pairs; unassigned players fill open pair slots. Only the actor's partner may submit guesses or be awarded a spoken answer. Each member receives a full timed guessing turn, with their partner acting, before the next pair plays. Correct answers count once for the pair and once for the guesser's personal correct-answer count. Skip penalties affect pair points without reducing the count of correct answers.
 
 Before starting, select one of ten categories under House rules → Game rules. Each category has 100 prompts (50 distinct scenes and 50 specific scenario twists), for a total of 1,000. Categories cover animals, jobs, sports, everyday life, food, travel, fantasy, objects, emotions, and celebrations. Custom prompts may override the category collection. The whole-match timer defaults to five minutes and can be set from 30 seconds to 20 minutes; the prompt timer is bounded by the match deadline. Skipping cannot extend the whole match. The recap lists your correct guesses and each pair's correct-answer total and points, including when the host ends early.
 
@@ -260,7 +290,7 @@ Select **Card sandbox → Game rules → Card table layout → Klondike Solitair
 
 Enable **House rules → Chaos → Winner Takes It**. Challenge another player using the table control. The recipient can accept or refuse within 15 seconds. Accepted duels run three simultaneous-choice beats: jab beats hook, hook beats block, block beats jab. Each beat lasts eight seconds and choices remain private until both players submit or the timer expires. Missed input loses to a submitted move. Tied duels transfer nothing; a participant who disconnects forfeits an accepted duel. Existing prompt/question timers pause and resume with the remaining time.
 
-The game chooses the stake dynamically: card hands in Bluff/Tarneeb/free card sandbox, cash in the board games, gold in the RPG, or points in party games. Winning a hand wager **exchanges the two hands** so the winner gets the opponent's hand while preserving the number of players and the deck; it does not leave a Tarneeb seat empty or accidentally give a Bluff opponent an empty-hand win. Tarneeb partners cannot challenge each other. Charades wagers use personal points and preserve pair totals. Other point wagers transfer the loser's positive scoring total, cash/gold wagers transfer their available positive balance, and a draw leaves ownership unchanged. Solitaire is single-player and has no opponent to challenge.
+The game chooses the stake dynamically: card hands in Bluff/Tarneeb/free card sandbox, chips between Poker hands, cash in the board games, gold in the RPG, or points in party games. Winning a hand wager **exchanges the two hands** so the winner gets the opponent's hand while preserving the number of players and the deck; it does not leave a Tarneeb seat empty or accidentally give a Bluff opponent an empty-hand win. Tarneeb partners cannot challenge each other. Charades wagers transfer personal points; cross-pair transfers update combined pair totals, while transfers within a pair leave its total unchanged. Other point wagers transfer the loser's positive scoring total, cash/gold wagers transfer their available positive balance, and a draw leaves ownership unchanged. Solitaire is single-player and has no opponent to challenge.
 
 Duels show avatar impacts, hand/coin transfer feedback and corresponding sounds. Only participants choose moves; all players watch. Offers and challenges are cleared on restart, early end or return to the lobby.
 

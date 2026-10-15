@@ -7,7 +7,7 @@ export function chaosSound(a:GameAudio,e:GameEvent){if(!e.kind.startsWith('chaos
  else if(kind==='Cyclone'){for(let i=0;i<12;i++)a.noise(.09,i*.1,.25,1800);a.noise(1.5,0,.25,650);}
  else if(kind==='Coin'){for(let i=0;i<8;i++)a.tone(1400,.07,i*.16,'sine',.15);(e.data.won?[523,659,784,1047]:[392,330,262,196]).forEach((f,i)=>a.tone(f,.25,1.3+i*.17,'triangle'));}
  else if(kind==='Die'){for(let i=0;i<9;i++)a.noise(.08,i*.12,.35,450);a.tone(80,.3,1.3,'triangle',.5);}
- else if(kind==='Flip'){a.noise(.65,0,.7,300);a.noise(.5,1,.4,100);a.tone(55,.5,1,'sawtooth',.1);}
+ else if(kind==='Flip'){for(let i=0;i<8;i++)a.noise(.06,i*.1,.3,700);a.noise(.65,1,.7,300);a.noise(.5,1,.4,100);a.tone(55,.5,1,'sawtooth',.1);}
  else if(kind==='Blackout'){[220,160,80].forEach((f,i)=>a.tone(f,.3,i*.15,'sawtooth',.08));a.noise(.8,.5,.4,100);}
  else if(kind==='Robin'){a.tone(1300,.1);a.tone(1800,.2,.12);}
  else if(kind==='Word'){a.noise(.1,0,.5,250);}

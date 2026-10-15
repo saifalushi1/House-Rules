@@ -3,7 +3,7 @@ export const backgrounds={garage:'Big garage',forest:'Forest clearing',speakeasy
 export interface SolitaireState{stock:Card[];waste:Card[];tableau:{cards:Card[];hidden:number}[];foundations:Card[][];moves:number}
 export interface SolitaireView{stockCount:number;waste:Card[];tableau:{cards:(Card|null)[];hidden:number}[];foundations:Card[][];moves:number}
 export interface Stroke{color:string;size:number;points:[number,number][]}
-export interface ScribbleState{drawer:string;word:string;choices:string[];phase:'choose'|'draw'|'result';ends:number;index:number;total:number;strokes:Stroke[];guessed:string[]}
+export interface ScribbleState{order:string[];scores:Record<string,{guess:number;drawing:number;correct:number}>;lastAward?:{guesser:string;drawer:string;guessPoints:number;drawingPoints:number};drawer:string;word:string;choices:string[];phase:'choose'|'draw'|'result';ends:number;index:number;total:number;strokes:Stroke[];guessed:string[]}
 export interface ScribbleView extends Omit<ScribbleState,'word'|'choices'>{word?:string;choices?:string[];letters:number}
 export const classes={fighter:'Fighter',rogue:'Rogue',wizard:'Wizard',cleric:'Cleric'} as const;
 export type RpgClass=keyof typeof classes;
