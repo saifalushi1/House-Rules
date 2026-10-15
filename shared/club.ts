@@ -28,3 +28,6 @@ export function sideBetReturns(cards:Card[],up:Card,pairBet:number,trioBet:numbe
  if(trips&&flush)trio=100;else if(straight&&flush)trio=40;else if(trips)trio=30;else if(straight)trio=10;else if(flush)trio=5;
  if(trio)labels.push('21+3 '+trio+':1');return{returned:(pair?pairBet*(pair+1):0)+(trio?trioBet*(trio+1):0),label:labels.join(' · ')||'No side-bet win'};
 }
+
+/** Fixed world-space rim position; independent of the viewing player's seat or camera. */
+export function pongRackPosition(team:number,x:number,y:number){return{x,y:1.3,z:(team===0?1:-1)*(1.15+y*.75)};}
