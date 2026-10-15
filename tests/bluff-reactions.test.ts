@@ -2,9 +2,9 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {act,makeRoom,player,start,tick,view} from '../server/engine';
 function setup(){const r=makeRoom('TEST','p0');r.players=Array.from({length:3},(_,i)=>player('p'+i,'Player '+i,i));r.rules.allowPeeking=true;start(r);return r;}
-test('only the peeked-at player can slap within two seconds; cooldown lasts eight subsequent plays',()=>{
+test('only the peeked-at player can slap within one second; cooldown lasts eight subsequent plays',()=>{
  const r=setup();act(r,'p0',{type:'peek',target:'p1'});
- assert.ok(r.players[0].catchUntil-Date.now()<=2000);
+ assert.ok(r.players[0].catchUntil-Date.now()<=1000);
  assert.throws(()=>act(r,'p2',{type:'catch',target:'p0'}));
  act(r,'p1',{type:'catch',target:'p0'});
  assert.equal(r.players[0].peekBlockedUntil,8);assert.equal(r.players[0].peekingUntil,0);

@@ -3,10 +3,10 @@ export const chaosRules = {
   chaosHotPotato:['Hot Potato','A shrinking turn timer; expiry gives a random penalty or forces a legal action.'],
   chaosSeatRoulette:['Seat Roulette','Swap physical seats every N turns; keep hands or leave them at the seat.'],
   chaosCyclone:['Cyclone','Pass hands at safe round boundaries; other games pass chaos points.'],
-  chaosDouble:['Double or Nothing','Flip a coin to double or erase each positive score/cash gain.'],
+  chaosDouble:['Double or Nothing','A random coin flip doubles or erases card pickups, or positive score/cash gains.'],
   chaosDie:['Chaos Die','A d12 chooses a shared modifier for each round.'],
   chaosTableFlip:['Table Flip','The lowest scorer rolls a d6, flips the table and ends the game. Nobody wins.'],
-  chaosBlackout:['Blackout','Random turn-start blackouts spotlight only the active player for 10 seconds.'],
+  chaosBlackout:['Blackout','Ten seconds with one fixed spotlight; other players’ actions and sounds are concealed.'],
   chaosRobin:['Robin Hood','A gaining leader pays one point or coin to last place.'],
   chaosBanned:['Banned Word','A secret host-visible word changes each round; chat slips cost a point/coin.'],
   chaosDare:['Dare Wheel','Every penalty spins a dare from the host’s list.'],
@@ -15,7 +15,7 @@ export const chaosRules = {
 export type ChaosToggle = keyof typeof chaosRules;
 export interface ChaosState {
   seats:string[]; order:string[]; turns:number; roundKey:string; points:Record<string,number>;
-  hot?:{player:string;ends:number;duration:number}; blackoutUntil:number;
+  hot?:{player:string;ends:number;duration:number}; blackoutUntil:number; blackoutPlayer?:string;
   modifier?:{face:number;name:string}; flipUsed:boolean; reversed:boolean;
   lastDare?:{player:string;text:string}; word?:string;
   vote?:{requester:string;yes:string[];no:string[];voters:string[];ends:number};

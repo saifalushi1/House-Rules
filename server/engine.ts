@@ -1,3 +1,4 @@
+import {blackoutView,traceBlackout,recordBlackout} from './blackout.js';
 import {initCharades,prepareCharadeTeams,handleCharades,tickCharades} from './charades.js';
 import {handlePeek,clearPeeks} from './peek.js';
 import {handleAftermath,finishEffects} from './aftermath.js';
@@ -6,7 +7,7 @@ import {initSolitaire,solitaireView,handleSolitaire} from './solitaire.js';
 import {initScribble,scribbleView,handleScribble,tickScribble} from './scribble.js';
 import {initRpg,handleRpg} from './rpg.js';
 import {handleRaid,tickRaid} from './raid.js';
-import {initChaos,chaosWord,chaosBefore,chaosAfter,tickChaos,handleChaos,saveChaosAction,commitChaosAction,checkBanned,chaosGuard,invalidateChaos,chaosPenaltiesForAction,takeChaosForcedAction,chaosPenalty} from './chaos.js';
+import {chaosCardGain,initChaos,chaosWord,chaosBefore,chaosAfter,tickChaos,handleChaos,saveChaosAction,commitChaosAction,checkBanned,chaosGuard,invalidateChaos,chaosPenaltiesForAction,takeChaosForcedAction,chaosPenalty} from './chaos.js';
 import {handleTrivia,initializeTrivia,tickTrivia,triviaView} from "./trivia.js";
 import {charadePrompts} from "./charade-prompts.js";
 import { emit, handleInteraction, tickInteractions } from './interactions.js';
@@ -99,7 +100,7 @@ else if (r.round > r.rules.roundLimit) {
     finish(r, winner.name);
 } }
 export function worth(r: Room, p: Player) { return p.cash + r.tiles.filter(t => t.owner === p.id).reduce((n, t) => n + t.price, 0); }
-export function view(r: Room, id: string): View { const { deck, players, lastPlay, charadeBag: _, charade, duel, tradeOffers, trivia: privateTrivia, solitaire:privateSolitaire,scribble:privateScribble,raid:privateRaid,poker:privatePoker, ...publicRoom } = r; const me=players.find(p=>p.id===id);const visiblePeek=r.phase==='playing'&&me&&me.peekTarget&&me.peekRevealed&&me.peekRevealsAt<=Date.now()&&me.peekingUntil>Date.now()?players.find(p=>p.id===me.peekTarget)?.hand.slice(0,3):undefined;return { ...publicRoom,poker:pokerView(r),rpg:r.rules.game==='rpg'?r.rpg:undefined,solitaire:solitaireView(r),scribble:scribbleView(r,id),raid:r.raid?{from:r.raid.from,to:r.raid.to,stake:r.raid.stake,phase:r.raid.phase,pausedAt:r.raid.pausedAt,ends:r.raid.ends,round:r.raid.round,wins:r.raid.wins,ready:Object.keys(r.raid.choices)}:undefined, chaos:r.chaos?{...r.chaos,word:chaosWord(r,id)}:undefined, trivia:triviaView(r,id), peek:visiblePeek, tradeOffers: tradeOffers.filter(t => t.from === id || t.to === id), duel: duel ? { acePlayer: duel.acePlayer, trumpPlayer: duel.trumpPlayer, card: duel.card, round: duel.round, score: duel.score, ends: duel.ends, ready: Object.keys(duel.choices) } : undefined, players: players.map(({ hand, ...p }) => ({ ...p, handCount: hand.length })), hand: players.find(p => p.id === id)?.hand || [], deckCount: deck.length, pileCount: r.pile.length, lastPlay: lastPlay ? { player: lastPlay.player, count: lastPlay.cards.length, claim: lastPlay.claim, expires: lastPlay.expires } : undefined, charade: charade ? { actor: charade.actor,guesser:charade.guesser, ends: charade.ends, ...(id === charade.actor ? { prompt: charade.prompt } : {}) } : undefined, pile: r.rules.game === 'bluff' ? [] : r.pile }; }
+function rawView(r: Room, id: string): View { const { deck, players, lastPlay, charadeBag: _, charade, duel, tradeOffers, trivia: privateTrivia, solitaire:privateSolitaire,scribble:privateScribble,raid:privateRaid,poker:privatePoker, ...publicRoom } = r; const me=players.find(p=>p.id===id);const visiblePeek=r.phase==='playing'&&me&&me.peekTarget&&me.peekRevealed&&me.peekRevealsAt<=Date.now()&&me.peekingUntil>Date.now()?players.find(p=>p.id===me.peekTarget)?.hand.slice(0,3):undefined;return { ...publicRoom,poker:pokerView(r),rpg:r.rules.game==='rpg'?r.rpg:undefined,solitaire:solitaireView(r),scribble:scribbleView(r,id),raid:r.raid?{from:r.raid.from,to:r.raid.to,stake:r.raid.stake,phase:r.raid.phase,pausedAt:r.raid.pausedAt,ends:r.raid.ends,round:r.raid.round,wins:r.raid.wins,ready:Object.keys(r.raid.choices)}:undefined, chaos:r.chaos?{...r.chaos,word:chaosWord(r,id)}:undefined, trivia:triviaView(r,id), peek:visiblePeek, tradeOffers: tradeOffers.filter(t => t.from === id || t.to === id), duel: duel ? { acePlayer: duel.acePlayer, trumpPlayer: duel.trumpPlayer, card: duel.card, round: duel.round, score: duel.score, ends: duel.ends, ready: Object.keys(duel.choices) } : undefined, players: players.map(({ hand, ...p }) => ({ ...p, handCount: hand.length })), hand: players.find(p => p.id === id)?.hand || [], deckCount: deck.length, pileCount: r.pile.length, lastPlay: lastPlay ? { player: lastPlay.player, count: lastPlay.cards.length, claim: lastPlay.claim, expires: lastPlay.expires } : undefined, charade: charade ? { actor: charade.actor,guesser:charade.guesser, ends: charade.ends, ...(id === charade.actor ? { prompt: charade.prompt } : {}) } : undefined, pile: r.rules.game === 'bluff' ? [] : r.pile }; }
 function tickInternal(r: Room) {
     if (r.phase !== 'playing'){if(r.busyUntil&&r.busyUntil<=Date.now()){r.busyUntil=0;return true;}return false;}
     if(tickRaid(r))return true;
@@ -119,7 +120,7 @@ function tickInternal(r: Room) {
     }
     return interactionChanged || peekChanged;
 }
-export function tick(r:Room){const before=chaosBefore(r);const changed=r.chaos?.vote?false:tickInternal(r);if(changed){invalidateChaos(r);chaosAfter(r,before);}const chaosChanged=tickChaos(r);const forced=takeChaosForcedAction(r);if(forced){forceChaosAction(r,forced);return true;}finishEffects(r);return chaosChanged||changed;}
+function tickInternalChaos(r:Room){const before=chaosBefore(r);const changed=r.chaos?.vote?false:tickInternal(r);if(changed){invalidateChaos(r);chaosAfter(r,before);}const chaosChanged=tickChaos(r);const forced=takeChaosForcedAction(r);if(forced){forceChaosAction(r,forced);return true;}finishEffects(r);return chaosChanged||changed;}
 function actInternal(r: Room, id: string, a: Action): {
     peek?: Card[];
 } | void {
@@ -222,8 +223,8 @@ function actInternal(r: Room, id: string, a: Action): {
         const last = r.lastPlay;
         const liar = last.cards.some(c => c.rank !== last.claim);
         const loser = liar ? r.players.find(q => q.id === last.player)! : p;
-        loser.hand.push(...r.pile);
-        note(r, `${p.name} called bluff. ${liar ? 'Caught a lie!' : 'They told the truth!'} ${loser.name} takes ${r.pile.length} cards. Revealed: ${last.cards.map(c => rankName(c.rank) + c.suit).join(', ')}.`);
+        const pickup=chaosCardGain(r,loser.id,r.pile);loser.hand.push(...pickup);
+        note(r, `${p.name} called bluff. ${liar ? 'Caught a lie!' : 'They told the truth!'} ${loser.name} takes ${pickup.length} cards. Revealed: ${last.cards.map(c => rankName(c.rank) + c.suit).join(', ')}.`);
         r.pile = [];
         r.lastPlay = undefined;
         r.busyUntil = Date.now()+2100;
@@ -319,8 +320,8 @@ function actInternal(r: Room, id: string, a: Action): {
     }
     if (a.type === 'draw') {
         need(r.rules.game === 'cards' && r.deck.length, 'The deck is empty or drawing is unavailable.');
-        p.hand.push(r.deck.pop()!);
-        note(r, `${p.name} draws a card.`);
+        const drawn=chaosCardGain(r,p.id,[r.deck.pop()!]);p.hand.push(...drawn);
+        note(r, `${p.name} draws ${drawn.length} card${drawn.length===1?'':'s'}.`);
         return;
     }
     if (a.type === 'pass') {
@@ -330,7 +331,7 @@ function actInternal(r: Room, id: string, a: Action): {
     }
     if (a.type === 'collect') {
         need(r.rules.game === 'cards' && r.pile.length, 'There are no cards to collect.');
-        p.hand.push(...r.pile);
+        p.hand.push(...chaosCardGain(r,p.id,r.pile));
         r.pile = [];
         note(r, `${p.name} collects the pile.`);
         return;
@@ -464,7 +465,7 @@ function commitTarneeb(r: Room, id: string, card: Card) {
     }
 }
 /** Every accepted action carries an explicit, privacy-safe presentation event. */
-export function act(r: Room, id: string, a: Action): { peek?: Card[] } | void {
+function actPresented(r: Room, id: string, a: Action): { peek?: Card[] } | void {
     const p = r.players.find(p => p.id === id);
     need(p&&p.connected,'Join this room first.');
     if(handleRaid(r,id,a))return;
@@ -473,7 +474,7 @@ export function act(r: Room, id: string, a: Action): { peek?: Card[] } | void {
     need(!r.raid||['chat','endGame','lobby','restart'].includes(a.type),'Finish the challenge first.');
     chaosGuard(r,a);
     const chaosBeforeAction=chaosBefore(r),snapshot=saveChaosAction(r,a);
-    const from = p?.position, oldScore = p?.score;
+    const from = p?.position, oldScore = p?.score, oldHandLength=p.hand.length;
     const challenged = a.type === "challenge" && r.lastPlay ? {player:r.lastPlay.player, liar:r.lastPlay.cards.some(c=>c.rank!==r.lastPlay!.claim), cards:r.lastPlay.cards.map(c=>({...c})), count:r.pile.length} : undefined;
     const allPassed = a.type === 'bid' && a.value === 0 && r.bidPassed.length === 3 && !r.bidder;
     const result = actInternal(r, id, a);
@@ -500,6 +501,7 @@ export function act(r: Room, id: string, a: Action): { peek?: Card[] } | void {
         if (r.clash) kind = 'clash';
         data.count = Array.isArray(a.cards) ? a.cards.length : 1;
     }
+    if(a.type==='draw'||a.type==='collect')data.count=p.hand.length-oldHandLength;
     if (a.type === 'roll') {
         r.busyUntil = Date.now() + 1000 + r.lastRoll * 160;
         Object.assign(data, { dice: r.rollDice, from, to: p?.position, steps: r.lastRoll, ends: r.busyUntil });
@@ -531,3 +533,7 @@ function forceChaosAction(r:Room,id:string){
  if(['property','life'].includes(r.rules.game))action=r.pendingLife?{type:'lifeChoice',choice:0}:r.rolled?{type:'endTurn'}:{type:'roll'};
  if(action){try{act(r,id,action);}catch{chaosPenalty(r,id,'Forced action unavailable');}}else chaosPenalty(r,id,'No legal forced action');
 }
+
+export function view(r:Room,id:string):View{return blackoutView(r,id,rawView(r,id),rawView);}
+export function act(r:Room,id:string,a:Action){const before=traceBlackout(r);try{return actPresented(r,id,a);}finally{recordBlackout(r,before,id,a.type==='chat');}}
+export function tick(r:Room){const before=traceBlackout(r);try{return tickInternalChaos(r);}finally{recordBlackout(r,before);}}

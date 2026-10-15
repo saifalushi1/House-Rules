@@ -42,7 +42,7 @@ For voice play, the drawer selects a player under **Spoken correct guess** and c
 
 ### Shared peeking and the d6 Table Flip
 
-Enable **Allow card peeking** and **Catch a peeker** for Bluff, Tarneeb, free card sandbox or Poker. All use the same lean, two-second victim-only slap event, delayed four-second reveal, and eight-play/hand cooldown after a successful catch. The slap animation briefly pulls first-person cameras back so both characters are visible. Tarneeb partners remain protected. Time Warp votes and challenge offers cannot start during a victim’s reaction window. Disabling catching permits an immediate four-second peek; disabling peeking prevents the feature entirely.
+Enable **Allow card peeking** and **Catch a peeker** for Bluff, Tarneeb, free card sandbox or Poker. All use the same lean, one-second victim-only slap event, delayed four-second reveal, and eight-play/hand cooldown after a successful catch. The slap animation briefly pulls first-person cameras back so both characters are visible. Tarneeb partners remain protected. Time Warp votes and challenge offers cannot start during a victim’s reaction window. Disabling catching permits an immediate four-second peek; disabling peeking prevents the feature entirely.
 
 **Table Flip** now rolls an actual six-sided die, flips the table and immediately ends the entire match with **no winner**, for every result. Final score/order totals are left as they were; outstanding gameplay, guesses, prompt timers, votes and duels cannot resume the match. The eligible lowest scorer uses it once per match at a clear table boundary; Poker permits it between hands. Restart resets it. The previous score/order-scramble selector is retained only for old imported recipes and has no effect on this rule.
 
@@ -103,17 +103,17 @@ Each correct answer gives one point, plays a success sound, and pops a gold star
 
 ## Shared chaos rules (v0.10)
 
-Before starting, open **House rules → Chaos**. Enable any combination of the twelve rules, configure their parameters, and **Apply house rules** or start the game. Everything is off by default. All players share the same server-controlled outcomes and receive corresponding 3D animations and synthesized action sounds. During play, expand **✹ Chaos** beside the table for timers, the current die modifier, turn order, bonus tallies, dares, flip controls and rewind voting.
+Before starting, open **House rules → Chaos**. Enable any combination of the twelve rules, configure their parameters, and **Apply house rules** or start the game. Everything is off by default. All players share the same server-controlled outcomes and receive corresponding 3D animations and synthesized action sounds. During play, expand **✹ Chaos** on the left edge of the table, below the player totals for timers, the current die modifier, turn order, bonus tallies, dares, flip controls and rewind voting.
 
 | Rule | Behavior and controls | Animation and sound |
 | --- | --- | --- |
 | Hot Potato | Starting fuse, minimum fuse, shrink per turn, and penalty/forced/random expiry. A penalty randomly tries to add a card or removes a point/coin; without an available card it removes a point. Forced actions use the game's legal moves: pass, play, bid, pick trump, roll, resolve a life choice, end a turn, or time out a party prompt/question. | Shaking low-poly bomb with a burning fuse; accelerating ticks and an explosion. |
 | Seat Roulette | Swap physical seats every N completed turns. Hands either travel with their owners or stay at their old physical seat. Player identities, properties, teams and pairs remain fixed. | Avatars hop across the table in arcs; whoosh and boing. |
 | Cyclone | At round boundaries or random turn starts, pass hands left/right. In games without hands, pass the bonus chaos tallies instead. | Cards fan out and orbit; shuffle riffle and wind. |
-| Double or Nothing | A server coin flip doubles or erases each positive gain. Cash is used on boards, team points in Tarneeb, pair points in Charades, contestant points in Trivia, and bonus chaos points in Bluff/Card sandbox. Losses stay unchanged. | Giant spinning coin; ring, jackpot or descending trombone-like tones. |
+| Double or Nothing | A separate chance slider (20% by default) rolls once per eligible gain, then flips a fair coin. Bluff pile pickups and free card-sandbox draws/collections receive twice as many real cards or none. Extra cards have unique IDs; erased pickups return to the stock. A room-wide 1,040-card guard skips the wager before excessive growth. Tarneeb and party/board games wager positive score or cash gains. Ordinary card plays do not trigger a flip. Fixed Poker and Solitaire hands stay intact. | Giant spinning coin; ring, jackpot or sad trombone. |
 | Chaos Die | Roll a d12 each round for a shared modifier, listed below. | Oversized polygon die tumbles above the table with its numbered result; rattle and thud. |
 | Table Flip | Once per match, a lowest-scoring player rolls a d6 and ends the entire game. Every result (1–6) ends with nobody winning. Ties for lowest qualify. | Six-sided die tumbles, then the table flips; rattle, crash and rumble. |
-| Blackout | Configurable chance at turn start; darkens the scene for ten seconds and spotlights the active player. Text, cards and gameplay controls remain usable. | Lights cut to a spotlight; power-down hum and thunder. |
+| Blackout | Ten seconds with a fixed spotlight on the player active when darkness starts. Unlit players’ actions, sounds and system messages are concealed from other clients; card totals and table observations stay at their last visible values. Your own hand and turn controls stay usable. An unseen Bluff play retains an anonymous call window. Concealed activity never reappears in the feed when lights return. | Lights cut to one spotlight; power-down hum and thunder. |
 | Robin Hood | A gaining leader transfers one cash unit or point to last place, once per accepted action. Team/pair totals are treated as one score. | Coins arc between players; ka-ching. |
 | Banned Word | A random single word from the host's list changes each round. Only the host sees the active word until an offence reveals it. Chat and typed guesses are checked as whole words, ignoring case. The host reports voice slips with the player selector. | Sealed-word stamp, red X over the offender; thunk and buzzer. |
 | Dare Wheel | Penalties spin a dare from the host's list, one per line. Hot Potato and banned-word penalties, caught peeking/bluffs, skips, timeouts and rejected offers can trigger it. Dares are social instructions carried out by the group. | Descending spinning wheel and flicking pointer; slowing clicks and fanfare. |
@@ -140,7 +140,7 @@ The host can edit rules before a game or return everyone to the lobby to change 
 - Boards: starting cash, Home bonus, round limit, rent multiplier, rest-stop jackpot.
 - Custom: written house contract and JSON rule import/export.
 
-In Bluff, Tarneeb, free card sandbox and Poker, peeking reveals up to three held cards (two in Poker). With catching enabled, the victim first gets two seconds to slap; cards remain private until that window ends, then a fresh four-second reveal begins. A successful slap cancels the reveal and blocks the peeker for eight accepted card plays, or eight completed Poker hands. Tarneeb partners cannot peek at each other; folded Poker hands and Solitaire cannot be peeked at. The server announces the chosen funny penalty; the group carries it out. Text house rules are group agreements, not executable scripts. You can change your own camera during play.
+In Bluff, Tarneeb, free card sandbox and Poker, peeking reveals up to three held cards (two in Poker). With catching enabled, the victim first gets one second to slap; cards remain private until that window ends, then a fresh four-second reveal begins. A successful slap cancels the reveal and blocks the peeker for eight accepted card plays, or eight completed Poker hands. Tarneeb partners cannot peek at each other; folded Poker hands and Solitaire cannot be peeked at. The server announces the chosen funny penalty; the group carries it out. Text house rules are group agreements, not executable scripts. You can change your own camera during play.
 
 ## Development
 
@@ -226,14 +226,14 @@ Tarneeb shows the ace-versus-trump challenge countdown. The ace holder can choos
 
 Bluff hands sort A (1) through K (13), then by suit. Calling bluff preserves the already-selected next seat in either outcome. The reveal banner names the accused, the result and the pile recipient. The caller throws cards toward the accused, then the pile flies into the recipient's hand; inputs briefly pause for this animation.
 
-When peeking is enabled, the character leans toward the target. With catching enabled, only that target receives a two-second Slap the peeker event. A successful slap stops the peek immediately, plays the cartoon slap, and blocks the peeker for eight subsequent card plays (completed hands in Poker). The server validates the target, deadline and cooldown. Failed/late reactions do not apply a cooldown. Restart clears it. Peeks otherwise last four seconds.
+When peeking is enabled, the character leans toward the target. With catching enabled, only that target receives a one-second Slap the peeker event. A successful slap stops the peek immediately, plays the cartoon slap, and blocks the peeker for eight subsequent card plays (completed hands in Poker). The server validates the target, deadline and cooldown. Failed/late reactions do not apply a cooldown. Restart clears it. Peeks otherwise last four seconds.
 
 First-person hands sit closer to the player, with smaller cards and rows for large Bluff hands, leaving the center pile visible. Selected cards glow with a minimal lift; hand-list selection stays inside its card footprint so adjacent cards remain accessible.
 
 
 ## Version 0.5: Tarneeb table and three environments
 
-Tarneeb hands group by suit (spades, hearts, diamonds, clubs), with 2 through K then A in each suit. Partner seats cannot peek at each other: both the UI and authoritative server enforce this. All card games now limit a peek to four seconds; Bluff retains its two-second slap opportunity.
+Tarneeb hands group by suit (spades, hearts, diamonds, clubs), with 2 through K then A in each suit. Partner seats cannot peek at each other: both the UI and authoritative server enforce this. All card games now limit a peek to four seconds; Bluff retains its one-second slap opportunity.
 
 Played Tarneeb cards show larger rank/suit faces at the center and a readable player/card summary. Each completed four-card trick pauses play briefly, then moves to the winning team's side pile. The scoreboard shows partner names, hands/tricks won out of 13, and cumulative match points. The last trick remains listed for reference. A new deal clears trick piles and counts while preserving match points.
 
@@ -258,7 +258,7 @@ Charades accepts 2, 4, 6 or 8 players. The lobby supports chosen teammates or au
 
 Before starting, select one of ten categories under House rules → Game rules. Each category has 100 prompts (50 distinct scenes and 50 specific scenario twists), for a total of 1,000. Categories cover animals, jobs, sports, everyday life, food, travel, fantasy, objects, emotions, and celebrations. Custom prompts may override the category collection. The whole-match timer defaults to five minutes and can be set from 30 seconds to 20 minutes; the prompt timer is bounded by the match deadline. Skipping cannot extend the whole match. The recap lists your correct guesses and each pair's correct-answer total and points, including when the host ends early.
 
-In Bluff with catching enabled, peeking begins with a two-second reaction window. No target cards are sent to the peeker during that window. If the target does not slap, the server starts a fresh four-second reveal window. A slap cancels the reveal and retains the eight-play cooldown. During a slap involving your seat, first-person view briefly pulls back to show both characters and the impact, then returns to your seat. Other card games retain their four-second peek rules.
+In Bluff with catching enabled, peeking begins with a one-second reaction window. No target cards are sent to the peeker during that window. If the target does not slap, the server starts a fresh four-second reveal window. A slap cancels the reveal and retains the eight-play cooldown. During a slap involving your seat, first-person view briefly pulls back to show both characters and the impact, then returns to your seat. Other card games retain their four-second peek rules.
 
 
 ## Version 0.8: expanded charades and Trivia

@@ -1,6 +1,7 @@
 import {charadeTeamMembers} from '../shared/charades.js';
-import {randomInt} from 'node:crypto';
-import type {Action,Room} from '../shared/types.js';
+import {beginBlackout,resetBlackout} from './blackout.js';
+import {randomUUID,randomInt} from 'node:crypto';
+import type {Action,Room,Card} from '../shared/types.js';
 import {chaosRules,dieModifiers} from '../shared/chaos.js';
 import {emit} from './interactions.js';
 import {recordMessage} from './messages.js';
@@ -46,7 +47,7 @@ function seats(r:Room){const c=r.chaos!,old=[...c.seats],updated=shuffle([...old
   if(!r.rules.chaosHandsTravel&&cardGame(r)){const hands=old.map(id=>r.players.find(p=>p.id===id)!.hand);updated.forEach((id,i)=>r.players.find(p=>p.id===id)!.hand=hands[i]);}
   c.seats=updated;r.busyUntil=Math.max(r.busyUntil,Date.now()+1800);effect(r,'Seats',undefined,undefined,{from:old,to:updated});recordMessage(r,'Seat Roulette! Identities, teams and properties stay with their owners.');
 }
-function blackout(r:Room){r.chaos!.blackoutUntil=Date.now()+10000;effect(r,'Blackout');}
+function blackout(r:Room){if(r.chaos!.blackoutUntil>Date.now())return;r.chaos!.blackoutUntil=Date.now()+10000;r.chaos!.blackoutPlayer=r.players[r.turn]?.id;beginBlackout(r);effect(r,'Blackout',r.chaos!.blackoutPlayer);}
 function roundKey(r:Room){if(r.rules.game==='scribble')return 'sketch'+(r.scribble?.index??-1);if(r.rules.game==='rpg')return 'rpg'+r.round;if(r.rules.game==='trivia')return 'quiz'+(r.trivia?.index??-1);if(r.rules.game==='charades')return 'prompt'+(r.charade?.actor||'')+':'+(r.charade?.ends||0)+':'+r.charadeBag.length;if(r.rules.game==='tarneeb')return `${r.round}:${r.tricks.join('-')}`;return String(r.round);}
 function chooseWord(r:Room){const words=r.rules.chaosWords.split('\n').map(w=>w.trim().toLowerCase()).filter(Boolean);privateState.get(r)!.word=words[randomInt(words.length)];effect(r,'Word',undefined,undefined,{text:'SECRET WORD SEALED'});}
 function roundStart(r:Room){const c=r.chaos!;if(r.rules.chaosBanned)chooseWord(r);if(!r.rules.chaosDie)return;const face=randomInt(1,13);c.modifier={face,name:dieModifiers[face-1]};effect(r,'Die',undefined,undefined,{face,text:c.modifier.name});recordMessage(r,`Chaos Die: ${face} · ${c.modifier.name}.`);
@@ -58,13 +59,13 @@ function turnStart(r:Room){const c=r.chaos!;c.turns++;const active=r.rules.game=
   if(r.rules.chaosBlackout&&randomInt(100)<r.rules.chaosRandomPercent)blackout(r);
   if(r.rules.chaosCyclone&&r.rules.chaosCycloneTrigger==='random'&&randomInt(100)<r.rules.chaosRandomPercent)c.pendingCyclone=true;
 }
-export function initChaos(r:Room){privateState.delete(r);forcedActions.delete(r);r.chaos=undefined;if(!enabled(r))return;r.chaos={seats:r.players.map(p=>p.id),order:r.players.map(p=>p.id),turns:0,roundKey:roundKey(r),points:Object.fromEntries(r.players.map(p=>[p.id,0])),blackoutUntil:0,flipUsed:false,reversed:false,canUndo:false,undoUntil:0,pendingCyclone:false,pendingSeats:false};privateState.set(r,{word:'',savedAt:0,label:''});roundStart(r);turnStart(r);}
+export function initChaos(r:Room){resetBlackout(r);privateState.delete(r);forcedActions.delete(r);r.chaos=undefined;if(!enabled(r))return;r.chaos={seats:r.players.map(p=>p.id),order:r.players.map(p=>p.id),turns:0,roundKey:roundKey(r),points:Object.fromEntries(r.players.map(p=>[p.id,0])),blackoutUntil:0,flipUsed:false,reversed:false,canUndo:false,undoUntil:0,pendingCyclone:false,pendingSeats:false};privateState.set(r,{word:'',savedAt:0,label:''});roundStart(r);turnStart(r);}
 export function chaosWord(r:Room,id:string){return r.rules.chaosBanned&&id===r.host?privateState.get(r)?.word:undefined;}
 export function chaosBefore(r:Room){return {phase:r.phase,turn:r.turn,round:roundKey(r),charade:r.charade?.ends,trivia:r.trivia?.phase,event:r.eventSequence,units:chaosUnits(r)};}
 export function chaosAfter(r:Room,before:ReturnType<typeof chaosBefore>,actionType=""){const c=r.chaos;if(!c||before.phase!=='playing')return;
   const face=c.modifier?.face;
   for(const u of chaosUnits(r)){const old=before.units.find(x=>x.id===u.id)?.value??u.value,gain=u.value-old;if(gain<=0)continue;
-    let amount=gain;if(r.rules.chaosDouble&&face!==12){const won=randomInt(2)===1;amount=won?gain*2:0;effect(r,'Coin',u.players[0],undefined,{won,gain,result:amount});}
+    let amount=gain;if(r.rules.chaosDouble&&face!==12&&!(['cards','bluff','poker'].includes(r.rules.game))&&randomInt(100)<r.rules.chaosDoublePercent){const won=randomInt(2)===1;amount=won?gain*2:0;effect(r,'Coin',u.players[0],undefined,{won,gain,result:amount});}
     if(face===1)amount*=2;if(face===2)amount=0;setUnit(r,u.id,old+amount);
   }
   if((r.rules.chaosRobin&&face!==12)||face===5){const ranked=chaosUnits(r).sort((a,b)=>b.value-a.value),top=ranked[0],bottom=ranked.at(-1);if(top&&bottom&&top.id!==bottom.id&&top.value>bottom.value&&top.value>(before.units.find(u=>u.id===top.id)?.value??top.value)){setUnit(r,top.id,top.value-1);setUnit(r,bottom.id,bottom.value+1);effect(r,'Robin',top.players[0],bottom.players[0]);}}
@@ -109,3 +110,14 @@ export function chaosGuard(r:Room,a:Action){if(r.chaos?.vote&&!['chat','endGame'
 export function chaosPenaltiesForAction(r:Room,id:string,a:Action,loser:string){if(!r.chaos||!r.rules.chaosDare)return;if(a.type==='challenge')dare(r,loser);if(a.type==='skip')dare(r,id);}
 
 export function takeChaosForcedAction(r:Room){const id=forcedActions.get(r);forcedActions.delete(r);return id;}
+
+/** Variable-hand games wager the actual incoming cards, before victory is checked. */
+export function chaosCardGain(r:Room,id:string,cards:Card[]):Card[]{
+ if(!r.chaos||!r.rules.chaosDouble||r.solitaire||!['cards','bluff'].includes(r.rules.game)||r.chaos.modifier?.face===12||!cards.length||randomInt(100)>=r.rules.chaosDoublePercent)return cards;
+ // Bound generated cards to keep repeated doubling within a playable room size.
+ if(r.players.reduce((n,p)=>n+p.hand.length,0)+r.deck.length+r.pile.length+cards.length>1040)return cards;
+ const won=randomInt(2)===1,result=won?[...cards,...cards.map(c=>({...c,id:'chaos-'+randomUUID()}))]:[];
+ if(!won)r.deck.unshift(...cards);
+ effect(r,'Coin',id,undefined,{won,gain:cards.length,result:result.length,cards:true});
+ recordMessage(r,`${r.players.find(p=>p.id===id)?.name}: Double or Nothing · ${cards.length} card${cards.length===1?'':'s'} → ${result.length}.`);return result;
+}

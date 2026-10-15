@@ -15,7 +15,7 @@ export interface Rules {
     pokerStack:number;pokerSmallBlind:number;pokerBigBlind:number;pokerSeconds:number;pokerHands:number;
     triviaHostMode:'everyone'|'master'; triviaCategory:keyof typeof import('./trivia.js').triviaCategories; cardLayout:'free'|'solitaire'; scribbleSeconds:number; scribbleRounds:number; rpgMap:'crypt'|'ruins'|'cavern'; chaosRaid:boolean;
     chaosHotPotato:boolean; chaosSeatRoulette:boolean; chaosCyclone:boolean; chaosDouble:boolean; chaosDie:boolean; chaosTableFlip:boolean; chaosBlackout:boolean; chaosRobin:boolean; chaosBanned:boolean; chaosDare:boolean; chaosWarp:boolean;
-    chaosHotSeconds:number; chaosMinSeconds:number; chaosShrinkSeconds:number; chaosSeatEvery:number; chaosRandomPercent:number;
+    chaosHotSeconds:number; chaosMinSeconds:number; chaosShrinkSeconds:number; chaosSeatEvery:number; chaosRandomPercent:number; chaosDoublePercent:number;
     chaosHotOutcome:'penalty'|'forced'|'random'; chaosHandsTravel:boolean; chaosDirection:'left'|'right'; chaosCycloneTrigger:'round'|'random'; chaosFlipMode:'scores'|'order'; chaosWords:string; chaosDares:string;
 
     allowTrading: boolean;
@@ -50,7 +50,7 @@ export interface Rules {
     roundLimit: number;
     customNotes: string;
 }
-export const defaults: Rules = {charadeRounds:1,rooftopAntics:true,soreLoser:true,pokerStack:1000,pokerSmallBlind:5,pokerBigBlind:10,pokerSeconds:45,pokerHands:0,triviaHostMode:'master',triviaCategory:'general',cardLayout:'free',scribbleSeconds:60,scribbleRounds:2,rpgMap:'crypt',chaosRaid:false,"chaosHotOutcome":"random","chaosHotPotato":false,"chaosSeatRoulette":false,"chaosCyclone":false,"chaosDouble":false,"chaosDie":false,"chaosTableFlip":false,"chaosBlackout":false,"chaosRobin":false,"chaosBanned":false,"chaosDare":false,"chaosWarp":false,"chaosHotSeconds":30,"chaosMinSeconds":5,"chaosShrinkSeconds":2,"chaosSeatEvery":3,"chaosRandomPercent":20,"chaosHandsTravel":true,"chaosDirection":"left","chaosCycloneTrigger":"round","chaosFlipMode":"order","chaosWords":"yes\nno\nokay\nliterally\nactually","chaosDares":"Speak like a pirate until your next turn\nDo a dramatic victory pose\nNarrate your next move like a sports commentator", allowTrading: true, tradeSlaps: true, boxingDuels: true, game: 'bluff', background: 'forest', camera: 'third', maxPlayers: 8, allowPeeking: false, catchPeeking: true, penalty: 'Speak like a pirate until your next turn', decks: 1, handSize: 7, followSuit: true, targetScore: 31, challengeSeconds: 12, reverseTurns: false, triviaQuestions: 10, triviaSeconds: 30, triviaMode: "ffa", charadeMatchSeconds: 300, charadeCategory: "animals", charadeSeconds: 120, allowSkipping: true, skipPenalty: 0, charadePrompts: '', startingCash: 1500, salary: 200, rentMultiplier: 1, freeParking: true, roundLimit: 15, customNotes: '' };
+export const defaults: Rules = {charadeRounds:1,rooftopAntics:true,soreLoser:true,pokerStack:1000,pokerSmallBlind:5,pokerBigBlind:10,pokerSeconds:45,pokerHands:0,triviaHostMode:'master',triviaCategory:'general',cardLayout:'free',scribbleSeconds:60,scribbleRounds:2,rpgMap:'crypt',chaosRaid:false,"chaosHotOutcome":"random","chaosHotPotato":false,"chaosSeatRoulette":false,"chaosCyclone":false,"chaosDouble":false,"chaosDie":false,"chaosTableFlip":false,"chaosBlackout":false,"chaosRobin":false,"chaosBanned":false,"chaosDare":false,"chaosWarp":false,"chaosHotSeconds":30,"chaosMinSeconds":5,"chaosShrinkSeconds":2,"chaosSeatEvery":3,"chaosRandomPercent":20,chaosDoublePercent:20,"chaosHandsTravel":true,"chaosDirection":"left","chaosCycloneTrigger":"round","chaosFlipMode":"order","chaosWords":"yes\nno\nokay\nliterally\nactually","chaosDares":"Speak like a pirate until your next turn\nDo a dramatic victory pose\nNarrate your next move like a sports commentator", allowTrading: true, tradeSlaps: true, boxingDuels: true, game: 'bluff', background: 'forest', camera: 'third', maxPlayers: 8, allowPeeking: false, catchPeeking: true, penalty: 'Speak like a pirate until your next turn', decks: 1, handSize: 7, followSuit: true, targetScore: 31, challengeSeconds: 12, reverseTurns: false, triviaQuestions: 10, triviaSeconds: 30, triviaMode: "ffa", charadeMatchSeconds: 300, charadeCategory: "animals", charadeSeconds: 120, allowSkipping: true, skipPenalty: 0, charadePrompts: '', startingCash: 1500, salary: 200, rentMultiplier: 1, freeParking: true, roundLimit: 15, customNotes: '' };
 export const games: Record<Game, {
     name: string;
     category: string;
@@ -182,6 +182,7 @@ export type PublicPlayer = Omit<Player, 'hand'> & {
     handCount: number;
 };
 export type View = Omit<Room, 'players' | 'deck' | 'charadeBag' | 'lastPlay' | 'charade' | 'duel' | 'tradeOffers' | 'trivia' | 'solitaire' | 'scribble' | 'raid' | 'poker'> & {
+    blackoutHidden?:boolean;
     poker?:PokerView;
     solitaire?:SolitaireView; scribble?:ScribbleView; raid?:RaidView;
     trivia?: TriviaView;
@@ -193,6 +194,7 @@ export type View = Omit<Room, 'players' | 'deck' | 'charadeBag' | 'lastPlay' | '
     pileCount: number;
     lastPlay?: {
         player: string;
+        hidden?: boolean;
         count: number;
         claim: number;
         expires: number;

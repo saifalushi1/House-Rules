@@ -25,7 +25,7 @@ export function validateRules(input: unknown): Rules {
   for(const key of ['chaosWords','chaosDares']){require(typeof x[key]==='string'&&(x[key] as string).length<=4000,'Chaos lists must be text up to 4000 characters.');const list=(x[key] as string).split('\n').map(v=>v.trim()).filter(Boolean);require(list.length>0&&list.length<=50&&list.every(v=>v.length<=120),'Use 1–50 entries, at most 120 characters each.');if(key==='chaosWords')require(list.every(v=>/^[\p{L}\p{N}]+$/u.test(v)),'Banned words must be single words.');(r as unknown as Record<string,unknown>)[key]=list.join('\n');}
   require(typeof x.triviaCategory==='string'&&Object.hasOwn(triviaCategories,x.triviaCategory),'Unknown trivia category.');r.triviaCategory=x.triviaCategory as Rules['triviaCategory'];
   const ranges: Record<string, [number, number]> = {
-    chaosHotSeconds:[5,120],chaosMinSeconds:[2,30],chaosShrinkSeconds:[0,10],chaosSeatEvery:[1,20],chaosRandomPercent:[0,100],
+    chaosHotSeconds:[5,120],chaosMinSeconds:[2,30],chaosShrinkSeconds:[0,10],chaosSeatEvery:[1,20],chaosRandomPercent:[0,100],chaosDoublePercent:[0,100],
     pokerStack:[100,10000],pokerSmallBlind:[1,100],pokerBigBlind:[2,200],pokerSeconds:[10,120],pokerHands:[0,100],
     charadeRounds:[1,5],scribbleSeconds:[20,180],scribbleRounds:[1,8],
     maxPlayers: [2, 8], decks: [1, 3], handSize: [1, 20], targetScore: [10, 100],

@@ -130,7 +130,7 @@ export class GameScene {
     else if(e.kind==='challenge')this.throwCards(e.actor,String(e.data.player),String(e.data.loser),Number(e.data.count)||1);
     else if(e.kind==='slap')this.slap(e.actor,e.target);
     else if(e.kind==='play'||e.kind==='clash')this.fly(e.actor,false,Number(e.data.count)||1);
-    else if(e.kind==='draw'||e.kind==='collect')this.fly(e.actor,true,e.kind==='collect'?4:1);
+    else if(e.kind==='draw'||e.kind==='collect')this.fly(e.actor,true,typeof e.data.count==='number'?e.data.count:e.kind==='collect'?4:1);
     else if(e.kind==='duelRound'){for(const [id,move] of [[e.actor,e.data.ace],[e.target,e.data.trump]]){const g=this.actorMap.get(String(id));if(!g)continue;const arms=g.userData.arms as THREE.Group[];this.tween(600,t=>{arms.forEach((arm,i)=>{arm.rotation.x=move==='block'?2.4:.5+Math.sin(t*Math.PI)*(i===0?1.6:.3);arm.rotation.z=move==='hook'?Math.sin(t*Math.PI)*1.2:0;});},()=>arms.forEach(arm=>arm.rotation.set(.5,0,0)));}this.shake=.07;this.burst(new THREE.Vector3(0,1.9,0),0xdd9979);}
     else if(['correct','win','duelEnd','buy','sell','tradeAccept','trick','lifeChoice'].includes(e.kind)){const actor=this.actorMap.get(e.actor||'');this.burst(actor?actor.position.clone().add(new THREE.Vector3(0,1.7,0)):new THREE.Vector3(0,1.3,0));}
     else{const g=this.actorMap.get(e.actor||'');if(g){const arms=g.userData.arms as THREE.Group[];this.tween(400,t=>arms.forEach(arm=>arm.rotation.x=.5-Math.sin(t*Math.PI)*.35));}}

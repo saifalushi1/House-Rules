@@ -11,9 +11,9 @@ export function handlePeek(r:Room,id:string,a:Action){if(!['peek','catch'].inclu
   need(r.rules.game!=='tarneeb'||r.players.indexOf(p)%2!==r.players.indexOf(target)%2,'You cannot peek at your teammate’s cards.');
   need(r.rules.game!=='poker'||r.poker?.street!=='handEnd'&&!r.poker?.seats.find(s=>s.id===target.id)?.folded,'They are not holding a live poker hand.');
   need(target.hand.length>0,'They have no cards to peek at.');need(p.peekingUntil<=Date.now(),'Finish your current peek first.');need(p.peekBlockedUntil<=r.bluffPlays,`Peek cooldown: ${p.peekBlockedUntil-r.bluffPlays} hands left.`);
-  const delay=r.rules.catchPeeking?2000:0;p.peekTarget=target.id;p.peekRevealsAt=Date.now()+delay;p.catchUntil=delay?p.peekRevealsAt:0;p.peekRevealed=!delay;p.peekingUntil=p.peekRevealsAt+4000;emit(r,'peek',id,target.id,{reaction:delay,ends:p.peekingUntil});return true;
+  const delay=r.rules.catchPeeking?1000:0;p.peekTarget=target.id;p.peekRevealsAt=Date.now()+delay;p.catchUntil=delay?p.peekRevealsAt:0;p.peekRevealed=!delay;p.peekingUntil=p.peekRevealsAt+4000;emit(r,'peek',id,target.id,{reaction:delay,ends:p.peekingUntil});return true;
  }
- need(r.rules.catchPeeking,'Catching peekers is disabled.');need(target.peekTarget===id&&target.catchUntil>Date.now()&&target.peekingUntil>Date.now(),'Your two-second slap opportunity has closed.');
+ need(r.rules.catchPeeking,'Catching peekers is disabled.');need(target.peekTarget===id&&target.catchUntil>Date.now()&&target.peekingUntil>Date.now(),'Your one-second slap opportunity has closed.');
  target.peekTarget=undefined;target.peekRevealed=false;target.peekRevealsAt=0;target.peekingUntil=0;target.catchUntil=0;target.peekBlockedUntil=r.bluffPlays+8;
  emit(r,'slap',id,target.id,{reason:'peek',hands:8});recordMessage(r,`${p.name} caught ${target.name} peeking! Eight-hand cooldown. Penalty: ${r.rules.penalty}`);return true;
 }
