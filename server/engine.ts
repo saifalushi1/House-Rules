@@ -1,3 +1,4 @@
+import {initPoker,handlePoker,tickPoker,pokerView,abortPoker} from './poker.js';
 import {initSolitaire,solitaireView,handleSolitaire} from './solitaire.js';
 import {initScribble,scribbleView,handleScribble,tickScribble} from './scribble.js';
 import {initRpg,handleRpg} from './rpg.js';
@@ -46,7 +47,7 @@ export function start(r: Room) {
     need(r.rules.game !== 'tarneeb' || r.players.length === 4, 'Tarneeb needs exactly four players, with partners across the table.');
     need(r.rules.game !== 'charades' || [2,4,6,8].includes(r.players.length), 'Charades needs 2, 4, 6 or 8 players in pairs.');
     need(r.rules.game!=='trivia'||r.rules.triviaHostMode==='everyone'||r.players.some(p=>p.id===r.triviaMaster&&p.connected),'Choose a trivia master before starting.');
-    r.trivia=undefined;r.solitaire=undefined;r.scribble=undefined;r.raid=undefined;
+    r.chaos=undefined;r.poker=undefined;r.trivia=undefined;r.solitaire=undefined;r.scribble=undefined;r.raid=undefined;
     r.charadeMatchEnds=r.rules.game==='charades'?Date.now()+r.rules.charadeMatchSeconds*1000:0;r.charadeCorrect=Array(r.players.length/2|0).fill(0);r.charadeScores=Array(r.players.length/2|0).fill(0);
     r.bluffPlays = 0; r.tradeOffers = []; r.clash = undefined; r.duel = undefined; r.deniedTrumps = []; r.busyUntil = 0; r.rollDice = [];
     r.gameInstance++;
@@ -83,6 +84,7 @@ export function start(r: Room) {
     }
     else if (r.rules.game === 'charades')
         newPrompt(r);
+    if(r.rules.game==='poker')initPoker(r);
     if(r.rules.game==='trivia')initializeTrivia(r);
     if(r.rules.game==='scribble')initScribble(r);
     if(r.rules.game==='rpg')initRpg(r);
@@ -98,12 +100,13 @@ else if (r.round > r.rules.roundLimit) {
     finish(r, winner.name);
 } }
 export function worth(r: Room, p: Player) { return p.cash + r.tiles.filter(t => t.owner === p.id).reduce((n, t) => n + t.price, 0); }
-export function view(r: Room, id: string): View { const { deck, players, lastPlay, charadeBag: _, charade, duel, tradeOffers, trivia: privateTrivia, solitaire:privateSolitaire,scribble:privateScribble,raid:privateRaid, ...publicRoom } = r; const me=players.find(p=>p.id===id);const visiblePeek=r.phase==='playing'&&me&&me.peekTarget&&me.peekRevealed&&me.peekRevealsAt<=Date.now()&&me.peekingUntil>Date.now()?players.find(p=>p.id===me.peekTarget)?.hand.slice(0,3):undefined;return { ...publicRoom,rpg:r.rules.game==='rpg'?r.rpg:undefined,solitaire:solitaireView(r),scribble:scribbleView(r,id),raid:r.raid?{from:r.raid.from,to:r.raid.to,stake:r.raid.stake,phase:r.raid.phase,pausedAt:r.raid.pausedAt,ends:r.raid.ends,round:r.raid.round,wins:r.raid.wins,ready:Object.keys(r.raid.choices)}:undefined, chaos:r.chaos?{...r.chaos,word:chaosWord(r,id)}:undefined, trivia:triviaView(r,id), peek:visiblePeek, tradeOffers: tradeOffers.filter(t => t.from === id || t.to === id), duel: duel ? { acePlayer: duel.acePlayer, trumpPlayer: duel.trumpPlayer, card: duel.card, round: duel.round, score: duel.score, ends: duel.ends, ready: Object.keys(duel.choices) } : undefined, players: players.map(({ hand, ...p }) => ({ ...p, handCount: hand.length })), hand: players.find(p => p.id === id)?.hand || [], deckCount: deck.length, pileCount: r.pile.length, lastPlay: lastPlay ? { player: lastPlay.player, count: lastPlay.cards.length, claim: lastPlay.claim, expires: lastPlay.expires } : undefined, charade: charade ? { actor: charade.actor, ends: charade.ends, ...(id === charade.actor ? { prompt: charade.prompt } : {}) } : undefined, pile: r.rules.game === 'bluff' ? [] : r.pile }; }
+export function view(r: Room, id: string): View { const { deck, players, lastPlay, charadeBag: _, charade, duel, tradeOffers, trivia: privateTrivia, solitaire:privateSolitaire,scribble:privateScribble,raid:privateRaid,poker:privatePoker, ...publicRoom } = r; const me=players.find(p=>p.id===id);const visiblePeek=r.phase==='playing'&&me&&me.peekTarget&&me.peekRevealed&&me.peekRevealsAt<=Date.now()&&me.peekingUntil>Date.now()?players.find(p=>p.id===me.peekTarget)?.hand.slice(0,3):undefined;return { ...publicRoom,poker:pokerView(r),rpg:r.rules.game==='rpg'?r.rpg:undefined,solitaire:solitaireView(r),scribble:scribbleView(r,id),raid:r.raid?{from:r.raid.from,to:r.raid.to,stake:r.raid.stake,phase:r.raid.phase,pausedAt:r.raid.pausedAt,ends:r.raid.ends,round:r.raid.round,wins:r.raid.wins,ready:Object.keys(r.raid.choices)}:undefined, chaos:r.chaos?{...r.chaos,word:chaosWord(r,id)}:undefined, trivia:triviaView(r,id), peek:visiblePeek, tradeOffers: tradeOffers.filter(t => t.from === id || t.to === id), duel: duel ? { acePlayer: duel.acePlayer, trumpPlayer: duel.trumpPlayer, card: duel.card, round: duel.round, score: duel.score, ends: duel.ends, ready: Object.keys(duel.choices) } : undefined, players: players.map(({ hand, ...p }) => ({ ...p, handCount: hand.length })), hand: players.find(p => p.id === id)?.hand || [], deckCount: deck.length, pileCount: r.pile.length, lastPlay: lastPlay ? { player: lastPlay.player, count: lastPlay.cards.length, claim: lastPlay.claim, expires: lastPlay.expires } : undefined, charade: charade ? { actor: charade.actor, ends: charade.ends, ...(id === charade.actor ? { prompt: charade.prompt } : {}) } : undefined, pile: r.rules.game === 'bluff' ? [] : r.pile }; }
 function tickInternal(r: Room) {
     if (r.phase !== 'playing')
         return false;
     if(tickRaid(r))return true;
     if(r.raid)return false;
+    if(tickPoker(r))return true;
     if(tickScribble(r))return true;
     if(tickTrivia(r))return true;
     if(r.rules.game==='charades' && Date.now()>=r.charadeMatchEnds){finishCharades(r);return true;}
@@ -130,10 +133,11 @@ function actInternal(r: Room, id: string, a: Action): {
 } | void {
     const p = r.players.find(p => p.id === id);
     need(p, 'Join this room first.');
-    if(handleSolitaire(r,id,a)||handleScribble(r,id,a)||handleRpg(r,id,a))return;
+    if(handlePoker(r,id,a)||handleSolitaire(r,id,a)||handleScribble(r,id,a)||handleRpg(r,id,a))return;
     if(handleTrivia(r,p,a))return;
     if (a.type === 'endGame') {
         need(r.host === id && r.phase === 'playing', 'Only the host can end an active game.');
+        abortPoker(r);
         r.phase = 'finished'; r.endedEarly = true; r.winner = undefined;
         r.clash = undefined; r.duel = undefined; r.tradeOffers = []; r.lastPlay = undefined;r.raid=undefined;
         if(r.trivia){r.trivia.phase="result";r.trivia.ends=0;}
@@ -192,6 +196,7 @@ function actInternal(r: Room, id: string, a: Action): {
     if (a.type === 'lobby') {
         need(r.host === id, 'Only the host can return to the lobby.');
         r.tradeOffers = []; r.clash = undefined; r.duel = undefined; r.busyUntil = 0;r.raid=undefined;
+        abortPoker(r);r.poker=undefined;
         r.trivia=undefined;
         r.phase = 'lobby';
         r.players.forEach(p => { p.hand = []; p.ready = false; });
@@ -549,7 +554,7 @@ export function act(r: Room, id: string, a: Action): { peek?: Card[] } | void {
 
     if(['endGame','restart','lobby'].includes(a.type))invalidateChaos(r);
     if(a.type==='scribbleStroke')return result;
-    if(a.type.startsWith('trivia'))return result;
+    if(a.type.startsWith('trivia')||a.type.startsWith('poker'))return result;
     if (['tradeOffer','tradeAccept','tradeReject','tradeCancel','box','allowTrump','punch'].includes(a.type)) return result;
     let kind = a.type === 'bid' && a.value === 0 && !allPassed ? 'bidPass' : a.type;
     const data: Record<string, unknown> = {};
@@ -568,6 +573,7 @@ export function act(r: Room, id: string, a: Action): { peek?: Card[] } | void {
     if (a.type === 'guess') kind = p?.score !== oldScore ? 'correct' : 'guess';
     if (a.type === 'award') kind = 'correct';
     if (a.type === 'buy' || a.type === 'sell') data.tile = a.type === 'buy' ? p?.position : a.tile;
+    if(r.rules.game==='poker'&&['start','restart'].includes(a.type))return result;
     emit(r, kind, id, typeof a.target === 'string' ? a.target : undefined, data);
     if(['challenge','skip','catch'].includes(a.type))chaosPenaltiesForAction(r,id,a,challenged?.liar?challenged.player:id);
     return result;
@@ -576,6 +582,7 @@ export function act(r: Room, id: string, a: Action): { peek?: Card[] } | void {
 function forceChaosAction(r:Room,id:string){
  if(r.phase!=='playing'||r.players[r.turn]?.id!==id)return;
  const p=r.players[r.turn];let action:Action|undefined;
+ if(r.rules.game==='poker'&&r.poker&&r.poker.street!=='handEnd'){const seat=r.poker.seats.find(s=>s.id===id);action={type:'pokerAct',move:seat&&seat.bet>=r.poker.currentBet?'check':'fold'};}
  if(r.rules.game==='cards')action={type:r.solitaire?'solitaireDraw':'pass'};
  if(r.rules.game==='bluff'&&p.hand.length&&!r.lastPlay)action={type:'play',cards:[p.hand[randomInt(p.hand.length)].id],claim:r.claim};
  if(r.rules.game==='tarneeb'){

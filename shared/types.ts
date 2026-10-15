@@ -1,8 +1,9 @@
+import type {PokerState,PokerView} from './poker.js';
 import type {SolitaireState,SolitaireView,ScribbleState,ScribbleView,RpgState,Raid,RaidView} from './expansion.js';
 import type {ChaosState} from './chaos.js';
 import type {TriviaState,TriviaView} from "./trivia.js";
 import type {CharadeCategory} from "./charades.js";
-export type Game = 'bluff' | 'tarneeb' | 'cards' | 'charades' | 'trivia' | 'property' | 'life' | 'scribble' | 'rpg';
+export type Game = 'bluff' | 'tarneeb' | 'cards' | 'charades' | 'trivia' | 'property' | 'life' | 'scribble' | 'rpg' | 'poker';
 export type Suit = '♠' | '♥' | '♦' | '♣';
 export interface Card {
     id: string;
@@ -10,6 +11,7 @@ export interface Card {
     suit: Suit;
 }
 export interface Rules {
+    pokerStack:number;pokerSmallBlind:number;pokerBigBlind:number;pokerSeconds:number;pokerHands:number;
     triviaHostMode:'everyone'|'master'; triviaCategory:keyof typeof import('./trivia.js').triviaCategories; cardLayout:'free'|'solitaire'; scribbleSeconds:number; scribbleRounds:number; rpgMap:'crypt'|'ruins'|'cavern'; chaosRaid:boolean;
     chaosHotPotato:boolean; chaosSeatRoulette:boolean; chaosCyclone:boolean; chaosDouble:boolean; chaosDie:boolean; chaosTableFlip:boolean; chaosBlackout:boolean; chaosRobin:boolean; chaosBanned:boolean; chaosDare:boolean; chaosWarp:boolean;
     chaosHotSeconds:number; chaosMinSeconds:number; chaosShrinkSeconds:number; chaosSeatEvery:number; chaosRandomPercent:number;
@@ -47,7 +49,7 @@ export interface Rules {
     roundLimit: number;
     customNotes: string;
 }
-export const defaults: Rules = {triviaHostMode:'master',triviaCategory:'general',cardLayout:'free',scribbleSeconds:60,scribbleRounds:2,rpgMap:'crypt',chaosRaid:false,"chaosHotOutcome":"random","chaosHotPotato":false,"chaosSeatRoulette":false,"chaosCyclone":false,"chaosDouble":false,"chaosDie":false,"chaosTableFlip":false,"chaosBlackout":false,"chaosRobin":false,"chaosBanned":false,"chaosDare":false,"chaosWarp":false,"chaosHotSeconds":30,"chaosMinSeconds":5,"chaosShrinkSeconds":2,"chaosSeatEvery":3,"chaosRandomPercent":20,"chaosHandsTravel":true,"chaosDirection":"left","chaosCycloneTrigger":"round","chaosFlipMode":"order","chaosWords":"yes\nno\nokay\nliterally\nactually","chaosDares":"Speak like a pirate until your next turn\nDo a dramatic victory pose\nNarrate your next move like a sports commentator", allowTrading: true, tradeSlaps: true, boxingDuels: true, game: 'bluff', background: 'forest', camera: 'third', maxPlayers: 8, allowPeeking: false, catchPeeking: true, penalty: 'Speak like a pirate until your next turn', decks: 1, handSize: 7, followSuit: true, targetScore: 31, challengeSeconds: 12, reverseTurns: false, triviaQuestions: 10, triviaSeconds: 30, triviaMode: "ffa", charadeMatchSeconds: 300, charadeCategory: "animals", charadeSeconds: 60, allowSkipping: true, skipPenalty: 0, charadePrompts: '', startingCash: 1500, salary: 200, rentMultiplier: 1, freeParking: true, roundLimit: 15, customNotes: '' };
+export const defaults: Rules = {pokerStack:1000,pokerSmallBlind:5,pokerBigBlind:10,pokerSeconds:45,pokerHands:0,triviaHostMode:'master',triviaCategory:'general',cardLayout:'free',scribbleSeconds:60,scribbleRounds:2,rpgMap:'crypt',chaosRaid:false,"chaosHotOutcome":"random","chaosHotPotato":false,"chaosSeatRoulette":false,"chaosCyclone":false,"chaosDouble":false,"chaosDie":false,"chaosTableFlip":false,"chaosBlackout":false,"chaosRobin":false,"chaosBanned":false,"chaosDare":false,"chaosWarp":false,"chaosHotSeconds":30,"chaosMinSeconds":5,"chaosShrinkSeconds":2,"chaosSeatEvery":3,"chaosRandomPercent":20,"chaosHandsTravel":true,"chaosDirection":"left","chaosCycloneTrigger":"round","chaosFlipMode":"order","chaosWords":"yes\nno\nokay\nliterally\nactually","chaosDares":"Speak like a pirate until your next turn\nDo a dramatic victory pose\nNarrate your next move like a sports commentator", allowTrading: true, tradeSlaps: true, boxingDuels: true, game: 'bluff', background: 'forest', camera: 'third', maxPlayers: 8, allowPeeking: false, catchPeeking: true, penalty: 'Speak like a pirate until your next turn', decks: 1, handSize: 7, followSuit: true, targetScore: 31, challengeSeconds: 12, reverseTurns: false, triviaQuestions: 10, triviaSeconds: 30, triviaMode: "ffa", charadeMatchSeconds: 300, charadeCategory: "animals", charadeSeconds: 60, allowSkipping: true, skipPenalty: 0, charadePrompts: '', startingCash: 1500, salary: 200, rentMultiplier: 1, freeParking: true, roundLimit: 15, customNotes: '' };
 export const games: Record<Game, {
     name: string;
     category: string;
@@ -55,6 +57,7 @@ export const games: Record<Game, {
     icon: string;
     players: string;
 }> = {
+    poker:{name:'Poker',category:'CARDS',description:'Texas Hold’em. Read the room. Bet, bluff, and chase the pot.',icon:'♠',players:'2–8'},
     scribble:{name:'Scribble',category:'PARTY',description:'Draw a secret word. Guess your friends’ doodles.',icon:'✎',players:'2–8'},
     rpg:{name:'D&D tabletop',category:'TABLETOP',description:'Character sheets, dice and a dungeon master. Your adventure.',icon:'⚔',players:'1–8'},
     bluff: { name: 'Bluff', category: 'CARDS', description: 'Keep a straight face. Call their bluff. Lose all your cards.', icon: '♠', players: '2–8' },
@@ -93,6 +96,7 @@ export interface Tile {
     owner?: string;
 }
 export interface Room {
+    poker?:PokerState;
     solitaire?:SolitaireState; scribble?:ScribbleState; rpg?:RpgState; rpgDm?:string; raid?:Raid;
     chaos?:ChaosState;
     trickCollectUntil: number;
@@ -173,7 +177,8 @@ export interface Room {
 export type PublicPlayer = Omit<Player, 'hand'> & {
     handCount: number;
 };
-export type View = Omit<Room, 'players' | 'deck' | 'charadeBag' | 'lastPlay' | 'charade' | 'duel' | 'tradeOffers' | 'trivia' | 'solitaire' | 'scribble' | 'raid'> & {
+export type View = Omit<Room, 'players' | 'deck' | 'charadeBag' | 'lastPlay' | 'charade' | 'duel' | 'tradeOffers' | 'trivia' | 'solitaire' | 'scribble' | 'raid' | 'poker'> & {
+    poker?:PokerView;
     solitaire?:SolitaireView; scribble?:ScribbleView; raid?:RaidView;
     trivia?: TriviaView;
     tradeOffers: TradeOffer[];

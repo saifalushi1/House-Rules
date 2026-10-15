@@ -2,7 +2,7 @@
 
 ![House Rules poster: friends playing cards, charades, trivia and board games around a low-poly table](docs/images/house-rules-poster.png)
 
-A self-hosted TypeScript game-night sandbox. Low-poly 3D table and avatars, private hands, live shared rooms, and host-editable presets. Version 0.10 adds Scribble, a D&D-style tabletop RPG, Klondike Solitaire, optional-master Trivia, a challenge-and-steal chaos rule, and four more environments. Trivia has 1,000 questions across ten categories; pair Charades has 1,900 prompts across 19 categories.
+A self-hosted TypeScript game-night sandbox. Low-poly 3D table and avatars, private hands, live shared rooms, and host-editable presets. Version 0.11 adds multiplayer no-limit Texas Hold’em poker, with configurable stacks/blinds, private hole cards, betting rounds, all-ins, side pots, showdown rankings, and animated cards/chips with action sounds. Also includes Scribble, a D&D-style tabletop RPG, Klondike Solitaire, optional-master Trivia, a challenge-and-steal chaos rule, and seven environments. Trivia has 1,000 questions across ten categories; pair Charades has 1,900 prompts across 19 categories.
 
 ## Start on this machine
 
@@ -28,6 +28,7 @@ Use it with trusted friends. Room codes are lightweight invite gates, not accoun
 
 | Preset | Playable behavior |
 | --- | --- |
+| Poker | 2–8 players, no-limit Texas Hold’em with rotating dealer/blinds, four betting rounds, all-ins, side pots, split pots and automatic showdown. Play chips. |
 | Bluff / Bullshit | Deal the whole deck; claim A–K in sequence, play 1–4 hidden cards, timed challenges, liar or caller takes the pile, first empty hand wins after the challenge window. |
 | Tarneeb | Four seats, alternating partnerships, 7–13 auction, trump selection, optional follow-suit enforcement, trick winner, hand scoring, and target team score. |
 | Card sandbox | Private hands and shared piles, or a one-player Klondike Solitaire layout with stock, waste, tableau runs and suit foundations. |
@@ -41,6 +42,21 @@ Use it with trusted friends. Room codes are lightweight invite gates, not accoun
 The board presets are small original games inspired by property-trading and life-journey mechanics. They are not full reproductions of Monopoly or The Game of Life: no auctions, mortgages, house-building systems, or full career/family simulation yet. Cash and player-to-player property trades are now supported.
 
 Tarneeb uses the common scoring variation: a made bid scores tricks won, an unbid sweep scores 16, a made bid of 13 scores 26, a failed bid subtracts the contract, and defenders score their tricks when the contract fails. Regional rules vary. Reference: [Pagat's Tarneeb rules](https://www.pagat.com/auctionwhist/tarneeb.html).
+
+## Playing Poker (v0.11)
+
+1. Choose **Poker** from the game shelf and invite 2–8 players.
+2. In **House rules → Game rules**, set starting chips (100–10,000), small blind (1–100), big blind (2–200), seconds per turn (10–120), and an optional hand limit (0 means unlimited). The small blind must be below the big blind; the starting stack must cover the big blind. Defaults: 1,000 chips, 5/10 blinds, 45-second turns, unlimited hands.
+3. Start to shuffle a single 52-card deck and deal two private hole cards to each funded player. The button posts the small blind heads-up and acts first before the flop; with more players, action begins left of the big blind. After the flop, action starts left of the dealer. The button/blinds rotate each hand and skip empty stacks.
+4. Use **Fold**, **Check**, **Call**, **Bet / raise**, or **All-in**. “Raise to” is your total bet for this betting round, including chips already in front of you. Raises must match the previous full raise; smaller raises are allowed only for an all-in. A short all-in alone does not reopen a previous bettor’s raise option, while cumulative short raises can reopen it. When no opponent has chips left to bet, any outstanding call is resolved and the board runs out automatically.
+5. The table burns a hidden card before the flop (three community cards), turn and river. At showdown, the server finds each live player’s best five-card hand from seven cards, including ace-low straights. Folded cards stay hidden. Uncontested pots do not reveal the winner’s hole cards. Side pots use only eligible contributors; tied pots split separately, odd chips go left of the button, and unmatched overbets are returned.
+6. After the chip award animation, the host clicks **Deal next hand**. Play ends when only one funded player remains or the configured hand limit is reached; the biggest stack wins, including ties. The host can end early, refunding unfinished bets, restart with fresh stacks, or return to the lobby. A timed-out player checks when free and otherwise folds, so a disconnected seat cannot stall the hand indefinitely. Funded players must reconnect before the next deal.
+
+The compact panel shows community cards, your private cards, pot, blinds, turn timer, stacks and last actions. The polygon table shuffles/deals cards, reveals community cards, sends chip stacks into the pot and awards them to winners; checks knock, folds swish and chip wins chime. Both overview and first-person modes keep the board above the controls. Other players’ hole cards, undealt cards and burn cards remain server-private until an actual showdown.
+
+Shared chaos is optional. Poker uses a **separate bonus tally**, awarding a point to each pot winner; score doubling, taxes, penalties and score scrambles affect that tally without changing chips committed to a pot. Seat Roulette and Cyclone wait until a hand ends; Cyclone passes bonus tallies, and hole cards stay attached to their owners. Reverse direction and scrambled order affect subsequent action order as house rules. **Winner Takes It** wagers chip stacks only between completed hands. **Time Warp** restores private cards, bets, pot and stacks with a majority vote. Standard poker always determines the chip winner, regardless of bonus tallies. No real-money payments or buy-ins are implemented.
+
+Implementation: server/poker.ts, shared/poker.ts, src/poker-ui.ts, src/poker-visuals.ts. The 26 poker tests cover ranks/kickers, heads-up and multiway action, minimum raises, short all-ins, deterministic side pots, odd-chip ties, privacy, timeouts, lifecycle, challenge stakes, undo, and 75 randomized all-in tournaments with chip-conservation checks. Betting rules reference: [PokerStars Texas Hold’em rules](https://www.pokerstars.com/poker/games/texas-holdem/).
 
 ## Playing Trivia
 
@@ -142,7 +158,7 @@ Rooms are in memory. Restarting the server clears games. Disconnected rooms expi
 
 ## Verification
 
-123 automated tests pass, including a full 13-trick Tarneeb hand, challenge resolution, timer behavior, private views, validation, scoring, board actions and a real two-client reconnect flow. Browser checks cover room creation, joining, private deals, card selection/play, calling bluff, camera switching, enlarged board views, negotiation offers and refusals, and host rule editing.
+149 automated tests pass, including a full 13-trick Tarneeb hand, challenge resolution, timer behavior, private views, validation, scoring, board actions and a real two-client reconnect flow. Browser checks cover room creation, joining, private deals, card selection/play, calling bluff, camera switching, enlarged board views, negotiation offers and refusals, and host rule editing.
 
 ## Version 0.2: the table comes alive
 

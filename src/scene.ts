@@ -1,3 +1,4 @@
+import {PokerVisuals} from './poker-visuals';
 import {ExpansionVisuals} from './expansion-visuals';
 import {ChaosVisuals} from './chaos-visuals';
 import * as THREE from 'three';
@@ -16,7 +17,7 @@ export class GameScene {
   closeBoard = true; mode = 'third'; self = 0; room?: View; game: Game = 'bluff'; resize: ResizeObserver;
   actorMap = new Map<string, THREE.Group>(); tokenMap = new Map<string, THREE.Mesh>(); tweens: Tween[] = [];
   slapShot?:{until:number;actor:string;target:string};
-  expansionFX:ExpansionVisuals;chaosFX:ChaosVisuals; chaosShotUntil=0;
+  pokerFX:PokerVisuals;expansionFX:ExpansionVisuals;chaosFX:ChaosVisuals; chaosShotUntil=0;
   seatAngle(index:number){const id=this.room?.players[index]?.id,seat=id?this.room?.chaos?.seats.indexOf(id):undefined;return (seat!==undefined&&seat>=0?seat:index)*Math.PI*2/(this.room?.players.length||4);}
   actorKey = ''; pieceKey = ''; shake = 0; moving = new Set<string>();
   constructor(private el: HTMLElement) {
@@ -31,7 +32,7 @@ export class GameScene {
     this.resize = new ResizeObserver(() => { const w=el.clientWidth,h=el.clientHeight; this.renderer.setSize(w,h); this.camera.aspect=w/h; this.camera.updateProjectionMatrix(); this.handKey=''; this.updateOwnHand(); });
     this.renderer.domElement.addEventListener('pointerup',event=>{const pick=this.pick(event);if(pick)this.onPick?.(pick);});
     this.renderer.domElement.addEventListener('pointermove',event=>{const pick=this.pick(event);this.hoveredCard=pick?.card;this.renderer.domElement.style.cursor=pick?'pointer':'default';});
-    this.chaosFX=new ChaosVisuals(this);this.expansionFX=new ExpansionVisuals(this);
+    this.chaosFX=new ChaosVisuals(this);this.expansionFX=new ExpansionVisuals(this);this.pokerFX=new PokerVisuals(this);
     this.resize.observe(el); this.update('bluff'); this.animate();
   }
   get board() { return this.game === 'property' || this.game === 'life'||this.game==='rpg'||!!this.room?.solitaire; }
@@ -79,7 +80,7 @@ export class GameScene {
     if(this.board){room?.players.forEach((p,i)=>{let token=this.tokenMap.get(p.id);if(!token){token=this.mesh(new THREE.ConeGeometry(.105,.27,5),p.color);const[x,z]=this.tilePosition(p.position);token.position.set(x+(i%3)*.08-.08,1.19,z);token.userData.logical=p.position;const ring=this.mesh(new THREE.TorusGeometry(.2,.024,4,20),0xe7b770,0,-.11,0);ring.rotation.x=Math.PI/2;token.add(ring);token.userData.ring=ring;this.tokens.add(token);this.tokenMap.set(p.id,token);}else if(token.userData.logical!==p.position){const old=token.userData.logical as number;token.userData.logical=p.position;const event=room.events.at(-1);const steps=event?.kind==='roll'&&event.actor===p.id?Number(event.data.steps):(p.position-old+24)%24;if(event?.kind==='chaosWarp'){const from=token.position.clone(),[x,z]=this.tilePosition(p.position);this.tween(1800,t=>{token!.position.lerpVectors(from,new THREE.Vector3(x+(i%3)*.08-.08,1.19,z),t);token!.position.y+=Math.sin(t*Math.PI)*.3;});}else this.moveToken(token,old,steps,i,event?.kind==='roll'?1000:0);}token.userData.ring.visible=p.id===room.players[this.self]?.id||room.players[room.turn]?.id===p.id;});}
     const diceCount=['property','life'].includes(game)?(game==='property'?2:1):0;
     if(this.dice.children.length!==diceCount||previous?.rules.game!==game||previous?.gameInstance!==room?.gameInstance){this.clear(this.dice);for(let i=0;i<diceCount;i++){const die=this.makeDie();die.userData.action='roll';die.position.set(.3+i*.55,1.19,-.25);this.orientDie(die,room?.rollDice[i]||1);this.dice.add(die);}}
-    this.expansionFX.update(room);this.tokens.visible=!(room?.rules.game==='rpg'||room?.solitaire);
+    this.expansionFX.update(room);this.pokerFX.update(room);this.tokens.visible=!(room?.rules.game==='rpg'||room?.solitaire);
     this.updateOwnHand();
     if(previous?.duel&&!room?.duel){for(const g of this.actorMap.values()){const a=g.userData.baseAngle;g.position.set(Math.sin(a)*this.radius,-.38,Math.cos(a)*this.radius);g.rotation.set(0,a,0);g.userData.arms.forEach((arm:THREE.Group)=>arm.rotation.set(.5,0,0));}}
   }
@@ -117,6 +118,7 @@ export class GameScene {
   }
   star(actor?:string){const seat=this.actorMap.get(actor||'');if(!seat)return;const vertices:number[]=[];for(let i=0;i<10;i++){const a=i*Math.PI/5+Math.PI/2,b=(i+1)*Math.PI/5+Math.PI/2,r=i%2?.16:.36,next=(i+1)%2?.16:.36;vertices.push(0,0,0,Math.cos(a)*r,Math.sin(a)*r,0,Math.cos(b)*next,Math.sin(b)*next,0);}const geometry=new THREE.BufferGeometry();geometry.setAttribute('position',new THREE.Float32BufferAttribute(vertices,3));geometry.computeVertexNormals();const star=this.mesh(geometry,0xffd05e);const start=seat.position.clone().add(new THREE.Vector3(0,2.1,0));this.fx.add(star);this.tween(1200,t=>{star.position.copy(start);star.position.y+=t*.7;star.scale.setScalar(Math.sin(t*Math.PI));star.quaternion.copy(this.camera.quaternion);star.rotateZ(t*.6);},()=>this.remove(star));this.burst(start,0xffd05e);}
   play(e:GameEvent){
+    if(e.kind.startsWith('poker')){this.pokerFX.play(e);return;}
     if(e.kind.startsWith('rpg')||e.kind.startsWith('scribble')||e.kind.startsWith('solitaire')||e.kind.startsWith('raid')){this.expansionFX.play(e);return;}
     if(e.kind.startsWith('chaos')){this.chaosFX.play(e);return;}
     if(e.kind==='triviaCorrect')this.star(e.actor);
@@ -133,6 +135,8 @@ export class GameScene {
   }
   animate=()=>{
     requestAnimationFrame(this.animate);const now=performance.now();this.environment.animate(now);this.chaosFX.update();for(const t of [...this.tweens]){if(now<t.start)continue;const progress=Math.min(1,(now-t.start)/t.duration);t.step(progress);if(progress===1){this.tweens.splice(this.tweens.indexOf(t),1);t.done?.();}}
+    const pokerOffset=this.game==='poker'&&!!this.room&&this.room.phase!=='lobby',w=this.el.clientWidth,h=this.el.clientHeight;
+    if(pokerOffset){if(!this.camera.view?.enabled||this.camera.view.fullWidth!==w||this.camera.view.fullHeight!==h)this.camera.setViewOffset(w,h,0,h*.23,w,h);}else if(this.camera.view?.enabled)this.camera.clearViewOffset();
     const angle=this.seatAngle(this.self);
     for(const card of this.pieces.children)if(card.userData.seat!==undefined)card.visible=!(this.mode==='first'&&card.userData.seat===this.self);
     this.ownHand.visible=now>=this.chaosShotUntil&&!(this.slapShot&&now<this.slapShot.until)&&this.mode==='first'&&this.room?.phase==='playing'&&!this.room.duel&&this.room.busyUntil<=Date.now();

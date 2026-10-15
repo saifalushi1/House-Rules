@@ -14,7 +14,7 @@ export function validateRules(input: unknown): Rules {
   const require = (ok: unknown, message: string) => { if (!ok) throw new Error(message); };
   require(input && typeof input === 'object', 'Invalid rules.');
   const x: Record<string, unknown> = { ...defaults, ...(input as Record<string, unknown>) };
-  require(['bluff', 'tarneeb', 'cards', 'charades', 'trivia', 'property', 'life', 'scribble', 'rpg'].includes(String(x.game)), 'Unknown game.');
+  require(['bluff', 'tarneeb', 'cards', 'charades', 'trivia', 'property', 'life', 'scribble', 'rpg', 'poker'].includes(String(x.game)), 'Unknown game.');
   require(['first', 'third'].includes(String(x.camera)), 'Unknown camera.');
   require(Object.hasOwn(backgrounds,String(x.background)), 'Unknown background.');
   require(typeof x.charadeCategory==='string' && Object.hasOwn(charadeCategories,x.charadeCategory), 'Unknown charades category.');
@@ -26,6 +26,7 @@ export function validateRules(input: unknown): Rules {
   require(typeof x.triviaCategory==='string'&&Object.hasOwn(triviaCategories,x.triviaCategory),'Unknown trivia category.');r.triviaCategory=x.triviaCategory as Rules['triviaCategory'];
   const ranges: Record<string, [number, number]> = {
     chaosHotSeconds:[5,120],chaosMinSeconds:[2,30],chaosShrinkSeconds:[0,10],chaosSeatEvery:[1,20],chaosRandomPercent:[0,100],
+    pokerStack:[100,10000],pokerSmallBlind:[1,100],pokerBigBlind:[2,200],pokerSeconds:[10,120],pokerHands:[0,100],
     scribbleSeconds:[20,180],scribbleRounds:[1,8],
     maxPlayers: [2, 8], decks: [1, 3], handSize: [1, 20], targetScore: [10, 100],
     triviaQuestions: [1,100], triviaSeconds:[5,180], charadeMatchSeconds: [30,1200], challengeSeconds: [5, 30], charadeSeconds: [15, 180], skipPenalty: [0, 5],
@@ -46,6 +47,9 @@ export function validateRules(input: unknown): Rules {
     (r as unknown as Record<string, unknown>)[key] = (x[key] as string).slice(0, key === 'charadePrompts' ? 6000 : 1000);
   }
   require(r.chaosMinSeconds<=r.chaosHotSeconds,'Minimum fuse must not exceed starting fuse.');
+  require(r.pokerSmallBlind<r.pokerBigBlind,'Small blind must be below the big blind.');
+  require(r.pokerStack>=r.pokerBigBlind,'Starting chips must cover the big blind.');
+  if(r.game==='poker')r.decks=1;
   if (r.game === 'tarneeb') { r.decks = 1; r.maxPlayers = 4; }
   if(r.cardLayout==='solitaire'&&r.game==='cards')r.decks=1;
   return r;
