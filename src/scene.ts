@@ -5,7 +5,7 @@ import {ChaosVisuals} from './chaos-visuals';
 import * as THREE from 'three';
 import { orderCards } from '../shared/rules';
 import { TableEnvironment } from './environments';
-import type { Game, GameEvent, View } from '../shared/types';
+import type { Game, GameEvent, View, Rules } from '../shared/types';
 interface Tween { start: number; duration: number; step: (t: number) => void; done?: () => void }
 export class GameScene {
   renderer: THREE.WebGLRenderer;
@@ -58,8 +58,8 @@ export class GameScene {
     const ring=this.mesh(new THREE.TorusGeometry(.56,.026,4,24),0xe7b770,0,.15,0);ring.rotation.x=Math.PI/2;g.add(ring);g.userData.arms=arms;g.userData.ring=ring;this.actorMap.set(id,g);this.actors.add(g);
   }
   tilePosition(i:number):[number,number] {const s=Math.floor(i/6),t=(i%6)/6*3.28;return s===0?[-1.64+t,1.64]:s===1?[1.64,1.64-t]:s===2?[1.64-t,-1.64]:[-1.64,-1.64+t];}
-  update(game:Game,room?:View,id?:string) {
-    const previous=this.room;if(previous?.gameInstance!==room?.gameInstance||previous?.phase!==room?.phase){for(const group of [this.group,this.pieces,this.dice,this.expansionFX.group,this.pokerFX.group]){group.rotation.set(0,0,0);group.position.set(0,0,0);}this.rooftopShotUntil=0;this.chaosShotUntil=0;this.slapShot=undefined;this.tweens=[];this.clear(this.fx);this.moving.clear();this.actorKey='';this.pieceKey='';this.handKey='';}this.game=game;this.room=room;this.environment.update(room?.rules.background||'forest');this.self=Math.max(0,room?.players.findIndex(p=>p.id===id)??0);this.group.scale.set(this.board?1.3:1,1,this.board?1.3:1);
+  update(game:Game,room?:View,id?:string,background:Rules['background']=room?.rules.background||'forest') {
+    const previous=this.room;if(previous?.gameInstance!==room?.gameInstance||previous?.phase!==room?.phase){for(const group of [this.group,this.pieces,this.dice,this.expansionFX.group,this.pokerFX.group]){group.rotation.set(0,0,0);group.position.set(0,0,0);}this.rooftopShotUntil=0;this.chaosShotUntil=0;this.slapShot=undefined;this.tweens=[];this.clear(this.fx);this.moving.clear();this.actorKey='';this.pieceKey='';this.handKey='';}this.game=game;this.room=room;this.environment.update(background);this.self=Math.max(0,room?.players.findIndex(p=>p.id===id)??0);this.group.scale.set(this.board?1.3:1,1,this.board?1.3:1);
     if((previous?.gameInstance!==room?.gameInstance||previous?.rules.game!==game)&&this.mode!=='first'&&(game==='rpg'||room?.solitaire))this.camera.position.set(0,game==='rpg'?12.7:7,game==='rpg'?6:1.2);
     this.el.parentElement?.classList.toggle('board-stage',this.board);
     const players=room?.players.length?room.players:[{id:'preview0',color:'#d9a658'},{id:'preview1',color:'#83a3a8'},{id:'preview2',color:'#bc8c83'},{id:'preview3',color:'#8ba177'}];

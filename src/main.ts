@@ -94,7 +94,7 @@ function render() {
         if (field) { field.focus({ preventScroll: true }); if (position !== null && !['number','range','checkbox','color'].includes(field.type)) field.setSelectionRange(position, position); }
     }
     document.querySelector('.workspace')!.classList.toggle('board-layout', ['property','life'].includes(draft.game));
-    scene?.update(draft.game, room, id);
+    scene?.update(draft.game, room, id, draft.background);
     if (scene) {scene.mode = camera;scene.setSelected(selected);}
     applyLayout();
     mountExpansion(room,id,send);
@@ -285,7 +285,7 @@ app.addEventListener('click', async (e) => {
         camera = el.dataset.camera;
         if (scene)
             scene.mode = camera;
-        applyLayout(); renderStage(); renderPlay(); scene?.update(draft.game,room,id); scene?.setSelected(selected);
+        applyLayout(); renderStage(); renderPlay(); scene?.update(draft.game,room,id,draft.background); scene?.setSelected(selected);
     }
     if (el.dataset.card) {
         const c = el.dataset.card;
