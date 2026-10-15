@@ -4,6 +4,18 @@
 
 A self-hosted TypeScript game-night sandbox. Low-poly 3D table and avatars, private hands, live shared rooms, and host-editable presets. Version 0.12 adds chosen Charades teammates and full timed turns, four-player Scribble scoring receipts, shared peek/slap rules for all multiplayer card presets, a game-ending d6 Table Flip, and rooftop animations with cosmetic paintball retaliation. No-limit Texas Hold’em includes private cards, betting rounds, side pots and showdown. Also includes Scribble, a D&D-style tabletop RPG, Klondike Solitaire, optional-master Trivia, a challenge-and-steal chaos rule, and seven environments. Trivia has 1,000 questions across ten categories; pair Charades has 1,900 prompts across 19 categories.
 
+## Version 0.14 · paced chaos and easier party play
+
+The header’s **Info** button has **Games** and **Modifiers & custom rules** tabs, including every chaos toggle, all twelve Chaos Die faces, game options, peeking, negotiations, custom agreements and host controls.
+
+**Trivia:** easy is the default; it draws only easy-tagged questions, including 200 newly authored everyday questions across the ten categories. Each category retains 100 total questions in mixed mode. Easy rounds use the available 28–48 easy questions for their category and cap the requested length without repeats. Choose **Game rules → Answer format → Multiple choice** to show clickable answer options, or keep typed answers. Both formats support everyone/master and free-for-all/turn-based modes. Multiple choice permits one selection per contestant per question; the answer key stays private until resolution (except for the master). The [example question page](https://quizandsurveymaster.com/best-trivia-questions-and-answers/) informed the intended accessible difficulty; its question collection was not imported.
+
+**Scribble:** a short victory chime is broadcast to everyone for each correct guess, including spoken awards. Between drawings, a six-second animated pencil intermission reveals the word and announces the next drawer. Ordinary sound controls still apply.
+
+**Winner Takes It:** accepted challenges move fighters into a polygon boxing ring and place all other players ringside. Each of three beats has a three-second preparation countdown, a ten-second secret decision window and a 2.4-second reveal animation. Jab, hook and block have distinct poses. The server rejects early/duplicate moves; stakes change after the final reveal. Underlying party timers resume with the paused time restored. A disconnect forfeits the bout.
+
+**Seat Roulette** now updates future turn order along with physical seats. It preserves player/team identities, one drawing per player per Scribble round, and consecutive teammate turns in Charades. **Hot Potato** always explodes on its owner and forfeits their opportunity: Bluff/free sandbox skip a turn; Tarneeb auto-plays a random legal card (or automatically passes a bid/selects trump); Poker folds even when checking is free; Charades ends the turn, Scribble closes the drawing, Trivia excludes the owner for that question or ends their answering turn, and board games finish their turn automatically. The old expiry-outcome setting is retained only for importing older rules and no longer changes this behavior. Shield-round protection still applies.
+
 ## Start on this machine
 
 Double-click **Start House Rules.cmd**. It uses the installed Node.js runtime (or the bundled Codex runtime), installs missing dependencies, builds if necessary, and starts the server. Keep that terminal open while playing. Press Ctrl+C to stop.
@@ -107,8 +119,8 @@ Before starting, open **House rules → Chaos**. Enable any combination of the t
 
 | Rule | Behavior and controls | Animation and sound |
 | --- | --- | --- |
-| Hot Potato | Starting fuse, minimum fuse, shrink per turn, and penalty/forced/random expiry. A penalty randomly tries to add a card or removes a point/coin; without an available card it removes a point. Forced actions use the game's legal moves: pass, play, bid, pick trump, roll, resolve a life choice, end a turn, or time out a party prompt/question. | Shaking low-poly bomb with a burning fuse; accelerating ticks and an explosion. |
-| Seat Roulette | Swap physical seats every N completed turns. Hands either travel with their owners or stay at their old physical seat. Player identities, properties, teams and pairs remain fixed. | Avatars hop across the table in arcs; whoosh and boing. |
+| Hot Potato | Configurable fuse, minimum and shrink per turn. Expiry forfeits the current opportunity using the game-specific behavior described above. | Small explosion over the owner, bomb fuse, accelerating ticks and boom. |
+| Seat Roulette | Shuffle seats and future turn order every N turns. Hands travel or stay according to the toggle; team identities stay fixed. | Avatars hop to their new seats; whoosh and boing. |
 | Cyclone | At round boundaries or random turn starts, pass hands left/right. In games without hands, pass the bonus chaos tallies instead. | Cards fan out and orbit; shuffle riffle and wind. |
 | Double or Nothing | A separate chance slider (20% by default) rolls once per eligible gain, then flips a fair coin. Bluff pile pickups and free card-sandbox draws/collections receive twice as many real cards or none. Extra cards have unique IDs; erased pickups return to the stock. A room-wide 1,040-card guard skips the wager before excessive growth. Tarneeb and party/board games wager positive score or cash gains. Ordinary card plays do not trigger a flip. Fixed Poker and Solitaire hands stay intact. | Giant spinning coin; ring, jackpot or sad trombone. |
 | Chaos Die | Roll a d12 each round for a shared modifier, listed below. | Oversized polygon die tumbles above the table with its numbered result; rattle and thud. |
@@ -121,7 +133,7 @@ Before starting, open **House rules → Chaos**. Enable any combination of the t
 
 **Chaos Die faces:** 1 double gains, 2 zero gains, 3 reverse turn direction, 4 half-length hot fuse, 5 Robin's tax, 6 blackout, 7 Cyclone left, 8 Cyclone right, 9 seat shuffle, 10 a dare for everyone, 11 bonus point for each scoring unit, 12 shield from chaos penalties and score doubling/tax for that round. Die-selected effects can run even when their individual toggle is off.
 
-**Round boundaries:** a full turn cycle in Bluff, Card sandbox and board games; each completed trick in Tarneeb; a new Charades prompt; a new Trivia question. A round-end Cyclone in Trivia also queues when the current question resolves. Seat and hand swaps wait until deal/dice animations, Bluff challenge windows, boxing, pending life choices and partially played Tarneeb tricks are clear. Physical swaps do not change who owns the current turn or which players are teammates. Scrambled turn order is separate from seat order.
+**Round boundaries:** a full turn cycle in Bluff, Card sandbox and board games; each completed trick in Tarneeb; a new Charades prompt; a new Trivia question. A round-end Cyclone in Trivia also queues when the current question resolves. Seat and hand swaps wait until deal/dice animations, Bluff challenge windows, boxing, pending life choices and partially played Tarneeb tricks are clear. Physical swaps do not change who owns the current turn or which players are teammates. Seat Roulette makes the new seat order the future turn order.
 
 Card-game chaos tallies do not replace the usual victory condition. Cardless Cyclone passes a separate bonus tally rather than moving property ownership, master roles or team membership. Tarneeb still requires the final chaos-adjusted team total to reach its target. Correct-answer counts remain a count of correct answers even when points double or are erased.
 

@@ -1,4 +1,4 @@
-// Open Trivia DB question data, CC BY-SA 4.0. See TRIVIA-DATA-LICENSE.md.
+// Open Trivia DB (CC BY-SA 4.0) plus original everyday questions. See TRIVIA-DATA-LICENSE.md.
 export const triviaBank = {
   "general": [
     {
@@ -38,16 +38,16 @@ export const triviaBank = {
       "difficulty": "easy"
     },
     {
-      "id": "general-4",
-      "question": "In the MMO RPG \"Realm of the Mad God\", what dungeon is widely considered to be the most difficult?",
-      "answer": "The Shatter's",
+      "id": "general-friendly-1",
+      "question": "How many days make up one week?",
+      "answer": "7",
       "choices": [
-        "The Shatter's",
-        "Snake Pit",
-        "The Tomb of the Acient's",
-        "The Puppet Master's Theater"
+        "7",
+        "5",
+        "6",
+        "8"
       ],
-      "difficulty": "hard"
+      "difficulty": "easy"
     },
     {
       "id": "general-5",
@@ -70,14 +70,14 @@ export const triviaBank = {
       "difficulty": "easy"
     },
     {
-      "id": "general-7",
-      "question": "How tall is the Burj Khalifa?",
-      "answer": "2,722 ft",
+      "id": "general-friendly-11",
+      "question": "What do you use to unlock a traditional door lock?",
+      "answer": "Key",
       "choices": [
-        "2,722 ft",
-        "2,717 ft",
-        "2,546 ft",
-        "3,024 ft"
+        "Key",
+        "Fork",
+        "Brush",
+        "Candle"
       ],
       "difficulty": "easy"
     },
@@ -104,14 +104,14 @@ export const triviaBank = {
       "difficulty": "medium"
     },
     {
-      "id": "general-10",
-      "question": "What is the name of the company in Lethal Company?",
-      "answer": "The Company",
+      "id": "general-friendly-12",
+      "question": "Which season comes after winter?",
+      "answer": "Spring",
       "choices": [
-        "The Company",
-        "Planet Scrap Co.",
-        "Lethal Robotics",
-        "Gordian Shipping Co."
+        "Spring",
+        "Autumn",
+        "Summer",
+        "Winter again"
       ],
       "difficulty": "easy"
     },
@@ -126,14 +126,14 @@ export const triviaBank = {
       "difficulty": "easy"
     },
     {
-      "id": "general-12",
-      "question": "How many furlongs are there in a mile?",
-      "answer": "Eight",
+      "id": "general-friendly-13",
+      "question": "What is the opposite direction from north?",
+      "answer": "South",
       "choices": [
-        "Eight",
-        "Two",
-        "Four",
-        "Six"
+        "South",
+        "East",
+        "West",
+        "Up"
       ],
       "difficulty": "easy"
     },
@@ -150,26 +150,26 @@ export const triviaBank = {
       "difficulty": "easy"
     },
     {
-      "id": "general-14",
-      "question": "Which of the following  British Monarchs never appeared on a circulated pound sterling coin?",
-      "answer": "Edward VIII",
+      "id": "general-friendly-2",
+      "question": "Which object tells you the time using hands on a dial?",
+      "answer": "Clock",
       "choices": [
-        "Edward VIII",
-        "Victoria",
-        "George VI",
-        "Charles II"
+        "Clock",
+        "Compass",
+        "Thermometer",
+        "Ruler"
       ],
-      "difficulty": "hard"
+      "difficulty": "easy"
     },
     {
-      "id": "general-15",
-      "question": "In which year did Ghana gain independence?",
-      "answer": "1957",
+      "id": "general-friendly-14",
+      "question": "Which shape has no corners?",
+      "answer": "Circle",
       "choices": [
-        "1957",
-        "1947",
-        "1960",
-        "1958"
+        "Circle",
+        "Triangle",
+        "Square",
+        "Rectangle"
       ],
       "difficulty": "easy"
     },
@@ -186,16 +186,16 @@ export const triviaBank = {
       "difficulty": "easy"
     },
     {
-      "id": "general-18",
-      "question": "In the fictional SCP universe what “Object Class” is given to SCP’s that cannot be contained.",
-      "answer": "Apollyon",
+      "id": "general-friendly-3",
+      "question": "What do bees make that people put in tea?",
+      "answer": "Honey",
       "choices": [
-        "Apollyon",
-        "Thaumiel",
-        "Keter-Thaumiel",
-        "Esoteric/Narrative Classes"
+        "Honey",
+        "Butter",
+        "Flour",
+        "Salt"
       ],
-      "difficulty": "hard"
+      "difficulty": "easy"
     },
     {
       "id": "general-19",
@@ -234,26 +234,26 @@ export const triviaBank = {
       "difficulty": "medium"
     },
     {
-      "id": "general-22",
-      "question": "Before the 19th Century, the \"Living Room\" was originally called the...",
-      "answer": "Parlor",
+      "id": "general-friendly-4",
+      "question": "What color comes from mixing blue and yellow paint?",
+      "answer": "Green",
       "choices": [
-        "Parlor",
-        "Open Room",
-        "Sitting Room",
-        "Loft"
+        "Green",
+        "Purple",
+        "Orange",
+        "Red"
       ],
-      "difficulty": "hard"
+      "difficulty": "easy"
     },
     {
-      "id": "general-23",
-      "question": "What element has the chemical symbol Kr?",
-      "answer": "Krypton",
+      "id": "general-friendly-15",
+      "question": "Which animal is commonly called man's best friend?",
+      "answer": "Dog",
       "choices": [
-        "Krypton",
-        "Kerosine",
-        "Kineticium",
-        "Curium"
+        "Dog",
+        "Shark",
+        "Lizard",
+        "Snake"
       ],
       "difficulty": "easy"
     },
@@ -270,14 +270,14 @@ export const triviaBank = {
       "difficulty": "medium"
     },
     {
-      "id": "general-25",
-      "question": "Which of the three astronauts of the Apollo 11 spaceflight did NOT walk on the moon?",
-      "answer": "Michael Collins",
+      "id": "general-friendly-16",
+      "question": "Which color usually means stop on a traffic light?",
+      "answer": "Red",
       "choices": [
-        "Michael Collins",
-        "Buzz Aldrin",
-        "Neil Armstrong",
-        "None of them"
+        "Red",
+        "Green",
+        "Blue",
+        "Purple"
       ],
       "difficulty": "easy"
     },
@@ -316,36 +316,38 @@ export const triviaBank = {
       "difficulty": "easy"
     },
     {
-      "id": "general-29",
-      "question": "Trypophobia is the fear of ",
-      "answer": "groups of holes",
+      "id": "general-friendly-17",
+      "question": "What do you call a baby cat?",
+      "answer": "Kitten",
       "choices": [
-        "groups of holes",
-        "swimming in deep water",
-        "public speaking",
-        "eating too much"
+        "Kitten",
+        "Puppy",
+        "Calf",
+        "Foal"
       ],
       "difficulty": "easy"
     },
     {
-      "id": "general-30",
-      "question": "King Gizzard & The Lizard Wizard's album \"Nonagon Infinity\" can be looped seamlessly.",
-      "answer": "True",
+      "id": "general-friendly-18",
+      "question": "How many wheels does a standard bicycle have?",
+      "answer": "2",
       "choices": [
-        "True",
-        "False"
+        "2",
+        "1",
+        "3",
+        "4"
       ],
       "difficulty": "easy"
     },
     {
-      "id": "general-31",
-      "question": "Which candy is NOT made by Mars?",
-      "answer": "Almond Joy",
+      "id": "general-friendly-19",
+      "question": "Which utensil is commonly used to eat soup?",
+      "answer": "Spoon",
       "choices": [
-        "Almond Joy",
-        "M&M's",
-        "Twix",
-        "Snickers"
+        "Spoon",
+        "Fork",
+        "Knife",
+        "Tongs"
       ],
       "difficulty": "easy"
     },
@@ -396,14 +398,14 @@ export const triviaBank = {
       "difficulty": "easy"
     },
     {
-      "id": "general-36",
-      "question": "Terry Gilliam was an animator that worked with which British comedy group?",
-      "answer": "Monty Python",
+      "id": "general-friendly-20",
+      "question": "Which day comes directly after Friday?",
+      "answer": "Saturday",
       "choices": [
-        "Monty Python",
-        "The Goodies‎",
-        "The League of Gentlemen‎",
-        "The Penny Dreadfuls"
+        "Saturday",
+        "Sunday",
+        "Monday",
+        "Thursday"
       ],
       "difficulty": "easy"
     },
@@ -420,16 +422,16 @@ export const triviaBank = {
       "difficulty": "easy"
     },
     {
-      "id": "general-38",
-      "question": "What is the weight of a Gold Bar in Fallout: New Vegas?",
-      "answer": "35 Pounds",
+      "id": "general-friendly-5",
+      "question": "How many sides does a triangle have?",
+      "answer": "3",
       "choices": [
-        "35 Pounds",
-        "30 Pounds",
-        "40 Pounds",
-        "32.50 Pounds"
+        "3",
+        "4",
+        "5",
+        "6"
       ],
-      "difficulty": "hard"
+      "difficulty": "easy"
     },
     {
       "id": "general-39",
@@ -441,7 +443,7 @@ export const triviaBank = {
         "Taxi",
         "Turkey"
       ],
-      "difficulty": "easy"
+      "difficulty": "medium"
     },
     {
       "id": "general-40",
@@ -453,7 +455,7 @@ export const triviaBank = {
         "Jet",
         "Space Capsule"
       ],
-      "difficulty": "easy"
+      "difficulty": "medium"
     },
     {
       "id": "general-41",
@@ -465,7 +467,7 @@ export const triviaBank = {
         "Abel Tasman",
         "Dirk Hartog"
       ],
-      "difficulty": "easy"
+      "difficulty": "medium"
     },
     {
       "id": "general-42",
@@ -489,7 +491,7 @@ export const triviaBank = {
         "John Cadbury",
         "John Tyler"
       ],
-      "difficulty": "easy"
+      "difficulty": "medium"
     },
     {
       "id": "general-44",
@@ -516,16 +518,16 @@ export const triviaBank = {
       "difficulty": "medium"
     },
     {
-      "id": "general-46",
-      "question": "The words \"bungalow\" and \"shampoo\" originate from the languages of which country?",
-      "answer": "India",
+      "id": "general-friendly-6",
+      "question": "Which meal is usually eaten first in the morning?",
+      "answer": "Breakfast",
       "choices": [
-        "India",
-        "Papua New Guinea",
-        "Ethiopia",
-        "China"
+        "Breakfast",
+        "Lunch",
+        "Dinner",
+        "Supper"
       ],
-      "difficulty": "hard"
+      "difficulty": "easy"
     },
     {
       "id": "general-47",
@@ -564,38 +566,40 @@ export const triviaBank = {
       "difficulty": "medium"
     },
     {
-      "id": "general-50",
-      "question": "Virtual reality company Oculus VR lost which of it's co-founders in a freak car accident in 2013?",
-      "answer": "Andrew Scott Reisse",
+      "id": "general-friendly-7",
+      "question": "What do you call frozen water?",
+      "answer": "Ice",
       "choices": [
-        "Andrew Scott Reisse",
-        "Nate Mitchell",
-        "Jack McCauley",
-        "Palmer Luckey"
+        "Ice",
+        "Steam",
+        "Sand",
+        "Smoke"
       ],
-      "difficulty": "hard"
+      "difficulty": "easy"
     },
     {
-      "id": "general-51",
-      "question": "If someone said \"you are olid\", what would they mean?",
-      "answer": "You smell extremely unpleasant.",
+      "id": "general-friendly-8",
+      "question": "Which fruit is traditionally used to make lemonade?",
+      "answer": "Lemon",
       "choices": [
-        "You smell extremely unpleasant.",
-        "You are out of shape/weak.",
-        "Your appearance is repulsive.",
-        "You are incomprehensible/an idiot."
+        "Lemon",
+        "Apple",
+        "Banana",
+        "Grape"
       ],
-      "difficulty": "hard"
+      "difficulty": "easy"
     },
     {
-      "id": "general-52",
-      "question": "Spoon theory is a theory, utilizing \"Spoons\" as a metaphor for energy they can use in a day.",
-      "answer": "True",
+      "id": "general-friendly-9",
+      "question": "What tool is used to cut paper?",
+      "answer": "Scissors",
       "choices": [
-        "True",
-        "False"
+        "Scissors",
+        "Spoon",
+        "Comb",
+        "Whisk"
       ],
-      "difficulty": "hard"
+      "difficulty": "easy"
     },
     {
       "id": "general-53",
@@ -610,16 +614,16 @@ export const triviaBank = {
       "difficulty": "easy"
     },
     {
-      "id": "general-54",
-      "question": "When was \"YouTube\" founded?",
-      "answer": "February 14, 2005",
+      "id": "general-friendly-10",
+      "question": "How many months are in a year?",
+      "answer": "12",
       "choices": [
-        "February 14, 2005",
-        "May 22, 2004",
-        "September 12, 2005",
-        "July 19, 2009"
+        "12",
+        "10",
+        "11",
+        "13"
       ],
-      "difficulty": "hard"
+      "difficulty": "easy"
     },
     {
       "id": "general-55",
@@ -665,7 +669,7 @@ export const triviaBank = {
         "Commander Shepard",
         "Captain Kirk"
       ],
-      "difficulty": "easy"
+      "difficulty": "medium"
     },
     {
       "id": "general-59",
@@ -677,7 +681,7 @@ export const triviaBank = {
         "Kelly Clarkson",
         "Christopher Hitchens"
       ],
-      "difficulty": "easy"
+      "difficulty": "medium"
     },
     {
       "id": "general-60",
@@ -689,7 +693,7 @@ export const triviaBank = {
         "Biologist",
         "Musician"
       ],
-      "difficulty": "easy"
+      "difficulty": "medium"
     },
     {
       "id": "general-61",
@@ -713,7 +717,7 @@ export const triviaBank = {
         "Redshift doesn't let us see distant stars ",
         "Quantum mechanics"
       ],
-      "difficulty": "easy"
+      "difficulty": "medium"
     },
     {
       "id": "general-63",
@@ -807,7 +811,7 @@ export const triviaBank = {
         "Chocolate",
         "Bubblegum"
       ],
-      "difficulty": "easy"
+      "difficulty": "medium"
     },
     {
       "id": "general-71",
@@ -841,7 +845,7 @@ export const triviaBank = {
         "Ten",
         "Eight"
       ],
-      "difficulty": "easy"
+      "difficulty": "medium"
     },
     {
       "id": "general-74",
@@ -949,7 +953,7 @@ export const triviaBank = {
         "September",
         "November "
       ],
-      "difficulty": "easy"
+      "difficulty": "medium"
     },
     {
       "id": "general-83",
@@ -997,7 +1001,7 @@ export const triviaBank = {
         "Fat Man",
         "Trojan Horse"
       ],
-      "difficulty": "easy"
+      "difficulty": "medium"
     },
     {
       "id": "general-88",
@@ -1055,7 +1059,7 @@ export const triviaBank = {
         "Donald Trump",
         "Bill Gates"
       ],
-      "difficulty": "easy"
+      "difficulty": "medium"
     },
     {
       "id": "general-93",
@@ -1067,7 +1071,7 @@ export const triviaBank = {
         "Greece",
         "Romania"
       ],
-      "difficulty": "easy"
+      "difficulty": "medium"
     },
     {
       "id": "general-94",
@@ -1163,7 +1167,7 @@ export const triviaBank = {
         "Miguel Hidalgo Y Costilla",
         "Vicente Guerrero"
       ],
-      "difficulty": "easy"
+      "difficulty": "medium"
     },
     {
       "id": "general-replacement-99",
@@ -1214,28 +1218,28 @@ export const triviaBank = {
       "difficulty": "medium"
     },
     {
-      "id": "science-4",
-      "question": "Which of these is a stop codon in DNA?",
-      "answer": "TAA",
+      "id": "science-friendly-1",
+      "question": "Which organ pumps blood around your body?",
+      "answer": "Heart",
       "choices": [
-        "TAA",
-        "ACT",
-        "ACA",
-        "GTA"
+        "Heart",
+        "Liver",
+        "Lung",
+        "Stomach"
       ],
-      "difficulty": "hard"
+      "difficulty": "easy"
     },
     {
-      "id": "science-5",
-      "question": "Which of these chemical compounds is NOT found in gastric acid?",
-      "answer": "Sulfuric acid",
+      "id": "science-friendly-2",
+      "question": "What gas do humans breathe in to stay alive?",
+      "answer": "Oxygen",
       "choices": [
-        "Sulfuric acid",
-        "Hydrochloric acid",
-        "Potassium chloride",
-        "Sodium chloride"
+        "Oxygen",
+        "Helium",
+        "Hydrogen",
+        "Neon"
       ],
-      "difficulty": "hard"
+      "difficulty": "easy"
     },
     {
       "id": "science-6",
@@ -1270,28 +1274,28 @@ export const triviaBank = {
       "difficulty": "medium"
     },
     {
-      "id": "science-9",
-      "question": "Folic acid is the synthetic form of which vitamin?",
-      "answer": "Vitamin B",
+      "id": "science-friendly-3",
+      "question": "What force keeps your feet on the ground?",
+      "answer": "Gravity",
       "choices": [
-        "Vitamin B",
-        "Vitamin A",
-        "Vitamin C",
-        "Vitamin D"
+        "Gravity",
+        "Magnetism",
+        "Friction",
+        "Electricity"
       ],
-      "difficulty": "hard"
+      "difficulty": "easy"
     },
     {
-      "id": "science-10",
-      "question": "Which country first successfully farm-hatched and raised bluefin tuna in 1979?",
-      "answer": "Japan",
+      "id": "science-friendly-4",
+      "question": "Which star gives Earth most of its light and warmth?",
+      "answer": "The Sun",
       "choices": [
-        "Japan",
-        "France",
-        "USA",
-        "Philippines"
+        "The Sun",
+        "Polaris",
+        "Sirius",
+        "Vega"
       ],
-      "difficulty": "hard"
+      "difficulty": "easy"
     },
     {
       "id": "science-11",
@@ -1342,28 +1346,28 @@ export const triviaBank = {
       "difficulty": "easy"
     },
     {
-      "id": "science-16",
-      "question": "What is isobutylphenylpropanoic acid more commonly known as?",
-      "answer": "Ibuprofen",
+      "id": "science-friendly-5",
+      "question": "What part of a plant usually absorbs water from the soil?",
+      "answer": "Roots",
       "choices": [
-        "Ibuprofen",
-        "Morphine",
-        "Ketamine",
-        "Aspirin"
+        "Roots",
+        "Flowers",
+        "Fruit",
+        "Petals"
       ],
-      "difficulty": "hard"
+      "difficulty": "easy"
     },
     {
-      "id": "science-17",
-      "question": "On the Beaufort Scale of wind force, what wind name is given to number 8?",
-      "answer": "Gale",
+      "id": "science-friendly-6",
+      "question": "What is the main gas plants take in for photosynthesis?",
+      "answer": "Carbon dioxide",
       "choices": [
-        "Gale",
-        "Storm",
-        "Hurricane",
-        "Breeze"
+        "Carbon dioxide",
+        "Oxygen",
+        "Helium",
+        "Hydrogen"
       ],
-      "difficulty": "hard"
+      "difficulty": "easy"
     },
     {
       "id": "science-18",
@@ -1412,28 +1416,28 @@ export const triviaBank = {
       "difficulty": "medium"
     },
     {
-      "id": "science-22",
-      "question": "Which of these Elements is a metalloid?",
-      "answer": "Antimony",
+      "id": "science-friendly-11",
+      "question": "How many legs does a spider have?",
+      "answer": "8",
       "choices": [
-        "Antimony",
-        "Tin",
-        "Bromine",
-        "Rubidium"
+        "8",
+        "4",
+        "6",
+        "10"
       ],
       "difficulty": "easy"
     },
     {
-      "id": "science-23",
-      "question": "Botanically speaking, which of these fruits is NOT a berry?",
-      "answer": "Strawberry",
+      "id": "science-friendly-7",
+      "question": "Which planet do humans live on?",
+      "answer": "Earth",
       "choices": [
-        "Strawberry",
-        "Blueberry",
-        "Banana",
-        "Concord Grape"
+        "Earth",
+        "Mars",
+        "Venus",
+        "Saturn"
       ],
-      "difficulty": "hard"
+      "difficulty": "easy"
     },
     {
       "id": "science-24",
@@ -1502,62 +1506,64 @@ export const triviaBank = {
       "difficulty": "easy"
     },
     {
-      "id": "science-30",
-      "question": "Who is the chemical element Curium named after?",
-      "answer": "Marie & Pierre Curie",
+      "id": "science-friendly-12",
+      "question": "What do caterpillars turn into in the familiar butterfly life cycle?",
+      "answer": "Butterflies",
       "choices": [
-        "Marie & Pierre Curie",
-        "The Curiosity Rover",
-        "Curious George",
-        "Stephen Curry"
+        "Butterflies",
+        "Bees",
+        "Ants",
+        "Spiders"
       ],
       "difficulty": "easy"
     },
     {
-      "id": "science-31",
-      "question": "The biggest distinction between a eukaryotic cell and a prokaryotic cell is:",
-      "answer": "The presence or absence of a nucleus",
+      "id": "science-friendly-13",
+      "question": "Which part of the body contains the brain?",
+      "answer": "Head",
       "choices": [
-        "The presence or absence of a nucleus",
-        "The overall size",
-        "The presence or absence of certain organelles",
-        "The mode of reproduction"
+        "Head",
+        "Chest",
+        "Foot",
+        "Hand"
       ],
       "difficulty": "easy"
     },
     {
-      "id": "science-32",
-      "question": "Which of the following elements is typically used in the doping of the semiconductor silicon?",
-      "answer": "Boron",
+      "id": "science-friendly-8",
+      "question": "What do we call animals that eat only plants?",
+      "answer": "Herbivores",
       "choices": [
-        "Boron",
-        "Oxygen",
-        "Carbon",
-        "Iron"
+        "Herbivores",
+        "Carnivores",
+        "Omnivores",
+        "Insectivores"
       ],
-      "difficulty": "hard"
+      "difficulty": "easy"
     },
     {
-      "id": "science-33",
-      "question": "Albert Einstein won a noble prize for his theory of relativity.",
-      "answer": "False",
+      "id": "science-friendly-9",
+      "question": "Which sense do your ears help you use?",
+      "answer": "Hearing",
       "choices": [
-        "False",
-        "True"
+        "Hearing",
+        "Taste",
+        "Smell",
+        "Sight"
       ],
-      "difficulty": "hard"
+      "difficulty": "easy"
     },
     {
-      "id": "science-34",
-      "question": "What is the scientific name for the extinct hominin known as \"Lucy\"?",
-      "answer": "Australopithecus Afarensis",
+      "id": "science-friendly-10",
+      "question": "What is water's chemical formula?",
+      "answer": "H2O",
       "choices": [
-        "Australopithecus Afarensis",
-        "Australopithecus Africanus",
-        "Australopithecus Architeuthis",
-        "Australopithecus Antaris"
+        "H2O",
+        "CO2",
+        "O2",
+        "NaCl"
       ],
-      "difficulty": "hard"
+      "difficulty": "easy"
     },
     {
       "id": "science-35",
@@ -1654,24 +1660,26 @@ export const triviaBank = {
       "difficulty": "easy"
     },
     {
-      "id": "science-44",
-      "question": "How many planets are there in the Solar System?",
-      "answer": "8",
+      "id": "science-friendly-14",
+      "question": "What natural object orbits Earth and is visible at night?",
+      "answer": "The Moon",
       "choices": [
-        "8",
-        "9",
-        "11",
-        "10"
+        "The Moon",
+        "Mars",
+        "The Sun",
+        "Jupiter"
       ],
       "difficulty": "easy"
     },
     {
-      "id": "science-45",
-      "question": "An Astronomical Unit is the distance between Earth and the Moon.",
-      "answer": "False",
+      "id": "science-friendly-15",
+      "question": "Which of these animals is a mammal?",
+      "answer": "Dolphin",
       "choices": [
-        "False",
-        "True"
+        "Dolphin",
+        "Shark",
+        "Trout",
+        "Octopus"
       ],
       "difficulty": "easy"
     },
@@ -1688,12 +1696,14 @@ export const triviaBank = {
       "difficulty": "medium"
     },
     {
-      "id": "science-47",
-      "question": "An exothermic reaction is a chemical reaction that releases energy by radiating electricity.",
-      "answer": "False",
+      "id": "science-friendly-16",
+      "question": "What do we call water falling from clouds in liquid drops?",
+      "answer": "Rain",
       "choices": [
-        "False",
-        "True"
+        "Rain",
+        "Snow",
+        "Hail",
+        "Fog"
       ],
       "difficulty": "easy"
     },
@@ -1816,22 +1826,26 @@ export const triviaBank = {
       "difficulty": "hard"
     },
     {
-      "id": "science-58",
-      "question": "A plant that has a life cycle for more than a year is known as an annual.",
-      "answer": "False",
+      "id": "science-friendly-17",
+      "question": "What is the hard outer covering that protects your brain?",
+      "answer": "Skull",
       "choices": [
-        "False",
-        "True"
+        "Skull",
+        "Rib cage",
+        "Pelvis",
+        "Spine"
       ],
       "difficulty": "easy"
     },
     {
-      "id": "science-59",
-      "question": "Igneous rocks are formed by excessive heat and pressure.",
-      "answer": "False",
+      "id": "science-friendly-18",
+      "question": "Which planet is famous for its large, easily visible ring system?",
+      "answer": "Saturn",
       "choices": [
-        "False",
-        "True"
+        "Saturn",
+        "Earth",
+        "Mars",
+        "Mercury"
       ],
       "difficulty": "easy"
     },
@@ -2008,14 +2022,14 @@ export const triviaBank = {
       "difficulty": "medium"
     },
     {
-      "id": "science-76",
-      "question": "What is the speed of light in a vacuum?",
-      "answer": "299,792,458 m/s",
+      "id": "science-friendly-19",
+      "question": "Which organ lets humans breathe air?",
+      "answer": "Lungs",
       "choices": [
-        "299,792,458 m/s",
-        "50,461 m/s",
-        "308,215,043 m/s",
-        "751,665,014,151 m/s"
+        "Lungs",
+        "Kidneys",
+        "Liver",
+        "Stomach"
       ],
       "difficulty": "easy"
     },
@@ -2044,14 +2058,14 @@ export const triviaBank = {
       "difficulty": "medium"
     },
     {
-      "id": "science-79",
-      "question": "How many laws of thermodynamics are there?",
-      "answer": "Four",
+      "id": "science-friendly-20",
+      "question": "What instrument measures temperature?",
+      "answer": "Thermometer",
       "choices": [
-        "Four",
-        "Three",
-        "Two",
-        "Five"
+        "Thermometer",
+        "Compass",
+        "Ruler",
+        "Barometer"
       ],
       "difficulty": "easy"
     },
@@ -2315,7 +2329,7 @@ export const triviaBank = {
         "Tesla",
         "Joule"
       ],
-      "difficulty": "easy"
+      "difficulty": "medium"
     },
     {
       "id": "science-replacement-99",
@@ -2327,7 +2341,7 @@ export const triviaBank = {
         "2",
         "3"
       ],
-      "difficulty": "easy"
+      "difficulty": "medium"
     }
   ],
   "sports": [
@@ -2392,16 +2406,16 @@ export const triviaBank = {
       "difficulty": "medium"
     },
     {
-      "id": "sports-6",
-      "question": "What is “The Sport of Kings”?",
-      "answer": "Horse Racing",
+      "id": "sports-friendly-1",
+      "question": "Which sport uses a bat, wickets and a ball?",
+      "answer": "Cricket",
       "choices": [
-        "Horse Racing",
-        "Chess",
-        "Jousting",
-        "Fencing"
+        "Cricket",
+        "Tennis",
+        "Basketball",
+        "Hockey"
       ],
-      "difficulty": "hard"
+      "difficulty": "easy"
     },
     {
       "id": "sports-7",
@@ -2428,26 +2442,26 @@ export const triviaBank = {
       "difficulty": "easy"
     },
     {
-      "id": "sports-9",
-      "question": "This Canadian television sportscaster is known for his \"Hockey Night in Canada\" role, a commentary show during hockey games.",
-      "answer": "Don Cherry",
+      "id": "sports-friendly-11",
+      "question": "Which sport uses a puck on ice?",
+      "answer": "Ice hockey",
       "choices": [
-        "Don Cherry",
-        "Don McKellar",
-        "Don Taylor ",
-        "Donald Sutherland"
+        "Ice hockey",
+        "Basketball",
+        "Tennis",
+        "Cricket"
       ],
       "difficulty": "easy"
     },
     {
-      "id": "sports-10",
-      "question": "The Rio 2016 Summer Olympics held it's closing ceremony on what date?",
-      "answer": "August 21",
+      "id": "sports-friendly-12",
+      "question": "In tennis, what word is used for a score of zero?",
+      "answer": "Love",
       "choices": [
-        "August 21",
-        "August 23",
-        "August 19",
-        "August 17"
+        "Love",
+        "Nil point",
+        "Blank",
+        "Void"
       ],
       "difficulty": "easy"
     },
@@ -2464,26 +2478,26 @@ export const triviaBank = {
       "difficulty": "medium"
     },
     {
-      "id": "sports-12",
-      "question": "What tool lends it's name to a last-stone advantage in an end in Curling?",
-      "answer": "Hammer",
+      "id": "sports-friendly-2",
+      "question": "What sport has players shooting a ball through a raised hoop?",
+      "answer": "Basketball",
       "choices": [
-        "Hammer",
-        "Wrench",
-        "Drill",
-        "Screwdriver"
+        "Basketball",
+        "Soccer",
+        "Rugby",
+        "Golf"
       ],
-      "difficulty": "hard"
+      "difficulty": "easy"
     },
     {
-      "id": "sports-13",
-      "question": "What team did England beat to win in the 1966 World Cup final?",
-      "answer": "West Germany",
+      "id": "sports-friendly-13",
+      "question": "How many points is a basketball free throw worth?",
+      "answer": "1",
       "choices": [
-        "West Germany",
-        "Soviet Union",
-        "Portugal",
-        "Brazil"
+        "1",
+        "2",
+        "3",
+        "4"
       ],
       "difficulty": "easy"
     },
@@ -2524,14 +2538,14 @@ export const triviaBank = {
       "difficulty": "medium"
     },
     {
-      "id": "sports-17",
-      "question": "What year did the New Orleans Saints win the Super Bowl?",
-      "answer": "2010",
+      "id": "sports-friendly-14",
+      "question": "In soccer, what color card means a player is sent off?",
+      "answer": "Red",
       "choices": [
-        "2010",
-        "2008",
-        "2009",
-        "2011"
+        "Red",
+        "Blue",
+        "Green",
+        "White"
       ],
       "difficulty": "easy"
     },
@@ -2572,16 +2586,16 @@ export const triviaBank = {
       "difficulty": "medium"
     },
     {
-      "id": "sports-21",
-      "question": "The AHL affiliate team of the Boston Bruins is named what?",
-      "answer": "Providence Bruins",
+      "id": "sports-friendly-3",
+      "question": "In soccer, who can normally handle the ball inside their own penalty area?",
+      "answer": "Goalkeeper",
       "choices": [
-        "Providence Bruins",
-        "New Haven Bruins",
-        "Cambridge Bruins",
-        "Hartford Bruins"
+        "Goalkeeper",
+        "Striker",
+        "Midfielder",
+        "Defender"
       ],
-      "difficulty": "hard"
+      "difficulty": "easy"
     },
     {
       "id": "sports-22",
@@ -2618,26 +2632,26 @@ export const triviaBank = {
       "difficulty": "easy"
     },
     {
-      "id": "sports-25",
-      "question": "The Mazda 787B won the 24 Hours of Le Mans in what year?",
-      "answer": "1991",
+      "id": "sports-friendly-4",
+      "question": "How many rings appear on the Olympic symbol?",
+      "answer": "5",
       "choices": [
-        "1991",
-        "1990",
-        "2000",
-        "1987"
+        "5",
+        "3",
+        "4",
+        "6"
       ],
-      "difficulty": "hard"
+      "difficulty": "easy"
     },
     {
-      "id": "sports-26",
-      "question": "In the 2014 FIFA World Cup, what was the final score in the match Brazil - Germany?",
-      "answer": "1-7",
+      "id": "sports-friendly-15",
+      "question": "Which sport uses a bow and arrows?",
+      "answer": "Archery",
       "choices": [
-        "1-7",
-        "1-5",
-        "1-6",
-        "2-6"
+        "Archery",
+        "Fencing",
+        "Rowing",
+        "Badminton"
       ],
       "difficulty": "easy"
     },
@@ -2654,26 +2668,26 @@ export const triviaBank = {
       "difficulty": "medium"
     },
     {
-      "id": "sports-28",
-      "question": "How many times did Martina Navratilova win the Wimbledon Singles Championship?",
-      "answer": "Nine",
+      "id": "sports-friendly-5",
+      "question": "What sport uses clubs to hit a ball toward holes in the ground?",
+      "answer": "Golf",
       "choices": [
-        "Nine",
-        "Ten",
-        "Seven",
-        "Eight"
+        "Golf",
+        "Cricket",
+        "Polo",
+        "Baseball"
       ],
-      "difficulty": "hard"
+      "difficulty": "easy"
     },
     {
-      "id": "sports-29",
-      "question": "What team won the 2016 MLS Cup?",
-      "answer": "Seattle Sounders",
+      "id": "sports-friendly-16",
+      "question": "In baseball, what is the player who throws the ball to the batter called?",
+      "answer": "Pitcher",
       "choices": [
-        "Seattle Sounders",
-        "Colorado Rapids",
-        "Toronto FC",
-        "Montreal Impact"
+        "Pitcher",
+        "Catcher",
+        "Shortstop",
+        "Runner"
       ],
       "difficulty": "easy"
     },
@@ -2714,12 +2728,14 @@ export const triviaBank = {
       "difficulty": "medium"
     },
     {
-      "id": "sports-34",
-      "question": "There are a total of 20 races in Formula One 2016 season.",
-      "answer": "False",
+      "id": "sports-friendly-17",
+      "question": "What does a referee usually blow to signal a stoppage?",
+      "answer": "Whistle",
       "choices": [
-        "False",
-        "True"
+        "Whistle",
+        "Trumpet",
+        "Flute",
+        "Horn of a car"
       ],
       "difficulty": "easy"
     },
@@ -2736,14 +2752,14 @@ export const triviaBank = {
       "difficulty": "medium"
     },
     {
-      "id": "sports-36",
-      "question": "Which English football club has the nickname 'The Foxes'?",
-      "answer": "Leicester City",
+      "id": "sports-friendly-18",
+      "question": "Which activity involves running a distance of about 42.2 kilometers?",
+      "answer": "Marathon",
       "choices": [
-        "Leicester City",
-        "Northampton Town",
-        "Bradford City",
-        "West Bromwich Albion"
+        "Marathon",
+        "100-meter sprint",
+        "Long jump",
+        "High jump"
       ],
       "difficulty": "easy"
     },
@@ -2760,28 +2776,28 @@ export const triviaBank = {
       "difficulty": "medium"
     },
     {
-      "id": "sports-38",
-      "question": "Who won the premier league title in the 2015-2016 season following a fairy tale run?",
-      "answer": "Leicester City",
+      "id": "sports-friendly-19",
+      "question": "Which sport is played with a net and a shuttlecock?",
+      "answer": "Badminton",
       "choices": [
-        "Leicester City",
-        "Tottenham Hotspur",
-        "Watford",
-        "Stoke City"
+        "Badminton",
+        "Squash",
+        "Table tennis",
+        "Volleyball"
       ],
       "difficulty": "easy"
     },
     {
-      "id": "sports-39",
-      "question": "Which of these NHL players have never won a Hart Trophy for Regular Season MVP?",
-      "answer": "Steve Yzerman",
+      "id": "sports-friendly-6",
+      "question": "What sport is played at Wimbledon?",
+      "answer": "Tennis",
       "choices": [
-        "Steve Yzerman",
-        "Chris Pronger",
-        "Jose Theodore",
-        "Henrik Sedin"
+        "Tennis",
+        "Golf",
+        "Soccer",
+        "Badminton"
       ],
-      "difficulty": "hard"
+      "difficulty": "easy"
     },
     {
       "id": "sports-40",
@@ -2820,14 +2836,14 @@ export const triviaBank = {
       "difficulty": "medium"
     },
     {
-      "id": "sports-44",
-      "question": "Who won the UEFA Champions League in 2016?",
-      "answer": "Real Madrid C.F.",
+      "id": "sports-friendly-20",
+      "question": "What do Olympic gold medalists traditionally stand on during the medal ceremony?",
+      "answer": "Podium",
       "choices": [
-        "Real Madrid C.F.",
-        "FC Bayern Munich",
-        "Atletico Madrid",
-        "Manchester City F.C."
+        "Podium",
+        "Diving board",
+        "Trampoline",
+        "Balance beam"
       ],
       "difficulty": "easy"
     },
@@ -2900,16 +2916,16 @@ export const triviaBank = {
       "difficulty": "medium"
     },
     {
-      "id": "sports-51",
-      "question": "Which is Kenesisa Bekele's personal best at marathon?",
-      "answer": "2:01:41",
+      "id": "sports-friendly-7",
+      "question": "What sport takes place in a swimming pool using lanes?",
+      "answer": "Swimming",
       "choices": [
-        "2:01:41",
-        "2:01:12",
-        "2:01:45",
-        "2:01:51"
+        "Swimming",
+        "Skiing",
+        "Boxing",
+        "Cycling"
       ],
-      "difficulty": "hard"
+      "difficulty": "easy"
     },
     {
       "id": "sports-52",
@@ -2960,16 +2976,16 @@ export const triviaBank = {
       "difficulty": "medium"
     },
     {
-      "id": "sports-56",
-      "question": "Who did Drew Brees pass in all time NFL passing yards in 2018?",
-      "answer": "Peyton Manning",
+      "id": "sports-friendly-8",
+      "question": "Which sport is associated with the Super Bowl?",
+      "answer": "American football",
       "choices": [
-        "Peyton Manning",
-        "Tom Brady",
-        "Dan Marino",
-        "Joe Montana"
+        "American football",
+        "Baseball",
+        "Ice hockey",
+        "Basketball"
       ],
-      "difficulty": "hard"
+      "difficulty": "easy"
     },
     {
       "id": "sports-57",
@@ -2996,16 +3012,16 @@ export const triviaBank = {
       "difficulty": "medium"
     },
     {
-      "id": "sports-59",
-      "question": "Where was the Games of the XXII Olympiad held?",
-      "answer": "Moscow",
+      "id": "sports-friendly-9",
+      "question": "What protective item do baseball batters wear on their head?",
+      "answer": "Helmet",
       "choices": [
-        "Moscow",
-        "Barcelona",
-        "Tokyo",
-        "Los Angeles"
+        "Helmet",
+        "Crown",
+        "Visor only",
+        "Swimming cap"
       ],
-      "difficulty": "hard"
+      "difficulty": "easy"
     },
     {
       "id": "sports-60",
@@ -3017,7 +3033,7 @@ export const triviaBank = {
         "Toronto Maple Leafs",
         "Detroit Red Wings"
       ],
-      "difficulty": "easy"
+      "difficulty": "medium"
     },
     {
       "id": "sports-61",
@@ -3075,19 +3091,19 @@ export const triviaBank = {
         "AS Monaco FC",
         "Juventus F.C."
       ],
-      "difficulty": "easy"
+      "difficulty": "medium"
     },
     {
-      "id": "sports-66",
-      "question": "Which player \"kung-fu kicked\" a Crystal Palace fan in January 1995?",
-      "answer": "Eric Cantona",
+      "id": "sports-friendly-10",
+      "question": "In boxing, what do fighters wear on their hands?",
+      "answer": "Gloves",
       "choices": [
-        "Eric Cantona",
-        "David Seamen",
-        "Ashley Cole",
-        "Mark Hughes"
+        "Gloves",
+        "Skates",
+        "Boots",
+        "Goggles"
       ],
-      "difficulty": "hard"
+      "difficulty": "easy"
     },
     {
       "id": "sports-67",
@@ -3123,7 +3139,7 @@ export const triviaBank = {
         "2007",
         "2006"
       ],
-      "difficulty": "easy"
+      "difficulty": "medium"
     },
     {
       "id": "sports-70",
@@ -3279,7 +3295,7 @@ export const triviaBank = {
         "New Jersey Devils",
         "Dallas Stars"
       ],
-      "difficulty": "easy"
+      "difficulty": "medium"
     },
     {
       "id": "sports-83",
@@ -3349,7 +3365,7 @@ export const triviaBank = {
         "Paris Saints-Germain",
         "Manchester United"
       ],
-      "difficulty": "easy"
+      "difficulty": "medium"
     },
     {
       "id": "sports-89",
@@ -3361,7 +3377,7 @@ export const triviaBank = {
         "Boston",
         "Seattle"
       ],
-      "difficulty": "easy"
+      "difficulty": "medium"
     },
     {
       "id": "sports-90",
@@ -3489,7 +3505,7 @@ export const triviaBank = {
         "Max Verstappen",
         "Kimi Raikkonen"
       ],
-      "difficulty": "easy"
+      "difficulty": "medium"
     },
     {
       "id": "sports-replacement-98",
@@ -3513,31 +3529,31 @@ export const triviaBank = {
         "Sebastian Vettel",
         "Jenson Button"
       ],
-      "difficulty": "easy"
+      "difficulty": "medium"
     }
   ],
   "history": [
     {
-      "id": "history-1",
-      "question": "Which infamous European traitor was known as \"the last person to enter Parliament with honest intentions\"?",
-      "answer": "Guy Fawkes",
+      "id": "history-friendly-20",
+      "question": "Which leader is closely associated with nonviolent protests for Indian independence?",
+      "answer": "Mahatma Gandhi",
       "choices": [
-        "Guy Fawkes",
-        "Robert Catesby",
-        "Francis Tresham",
-        "Everard Digby"
+        "Mahatma Gandhi",
+        "Nelson Mandela",
+        "Abraham Lincoln",
+        "Winston Churchill"
       ],
-      "difficulty": "medium"
+      "difficulty": "easy"
     },
     {
-      "id": "history-2",
-      "question": "Who was the Prime Minister of Japan when Japan declared war on the US?",
-      "answer": "Hideki Tojo",
+      "id": "history-friendly-11",
+      "question": "Which famous wall was built across northern China?",
+      "answer": "Great Wall of China",
       "choices": [
-        "Hideki Tojo",
-        "Michinomiya Hirohito",
-        "Isoroku Yamamoto",
-        "Fumimaro Konoe"
+        "Great Wall of China",
+        "Berlin Wall",
+        "Hadrian's Wall",
+        "Western Wall"
       ],
       "difficulty": "easy"
     },
@@ -3566,16 +3582,16 @@ export const triviaBank = {
       "difficulty": "easy"
     },
     {
-      "id": "history-5",
-      "question": "When did Spanish Peninsular War start?",
-      "answer": "1808",
+      "id": "history-friendly-1",
+      "question": "Which ancient civilization built the pyramids at Giza?",
+      "answer": "Ancient Egyptians",
       "choices": [
-        "1808",
-        "1806",
-        "1810",
-        "1809"
+        "Ancient Egyptians",
+        "Vikings",
+        "Aztecs",
+        "Ancient Japanese"
       ],
-      "difficulty": "hard"
+      "difficulty": "easy"
     },
     {
       "id": "history-6",
@@ -3590,14 +3606,14 @@ export const triviaBank = {
       "difficulty": "medium"
     },
     {
-      "id": "history-7",
-      "question": "What country joined the EU in 2013?",
-      "answer": "Croatia",
+      "id": "history-friendly-12",
+      "question": "Which queen of ancient Egypt is associated with Julius Caesar and Mark Antony?",
+      "answer": "Cleopatra",
       "choices": [
-        "Croatia",
-        "Bulgaria",
-        "Slovenia",
-        "Turkey"
+        "Cleopatra",
+        "Victoria",
+        "Elizabeth I",
+        "Nefertiti"
       ],
       "difficulty": "easy"
     },
@@ -3626,14 +3642,14 @@ export const triviaBank = {
       "difficulty": "easy"
     },
     {
-      "id": "history-10",
-      "question": "Who was among those killed in the 2010 Smolensk, Russia plane crash tragedy?",
-      "answer": "The Polish President",
+      "id": "history-friendly-13",
+      "question": "Which leader was known as the Maid of Orleans?",
+      "answer": "Joan of Arc",
       "choices": [
-        "The Polish President",
-        "Pope John Paul II",
-        "Bang-Ding Ow",
-        "Albert Putin"
+        "Joan of Arc",
+        "Cleopatra",
+        "Queen Victoria",
+        "Rosa Parks"
       ],
       "difficulty": "easy"
     },
@@ -3728,12 +3744,14 @@ export const triviaBank = {
       "difficulty": "medium"
     },
     {
-      "id": "history-19",
-      "question": "In World War ll, Great Britian used inflatable tanks on the ports of Great Britain to divert Hitler away from Normandy/D-day landing.",
-      "answer": "True",
+      "id": "history-friendly-14",
+      "question": "Which historic ship sank on its first voyage in 1912?",
+      "answer": "Titanic",
       "choices": [
-        "True",
-        "False"
+        "Titanic",
+        "Mayflower",
+        "Santa Maria",
+        "HMS Victory"
       ],
       "difficulty": "easy"
     },
@@ -3750,16 +3768,16 @@ export const triviaBank = {
       "difficulty": "easy"
     },
     {
-      "id": "history-21",
-      "question": "The main objective of the German operation \"Case Blue\" during World War II was originally to capture what?",
-      "answer": "Caucasus",
+      "id": "history-friendly-2",
+      "question": "Who was the first president of the United States?",
+      "answer": "George Washington",
       "choices": [
-        "Caucasus",
-        "Stalingrad",
-        "Crimea",
-        "Voronezh"
+        "George Washington",
+        "Abraham Lincoln",
+        "John Adams",
+        "Thomas Jefferson"
       ],
-      "difficulty": "hard"
+      "difficulty": "easy"
     },
     {
       "id": "history-22",
@@ -3786,16 +3804,16 @@ export const triviaBank = {
       "difficulty": "easy"
     },
     {
-      "id": "history-24",
-      "question": "What did the abbreviation \"RMS\" stand for in the RMS Titanic in 1912?",
-      "answer": "Royal Mail Ship",
+      "id": "history-friendly-3",
+      "question": "What ocean did the Titanic sink in?",
+      "answer": "Atlantic Ocean",
       "choices": [
-        "Royal Mail Ship",
-        "Royal Majesty Service",
-        "Regular Maritime Schedule ",
-        "Regulated Maelstrom Sensor"
+        "Atlantic Ocean",
+        "Pacific Ocean",
+        "Indian Ocean",
+        "Arctic Ocean"
       ],
-      "difficulty": "hard"
+      "difficulty": "easy"
     },
     {
       "id": "history-25",
@@ -3822,14 +3840,16 @@ export const triviaBank = {
       "difficulty": "medium"
     },
     {
-      "id": "history-27",
-      "question": "The USS Missouri (BB-63) last served in the Korean War.",
-      "answer": "False",
+      "id": "history-friendly-4",
+      "question": "Which country was ruled by pharaohs?",
+      "answer": "Egypt",
       "choices": [
-        "False",
-        "True"
+        "Egypt",
+        "Greece",
+        "Italy",
+        "China"
       ],
-      "difficulty": "hard"
+      "difficulty": "easy"
     },
     {
       "id": "history-28",
@@ -3844,16 +3864,16 @@ export const triviaBank = {
       "difficulty": "medium"
     },
     {
-      "id": "history-29",
-      "question": "What was the code name for the Allied invasion of Southern France on August 15th, 1944?",
-      "answer": "Operation Dragoon",
+      "id": "history-friendly-5",
+      "question": "What structure once divided East and West Berlin?",
+      "answer": "Berlin Wall",
       "choices": [
-        "Operation Dragoon",
-        "Operation Overlord",
-        "Operation Market Garden",
-        "Operation Torch"
+        "Berlin Wall",
+        "Great Wall",
+        "Hadrian's Wall",
+        "Iron Bridge"
       ],
-      "difficulty": "hard"
+      "difficulty": "easy"
     },
     {
       "id": "history-30",
@@ -3868,16 +3888,16 @@ export const triviaBank = {
       "difficulty": "easy"
     },
     {
-      "id": "history-31",
-      "question": "How long did the Warsaw Uprising during World War II last?",
-      "answer": "63 Days",
+      "id": "history-friendly-6",
+      "question": "Who is famous for a civil rights speech beginning with I Have a Dream?",
+      "answer": "Martin Luther King Jr.",
       "choices": [
-        "63 Days",
-        "20 Days",
-        "55 Days",
-        "224 Days"
+        "Martin Luther King Jr.",
+        "Nelson Mandela",
+        "Barack Obama",
+        "Malcolm X"
       ],
-      "difficulty": "hard"
+      "difficulty": "easy"
     },
     {
       "id": "history-32",
@@ -3892,28 +3912,28 @@ export const triviaBank = {
       "difficulty": "medium"
     },
     {
-      "id": "history-33",
-      "question": "Which one of these tanks was designed and operated by the United Kingdom?",
-      "answer": "Tog II",
+      "id": "history-friendly-15",
+      "question": "Which European country had a revolution associated with the storming of the Bastille?",
+      "answer": "France",
       "choices": [
-        "Tog II",
-        "M4 Sherman",
-        "Tiger H1",
-        "T-34"
+        "France",
+        "Spain",
+        "Portugal",
+        "Sweden"
       ],
       "difficulty": "easy"
     },
     {
-      "id": "history-34",
-      "question": "What was found in 1946 by two young shepards near a cave?",
-      "answer": "Dead Sea Scrolls",
+      "id": "history-friendly-7",
+      "question": "Which ancient city is associated with gladiators and the Colosseum?",
+      "answer": "Rome",
       "choices": [
-        "Dead Sea Scrolls",
-        "The Blackbeard Chest",
-        "Sheep",
-        "The First Oaxaca Cave Sleeper"
+        "Rome",
+        "Athens",
+        "Cairo",
+        "Paris"
       ],
-      "difficulty": "hard"
+      "difficulty": "easy"
     },
     {
       "id": "history-35",
@@ -3974,16 +3994,16 @@ export const triviaBank = {
       "difficulty": "medium"
     },
     {
-      "id": "history-40",
-      "question": "Which of the following physicists did NOT work on the Manhattan project?",
-      "answer": "Murray Gell-Mann",
+      "id": "history-friendly-8",
+      "question": "What was used to power most early steam locomotives?",
+      "answer": "Coal",
       "choices": [
-        "Murray Gell-Mann",
-        "Richard Feynman",
-        "J. Robert Oppenheimer",
-        "John Von-Neumann"
+        "Coal",
+        "Solar panels",
+        "Nuclear fuel",
+        "Batteries"
       ],
-      "difficulty": "hard"
+      "difficulty": "easy"
     },
     {
       "id": "history-41",
@@ -3998,40 +4018,40 @@ export const triviaBank = {
       "difficulty": "easy"
     },
     {
-      "id": "history-42",
-      "question": "Which of the following ancient peoples was NOT classified as Hellenic (Greek)?",
-      "answer": "Illyrians",
+      "id": "history-friendly-16",
+      "question": "Who is famous for refusing to give up her bus seat in Montgomery, Alabama?",
+      "answer": "Rosa Parks",
       "choices": [
-        "Illyrians",
-        "Dorians",
-        "Achaeans",
-        "Ionians"
+        "Rosa Parks",
+        "Amelia Earhart",
+        "Marie Curie",
+        "Helen Keller"
       ],
       "difficulty": "easy"
     },
     {
-      "id": "history-43",
-      "question": "The \"Trail of Tears\" was a result of which United States President's Indian Removal Policy?",
-      "answer": "Andrew Jackson",
+      "id": "history-friendly-17",
+      "question": "Which empire was ruled by emperors such as Augustus and Nero?",
+      "answer": "Roman Empire",
       "choices": [
-        "Andrew Jackson",
-        "Harry S. Truman",
-        "Martin Van Buren",
-        "John Quincy Adams"
+        "Roman Empire",
+        "Mongol Empire",
+        "Inca Empire",
+        "Ottoman Empire"
       ],
       "difficulty": "easy"
     },
     {
-      "id": "history-44",
-      "question": "The coat of arms of the King of Spain contains the arms from the monarchs of Castille, Leon, Aragon and which other former Iberian kingdom?",
-      "answer": "Navarre",
+      "id": "history-friendly-9",
+      "question": "Who walked on the Moon first?",
+      "answer": "Neil Armstrong",
       "choices": [
-        "Navarre",
-        "Galicia",
-        "Granada",
-        "Catalonia"
+        "Neil Armstrong",
+        "Buzz Aldrin",
+        "Yuri Gagarin",
+        "John Glenn"
       ],
-      "difficulty": "hard"
+      "difficulty": "easy"
     },
     {
       "id": "history-45",
@@ -4046,16 +4066,16 @@ export const triviaBank = {
       "difficulty": "medium"
     },
     {
-      "id": "history-46",
-      "question": "Which King of England was faced with the Peasants' Revolt in 1381?",
-      "answer": "Richard II",
+      "id": "history-friendly-10",
+      "question": "Which country is associated with samurai warriors?",
+      "answer": "Japan",
       "choices": [
-        "Richard II",
-        "Edward III",
-        "Edward II",
-        "Henry IV"
+        "Japan",
+        "Norway",
+        "Brazil",
+        "Spain"
       ],
-      "difficulty": "hard"
+      "difficulty": "easy"
     },
     {
       "id": "history-47",
@@ -4152,14 +4172,14 @@ export const triviaBank = {
       "difficulty": "medium"
     },
     {
-      "id": "history-55",
-      "question": "What was William Frederick Cody better known as?",
-      "answer": "Buffalo Bill",
+      "id": "history-friendly-18",
+      "question": "What title is commonly associated with a ruler of a kingdom?",
+      "answer": "King",
       "choices": [
-        "Buffalo Bill",
-        "Billy the Kid",
-        "Wild Bill Hickok",
-        "Pawnee Bill"
+        "King",
+        "Mayor",
+        "Senator",
+        "Captain"
       ],
       "difficulty": "easy"
     },
@@ -4466,14 +4486,14 @@ export const triviaBank = {
       "difficulty": "hard"
     },
     {
-      "id": "history-82",
-      "question": "How many Sister Ships were related to the TItanic?",
-      "answer": "2",
+      "id": "history-friendly-19",
+      "question": "Which civilization is associated with the city of Athens and the original Olympic Games?",
+      "answer": "Ancient Greeks",
       "choices": [
-        "2",
-        "4",
-        "3",
-        "1"
+        "Ancient Greeks",
+        "Vikings",
+        "Mayans",
+        "Ancient Egyptians"
       ],
       "difficulty": "easy"
     },
@@ -4538,9 +4558,9 @@ export const triviaBank = {
     {
       "id": "history-88",
       "question": "Who discovered Penicillin?",
-      "answer": "Alexander Flemming",
+      "answer": "Alexander Fleming",
       "choices": [
-        "Alexander Flemming",
+        "Alexander Fleming",
         "Marie Curie",
         "Alfred Nobel",
         "Louis Pasteur"
@@ -4692,16 +4712,16 @@ export const triviaBank = {
   ],
   "geography": [
     {
-      "id": "geography-1",
-      "question": "What is the official German name of the Swiss Federal Railways?",
-      "answer": "Schweizerische Bundesbahnen",
+      "id": "geography-friendly-1",
+      "question": "Which country contains the Eiffel Tower?",
+      "answer": "France",
       "choices": [
-        "Schweizerische Bundesbahnen",
-        "Schweizerische Nationalbahnen",
-        "Bundesbahnen der Schweiz",
-        "Schweizerische Staatsbahnen"
+        "France",
+        "Spain",
+        "Italy",
+        "Germany"
       ],
-      "difficulty": "hard"
+      "difficulty": "easy"
     },
     {
       "id": "geography-2",
@@ -4716,16 +4736,16 @@ export const triviaBank = {
       "difficulty": "medium"
     },
     {
-      "id": "geography-3",
-      "question": "Where is the city of Haarlem located?",
-      "answer": "The Netherlands",
+      "id": "geography-friendly-2",
+      "question": "Which continent contains Kenya and Nigeria?",
+      "answer": "Africa",
       "choices": [
-        "The Netherlands",
-        "Germany",
-        "United States",
-        "Switzerland"
+        "Africa",
+        "Europe",
+        "Asia",
+        "South America"
       ],
-      "difficulty": "hard"
+      "difficulty": "easy"
     },
     {
       "id": "geography-4",
@@ -4764,16 +4784,16 @@ export const triviaBank = {
       "difficulty": "easy"
     },
     {
-      "id": "geography-7",
-      "question": "How many islands does Kuwait have?",
-      "answer": "9",
+      "id": "geography-friendly-3",
+      "question": "What is the capital of the United Kingdom?",
+      "answer": "London",
       "choices": [
-        "9",
-        "3",
-        "6",
-        "2"
+        "London",
+        "Dublin",
+        "Paris",
+        "Rome"
       ],
-      "difficulty": "hard"
+      "difficulty": "easy"
     },
     {
       "id": "geography-8",
@@ -4788,28 +4808,28 @@ export const triviaBank = {
       "difficulty": "medium"
     },
     {
-      "id": "geography-9",
-      "question": "What is the name of the formerly rich fishing grounds off the island of Newfoundland, Canada?",
-      "answer": "Grand Banks",
+      "id": "geography-friendly-4",
+      "question": "Which ocean lies off the west coast of the United States?",
+      "answer": "Pacific Ocean",
       "choices": [
-        "Grand Banks",
-        "Great Barrier Reef",
-        "Mariana Trench",
-        "Hudson Bay"
+        "Pacific Ocean",
+        "Atlantic Ocean",
+        "Indian Ocean",
+        "Arctic Ocean"
       ],
-      "difficulty": "hard"
+      "difficulty": "easy"
     },
     {
-      "id": "geography-10",
-      "question": "The mountainous Khyber Pass connects which of the two following countries?",
-      "answer": "Afghanistan and Pakistan",
+      "id": "geography-friendly-5",
+      "question": "Which country is shaped roughly like a boot?",
+      "answer": "Italy",
       "choices": [
-        "Afghanistan and Pakistan",
-        "India and Nepal",
-        "Pakistan and India",
-        "Tajikistan and Kyrgyzstan"
+        "Italy",
+        "Canada",
+        "India",
+        "Portugal"
       ],
-      "difficulty": "hard"
+      "difficulty": "easy"
     },
     {
       "id": "geography-11",
@@ -4860,12 +4880,14 @@ export const triviaBank = {
       "difficulty": "medium"
     },
     {
-      "id": "geography-15",
-      "question": "There is a city called Rome in every continent on Earth.",
-      "answer": "False",
+      "id": "geography-friendly-11",
+      "question": "What is the capital of France?",
+      "answer": "Paris",
       "choices": [
-        "False",
-        "True"
+        "Paris",
+        "Rome",
+        "Madrid",
+        "Berlin"
       ],
       "difficulty": "easy"
     },
@@ -4882,14 +4904,14 @@ export const triviaBank = {
       "difficulty": "medium"
     },
     {
-      "id": "geography-17",
-      "question": "Which country was NOT part of the Soviet Union?",
-      "answer": "Romania",
+      "id": "geography-friendly-12",
+      "question": "What is the capital of Egypt?",
+      "answer": "Cairo",
       "choices": [
-        "Romania",
-        "Turkmenistan",
-        "Belarus",
-        "Tajikistan"
+        "Cairo",
+        "Tunis",
+        "Rabat",
+        "Beirut"
       ],
       "difficulty": "easy"
     },
@@ -4906,28 +4928,28 @@ export const triviaBank = {
       "difficulty": "medium"
     },
     {
-      "id": "geography-19",
-      "question": "What is the name of one of the Neo-Aramaic languages spoken by the Jewish population from Northwestern Iraq?",
-      "answer": "Lishana Deni",
+      "id": "geography-friendly-6",
+      "question": "Which country is famous for kangaroos in the wild?",
+      "answer": "Australia",
       "choices": [
-        "Lishana Deni",
-        "Hulaulá",
-        "Lishan Didan",
-        "Chaldean Neo-Aramaic"
+        "Australia",
+        "Iceland",
+        "Egypt",
+        "Mexico"
       ],
-      "difficulty": "hard"
+      "difficulty": "easy"
     },
     {
-      "id": "geography-20",
-      "question": "What is the largest city and commercial capital of Sri Lanka?",
-      "answer": "Colombo",
+      "id": "geography-friendly-7",
+      "question": "Which city is home to the Statue of Liberty?",
+      "answer": "New York City",
       "choices": [
-        "Colombo",
-        "Moratuwa",
-        "Negombo",
-        "Kandy"
+        "New York City",
+        "Chicago",
+        "Boston",
+        "Los Angeles"
       ],
-      "difficulty": "hard"
+      "difficulty": "easy"
     },
     {
       "id": "geography-21",
@@ -4954,16 +4976,16 @@ export const triviaBank = {
       "difficulty": "medium"
     },
     {
-      "id": "geography-23",
-      "question": "The prefix Sino- (As in Sino-American) is used to refer to what nationality?",
-      "answer": "Chinese",
+      "id": "geography-friendly-8",
+      "question": "Which country has Tokyo as its capital?",
+      "answer": "Japan",
       "choices": [
-        "Chinese",
-        "Japanese",
-        "Russian",
-        "Indian"
+        "Japan",
+        "China",
+        "Thailand",
+        "South Korea"
       ],
-      "difficulty": "hard"
+      "difficulty": "easy"
     },
     {
       "id": "geography-24",
@@ -4978,14 +5000,14 @@ export const triviaBank = {
       "difficulty": "medium"
     },
     {
-      "id": "geography-25",
-      "question": "Which Russian oblast forms a border with Poland?",
-      "answer": "Kaliningrad",
+      "id": "geography-friendly-13",
+      "question": "Which country contains the cities Mecca and Medina?",
+      "answer": "Saudi Arabia",
       "choices": [
-        "Kaliningrad",
-        "Samara",
-        "Nizhny Novgorod",
-        "Omsk"
+        "Saudi Arabia",
+        "Egypt",
+        "Jordan",
+        "Morocco"
       ],
       "difficulty": "easy"
     },
@@ -5012,16 +5034,16 @@ export const triviaBank = {
       "difficulty": "easy"
     },
     {
-      "id": "geography-28",
-      "question": "What is the capital of Suriname?",
-      "answer": "Paramaribo",
+      "id": "geography-friendly-9",
+      "question": "Which continent contains Brazil?",
+      "answer": "South America",
       "choices": [
-        "Paramaribo",
-        "Antananarivo",
-        "Tegucigalpa",
-        "Sucre"
+        "South America",
+        "North America",
+        "Africa",
+        "Europe"
       ],
-      "difficulty": "hard"
+      "difficulty": "easy"
     },
     {
       "id": "geography-29",
@@ -5036,14 +5058,14 @@ export const triviaBank = {
       "difficulty": "medium"
     },
     {
-      "id": "geography-30",
-      "question": "What is the only state in the United States that does not have a flag in a shape with 4 edges?",
-      "answer": "Ohio",
+      "id": "geography-friendly-14",
+      "question": "Which country contains Baghdad?",
+      "answer": "Iraq",
       "choices": [
-        "Ohio",
-        "Florida",
-        "Idaho",
-        "New Mexico"
+        "Iraq",
+        "Syria",
+        "Lebanon",
+        "Qatar"
       ],
       "difficulty": "easy"
     },
@@ -5194,38 +5216,38 @@ export const triviaBank = {
       "difficulty": "easy"
     },
     {
-      "id": "geography-44",
-      "question": "What is the official language in Liechtenstein?",
-      "answer": "German",
+      "id": "geography-friendly-15",
+      "question": "What is the capital of Lebanon?",
+      "answer": "Beirut",
       "choices": [
-        "German",
-        "French",
-        "English",
-        "Italian"
+        "Beirut",
+        "Amman",
+        "Damascus",
+        "Muscat"
       ],
       "difficulty": "easy"
     },
     {
-      "id": "geography-45",
-      "question": "Which country does Austria not border?",
-      "answer": "France",
+      "id": "geography-friendly-16",
+      "question": "Which country contains Dubai?",
+      "answer": "United Arab Emirates",
       "choices": [
-        "France",
-        "Slovenia",
-        "Switzerland",
-        "Slovakia"
+        "United Arab Emirates",
+        "Saudi Arabia",
+        "Kuwait",
+        "Oman"
       ],
       "difficulty": "easy"
     },
     {
-      "id": "geography-46",
-      "question": "The country of Belize borders which country?",
-      "answer": "Guatemala",
+      "id": "geography-friendly-17",
+      "question": "Which ocean lies between Europe and North America?",
+      "answer": "Atlantic Ocean",
       "choices": [
-        "Guatemala",
-        "Laos",
-        "Perú",
-        "Kenya"
+        "Atlantic Ocean",
+        "Pacific Ocean",
+        "Indian Ocean",
+        "Southern Ocean"
       ],
       "difficulty": "easy"
     },
@@ -5242,14 +5264,14 @@ export const triviaBank = {
       "difficulty": "medium"
     },
     {
-      "id": "geography-48",
-      "question": "Which of the following countries has a flag featuring a yellow lion wielding a sword on a dark red background?",
-      "answer": "Sri Lanka",
+      "id": "geography-friendly-18",
+      "question": "What is the capital of Italy?",
+      "answer": "Rome",
       "choices": [
-        "Sri Lanka",
-        "Kiribati",
-        "Scotland",
-        "Bhutan"
+        "Rome",
+        "Milan",
+        "Venice",
+        "Naples"
       ],
       "difficulty": "easy"
     },
@@ -5264,16 +5286,16 @@ export const triviaBank = {
       "difficulty": "easy"
     },
     {
-      "id": "geography-50",
-      "question": "When does Finland celebrate their independence day?",
-      "answer": "December 6th",
+      "id": "geography-friendly-10",
+      "question": "Which continent is covered by an ice sheet at the South Pole?",
+      "answer": "Antarctica",
       "choices": [
-        "December 6th",
-        "January 2nd",
-        "November 12th",
-        "February 8th"
+        "Antarctica",
+        "Europe",
+        "Asia",
+        "Australia"
       ],
-      "difficulty": "hard"
+      "difficulty": "easy"
     },
     {
       "id": "geography-51",
@@ -5300,14 +5322,14 @@ export const triviaBank = {
       "difficulty": "medium"
     },
     {
-      "id": "geography-53",
-      "question": "Which city is the capital of the United States of America?",
-      "answer": "Washington D.C",
+      "id": "geography-friendly-19",
+      "question": "Which country is famous for the Taj Mahal?",
+      "answer": "India",
       "choices": [
-        "Washington D.C",
-        "Seattle",
-        "Albany",
-        "Los Angeles"
+        "India",
+        "Pakistan",
+        "Turkey",
+        "Iran"
       ],
       "difficulty": "easy"
     },
@@ -5732,12 +5754,14 @@ export const triviaBank = {
       "difficulty": "hard"
     },
     {
-      "id": "geography-90",
-      "question": "Argentina's name comes from the latin name for Silver.",
-      "answer": "True",
+      "id": "geography-friendly-20",
+      "question": "What is the capital of Spain?",
+      "answer": "Madrid",
       "choices": [
-        "True",
-        "False"
+        "Madrid",
+        "Barcelona",
+        "Lisbon",
+        "Valencia"
       ],
       "difficulty": "easy"
     },
@@ -5775,7 +5799,7 @@ export const triviaBank = {
         "Shikoku",
         "Kyushu"
       ],
-      "difficulty": "easy"
+      "difficulty": "medium"
     },
     {
       "id": "geography-94",
@@ -5970,28 +5994,28 @@ export const triviaBank = {
       "difficulty": "easy"
     },
     {
-      "id": "movies-10",
-      "question": "Who played Deputy Marshal Samuel Gerard in the 1993 film \"The Fugitive\"?",
-      "answer": "Tommy Lee Jones",
+      "id": "movies-friendly-11",
+      "question": "What is Batman's home city called?",
+      "answer": "Gotham City",
       "choices": [
-        "Tommy Lee Jones",
-        "Harrison Ford",
-        "Harvey Keitel",
-        "Martin Landau"
+        "Gotham City",
+        "Metropolis",
+        "Wakanda",
+        "Atlantis"
       ],
       "difficulty": "easy"
     },
     {
-      "id": "movies-11",
-      "question": "In what year was the first Indian movie submitted for an Oscar?",
-      "answer": "1957",
+      "id": "movies-friendly-1",
+      "question": "In Finding Nemo, what kind of animal is Nemo?",
+      "answer": "Clownfish",
       "choices": [
-        "1957",
-        "1962",
-        "1938",
-        "1954"
+        "Clownfish",
+        "Shark",
+        "Dolphin",
+        "Turtle"
       ],
-      "difficulty": "hard"
+      "difficulty": "easy"
     },
     {
       "id": "movies-12",
@@ -6006,16 +6030,16 @@ export const triviaBank = {
       "difficulty": "medium"
     },
     {
-      "id": "movies-13",
-      "question": "How old was Laurence Fishburne when Francis Ford Coppola cast him in Apocalypse Now (1979)? ",
-      "answer": "14",
+      "id": "movies-friendly-2",
+      "question": "What is the name of the cowboy toy in Toy Story?",
+      "answer": "Woody",
       "choices": [
-        "14",
-        "16",
-        "18",
-        "20"
+        "Woody",
+        "Buzz Lightyear",
+        "Rex",
+        "Slinky Dog"
       ],
-      "difficulty": "hard"
+      "difficulty": "easy"
     },
     {
       "id": "movies-14",
@@ -6076,16 +6100,16 @@ export const triviaBank = {
       "difficulty": "easy"
     },
     {
-      "id": "movies-19",
-      "question": "The film Mad Max: Fury Road features the Dies Irae  from which composer's requiem?",
-      "answer": "Verdi",
+      "id": "movies-friendly-3",
+      "question": "What color is Shrek's skin?",
+      "answer": "Green",
       "choices": [
-        "Verdi",
-        "Mozart",
-        "Berlioz",
-        "Brahms"
+        "Green",
+        "Blue",
+        "Red",
+        "Purple"
       ],
-      "difficulty": "hard"
+      "difficulty": "easy"
     },
     {
       "id": "movies-20",
@@ -6100,84 +6124,88 @@ export const triviaBank = {
       "difficulty": "medium"
     },
     {
-      "id": "movies-21",
-      "question": "What three movies, in order from release date, make up the \"Dollars Trilogy\"?",
-      "answer": "\"A Fistful of Dollars\", \"For a Few Dollars More\", \"The Good, the Bad, and the Ugly\"",
+      "id": "movies-friendly-4",
+      "question": "Which superhero uses a shield decorated with a star?",
+      "answer": "Captain America",
       "choices": [
-        "\"A Fistful of Dollars\", \"For a Few Dollars More\", \"The Good, the Bad, and the Ugly\"",
-        "\"The Good, the Bad, and the Ugly\", \"For A Few Dollars More\", \"A Fistful of Dollars\"",
-        "\"For a Few Dollars More\", \"The Good, the Bad, and the Ugly\", \"A Fistful of Dollars\"",
-        "\"For a Few Dollars More\", \"A Fistful of Dollars\", \"The Good, the Bad, and the Ugly\""
-      ],
-      "difficulty": "hard"
-    },
-    {
-      "id": "movies-22",
-      "question": "Samuel L. Jackson had the words, 'Bad Motherf*cker' in-scripted on his lightsaber during the filming of Star Wars.",
-      "answer": "True",
-      "choices": [
-        "True",
-        "False"
+        "Captain America",
+        "Batman",
+        "Thor",
+        "Spider-Man"
       ],
       "difficulty": "easy"
     },
     {
-      "id": "movies-23",
-      "question": "What was the wifi password given to Stephen Strange in Doctor Strange?",
-      "answer": "Shambala",
+      "id": "movies-friendly-12",
+      "question": "Which superhero's civilian identity is Clark Kent?",
+      "answer": "Superman",
       "choices": [
-        "Shambala",
-        "Peace",
-        "Ancient",
-        "Chakra"
-      ],
-      "difficulty": "hard"
-    },
-    {
-      "id": "movies-24",
-      "question": "At the end of the 2001 film \"Rat Race\", whose concert do the contestants crash?",
-      "answer": "Smash Mouth",
-      "choices": [
-        "Smash Mouth",
-        "Bowling for Soup",
-        "Sum 41",
-        "Linkin Park"
+        "Superman",
+        "Batman",
+        "Iron Man",
+        "Captain America"
       ],
       "difficulty": "easy"
     },
     {
-      "id": "movies-25",
-      "question": "What is the name of the assassin in the first \"Hellboy\" movie?",
-      "answer": "Karl Ruprecht Kroenen",
+      "id": "movies-friendly-5",
+      "question": "In The Lion King, what kind of animal is Simba?",
+      "answer": "Lion",
       "choices": [
-        "Karl Ruprecht Kroenen",
-        "Klaus Werner von Krupt",
-        "Grigori Efimovich Rasputin",
-        "Ilsa Haupstein"
-      ],
-      "difficulty": "hard"
-    },
-    {
-      "id": "movies-26",
-      "question": "Who plays Jack Burton in the movie \"Big Trouble in Little China?\"",
-      "answer": "Kurt Russell",
-      "choices": [
-        "Kurt Russell",
-        "Patrick Swayze",
-        "John Cusack",
-        "Harrison Ford"
+        "Lion",
+        "Tiger",
+        "Leopard",
+        "Cheetah"
       ],
       "difficulty": "easy"
     },
     {
-      "id": "movies-27",
-      "question": "\"Cube\", \"Cube 2: Hypercube\" and \"Cube Zero\" were directed by the same person.",
-      "answer": "False",
+      "id": "movies-friendly-13",
+      "question": "In Toy Story, which toy says To infinity and beyond?",
+      "answer": "Buzz Lightyear",
       "choices": [
-        "False",
-        "True"
+        "Buzz Lightyear",
+        "Woody",
+        "Rex",
+        "Mr. Potato Head"
       ],
-      "difficulty": "hard"
+      "difficulty": "easy"
+    },
+    {
+      "id": "movies-friendly-6",
+      "question": "Which movie franchise features lightsabers and Jedi?",
+      "answer": "Star Wars",
+      "choices": [
+        "Star Wars",
+        "Star Trek",
+        "Jurassic Park",
+        "The Matrix"
+      ],
+      "difficulty": "easy"
+    },
+    {
+      "id": "movies-friendly-14",
+      "question": "Which animated movie features a young woman named Moana?",
+      "answer": "Moana",
+      "choices": [
+        "Moana",
+        "Frozen",
+        "Brave",
+        "Tangled"
+      ],
+      "difficulty": "easy"
+    },
+    {
+      "id": "movies-friendly-7",
+      "question": "Who is the snowman in Frozen?",
+      "answer": "Olaf",
+      "choices": [
+        "Olaf",
+        "Sven",
+        "Kristoff",
+        "Hans"
+      ],
+      "difficulty": "easy"
     },
     {
       "id": "movies-28",
@@ -6204,14 +6232,14 @@ export const triviaBank = {
       "difficulty": "medium"
     },
     {
-      "id": "movies-30",
-      "question": "What was the first monster to appear alongside Godzilla?",
-      "answer": "Anguirus",
+      "id": "movies-friendly-15",
+      "question": "In Harry Potter, what sport is played on flying broomsticks?",
+      "answer": "Quidditch",
       "choices": [
-        "Anguirus",
-        "King Kong",
-        "Mothra",
-        "King Ghidora"
+        "Quidditch",
+        "Cricket",
+        "Tennis",
+        "Rugby"
       ],
       "difficulty": "easy"
     },
@@ -6240,16 +6268,16 @@ export const triviaBank = {
       "difficulty": "easy"
     },
     {
-      "id": "movies-33",
-      "question": "Which actress portrayed Dr. Grace Augustine in the James Cameron movie \"Avatar\"?",
-      "answer": "Sigourney Weaver",
+      "id": "movies-friendly-8",
+      "question": "What school does Harry Potter attend?",
+      "answer": "Hogwarts",
       "choices": [
-        "Sigourney Weaver",
-        "Jessica Chastain",
-        "Melissa Beckett",
-        "Alyssa Monroe "
+        "Hogwarts",
+        "Nevermore",
+        "Xavier's School",
+        "Starfleet Academy"
       ],
-      "difficulty": "hard"
+      "difficulty": "easy"
     },
     {
       "id": "movies-34",
@@ -6298,28 +6326,28 @@ export const triviaBank = {
       "difficulty": "medium"
     },
     {
-      "id": "movies-38",
-      "question": "Before \"Jurassic Park III\" was finalized and the Spinosaurus was chosen, which dinosaur was going to be the star?",
-      "answer": "Baryonyx",
+      "id": "movies-friendly-9",
+      "question": "Which superhero swings through a city using webs?",
+      "answer": "Spider-Man",
       "choices": [
-        "Baryonyx",
-        "Tyrannosaurus Rex",
-        "Velociraptor",
-        "Suchomimus"
+        "Spider-Man",
+        "Superman",
+        "Aquaman",
+        "Hulk"
       ],
-      "difficulty": "hard"
+      "difficulty": "easy"
     },
     {
-      "id": "movies-39",
-      "question": "Which 1994 film did Roger Ebert famously despise, saying \"I hated hated hated hated hated this movie\".",
-      "answer": "North",
+      "id": "movies-friendly-10",
+      "question": "What kind of creatures are brought back in Jurassic Park?",
+      "answer": "Dinosaurs",
       "choices": [
-        "North",
-        "3 Ninjas Kick Back",
-        "The Santa Clause",
-        "Richie Rich"
+        "Dinosaurs",
+        "Dragons",
+        "Aliens",
+        "Giant insects"
       ],
-      "difficulty": "hard"
+      "difficulty": "easy"
     },
     {
       "id": "movies-40",
@@ -6356,34 +6384,38 @@ export const triviaBank = {
       "difficulty": "medium"
     },
     {
-      "id": "movies-43",
-      "question": "In the original Star Wars: A New Hope, Han Solo is the first to shoot his blaster in a conversation with Greedo.",
-      "answer": "True",
+      "id": "movies-friendly-16",
+      "question": "Which film follows a boy named Kevin who is accidentally left behind at Christmas?",
+      "answer": "Home Alone",
       "choices": [
-        "True",
-        "False"
+        "Home Alone",
+        "Elf",
+        "The Polar Express",
+        "The Santa Clause"
       ],
       "difficulty": "easy"
     },
     {
-      "id": "movies-44",
-      "question": "In the movie The Revenant, DiCaprio's character hunts down the killer of his son.",
-      "answer": "True",
+      "id": "movies-friendly-17",
+      "question": "What is the name of Elsa's sister in Frozen?",
+      "answer": "Anna",
       "choices": [
-        "True",
-        "False"
+        "Anna",
+        "Ariel",
+        "Belle",
+        "Jasmine"
       ],
       "difficulty": "easy"
     },
     {
-      "id": "movies-45",
-      "question": "In the 1995 film \"Balto\", who are Steele's accomplices?",
-      "answer": "Kaltag, Nikki, and Star",
+      "id": "movies-friendly-18",
+      "question": "What kind of animal is Po in Kung Fu Panda?",
+      "answer": "Panda",
       "choices": [
-        "Kaltag, Nikki, and Star",
-        "Dusty, Kirby, and Ralph",
-        "Nuk, Yak, and Sumac",
-        "Jenna, Sylvie, and Dixie"
+        "Panda",
+        "Tiger",
+        "Monkey",
+        "Fox"
       ],
       "difficulty": "easy"
     },
@@ -6472,14 +6504,14 @@ export const triviaBank = {
       "difficulty": "hard"
     },
     {
-      "id": "movies-53",
-      "question": "Which of the following movies was not based on a novel by Stephen King? ",
-      "answer": "The Thing",
+      "id": "movies-friendly-19",
+      "question": "Which Marvel hero carries a hammer called Mjolnir?",
+      "answer": "Thor",
       "choices": [
-        "The Thing",
-        "Carrie",
-        "Misery",
-        "The Green Mile"
+        "Thor",
+        "Hulk",
+        "Iron Man",
+        "Ant-Man"
       ],
       "difficulty": "easy"
     },
@@ -6506,14 +6538,14 @@ export const triviaBank = {
       "difficulty": "medium"
     },
     {
-      "id": "movies-56",
-      "question": "In the 1992 film \"Army of Darkness\", what name does Ash give to his double-barreled shotgun?",
-      "answer": "Boomstick",
+      "id": "movies-friendly-20",
+      "question": "What is the name of the princess in Disney's Aladdin?",
+      "answer": "Jasmine",
       "choices": [
-        "Boomstick",
-        "Bloomstick",
-        "Blastbranch",
-        "2-Pump Chump"
+        "Jasmine",
+        "Ariel",
+        "Belle",
+        "Aurora"
       ],
       "difficulty": "easy"
     },
@@ -6561,7 +6593,7 @@ export const triviaBank = {
         "Charles Bronson",
         "Robert Vaughn"
       ],
-      "difficulty": "easy"
+      "difficulty": "medium"
     },
     {
       "id": "movies-61",
@@ -6573,7 +6605,7 @@ export const triviaBank = {
         "Gordon Foster",
         "Gordon von Gam"
       ],
-      "difficulty": "easy"
+      "difficulty": "medium"
     },
     {
       "id": "movies-62",
@@ -6675,7 +6707,7 @@ export const triviaBank = {
         "2011",
         "2013"
       ],
-      "difficulty": "easy"
+      "difficulty": "medium"
     },
     {
       "id": "movies-71",
@@ -6747,7 +6779,7 @@ export const triviaBank = {
         "Vivien Leigh",
         "Mae West"
       ],
-      "difficulty": "easy"
+      "difficulty": "medium"
     },
     {
       "id": "movies-77",
@@ -6783,7 +6815,7 @@ export const triviaBank = {
         "Charlie Day",
         "Jack Black"
       ],
-      "difficulty": "easy"
+      "difficulty": "medium"
     },
     {
       "id": "movies-80",
@@ -6829,7 +6861,7 @@ export const triviaBank = {
         "Goldfinger",
         "Thunderball"
       ],
-      "difficulty": "easy"
+      "difficulty": "medium"
     },
     {
       "id": "movies-84",
@@ -6875,7 +6907,7 @@ export const triviaBank = {
         "Constipation",
         "Acid Reflux "
       ],
-      "difficulty": "easy"
+      "difficulty": "medium"
     },
     {
       "id": "movies-88",
@@ -6899,7 +6931,7 @@ export const triviaBank = {
         "Harvey Keitel",
         "Samuel L. Jackson"
       ],
-      "difficulty": "easy"
+      "difficulty": "medium"
     },
     {
       "id": "movies-90",
@@ -6923,7 +6955,7 @@ export const triviaBank = {
         "The Headless Horseman",
         "Häxan"
       ],
-      "difficulty": "easy"
+      "difficulty": "medium"
     },
     {
       "id": "movies-92",
@@ -6933,7 +6965,7 @@ export const triviaBank = {
         "True",
         "False"
       ],
-      "difficulty": "easy"
+      "difficulty": "medium"
     },
     {
       "id": "movies-93",
@@ -6957,7 +6989,7 @@ export const triviaBank = {
         "1999",
         "1990"
       ],
-      "difficulty": "easy"
+      "difficulty": "medium"
     },
     {
       "id": "movies-95",
@@ -7017,7 +7049,7 @@ export const triviaBank = {
         "Day",
         "Parker"
       ],
-      "difficulty": "easy"
+      "difficulty": "medium"
     },
     {
       "id": "movies-100",
@@ -7138,40 +7170,40 @@ export const triviaBank = {
       "difficulty": "medium"
     },
     {
-      "id": "music-10",
-      "question": "Which former boy-band star released hit solo single \"Angels\" in 1997?",
-      "answer": "Robbie Williams",
+      "id": "music-friendly-11",
+      "question": "Which instrument is a large triangle-shaped string instrument often played with the fingers?",
+      "answer": "Harp",
       "choices": [
-        "Robbie Williams",
-        "Justin Timberlake",
-        "Harry Styles",
-        "Gary Barlow"
+        "Harp",
+        "Flute",
+        "Trumpet",
+        "Drum"
       ],
       "difficulty": "easy"
     },
     {
-      "id": "music-11",
-      "question": "Which British band won the first edition of the Brit Awards in 1977?",
-      "answer": "The Beatles",
+      "id": "music-friendly-1",
+      "question": "How many strings does a standard guitar usually have?",
+      "answer": "6",
       "choices": [
-        "The Beatles",
-        "Pink Floyd",
-        "The Rolling Stones",
-        "The Who"
+        "6",
+        "4",
+        "5",
+        "8"
       ],
-      "difficulty": "hard"
+      "difficulty": "easy"
     },
     {
-      "id": "music-12",
-      "question": "What is the official name of Prince's backing band?",
-      "answer": "The Revolution",
+      "id": "music-friendly-2",
+      "question": "What instrument has black and white keys and is often played with both hands?",
+      "answer": "Piano",
       "choices": [
-        "The Revolution",
-        "The Paupers",
-        "The Wailers",
-        "The Heartbreakers"
+        "Piano",
+        "Violin",
+        "Trumpet",
+        "Flute"
       ],
-      "difficulty": "hard"
+      "difficulty": "easy"
     },
     {
       "id": "music-13",
@@ -7186,16 +7218,16 @@ export const triviaBank = {
       "difficulty": "medium"
     },
     {
-      "id": "music-14",
-      "question": "Who wrote the song \"You Know You Like It\"?",
-      "answer": "AlunaGeorge",
+      "id": "music-friendly-3",
+      "question": "Which singer is associated with the album Thriller?",
+      "answer": "Michael Jackson",
       "choices": [
-        "AlunaGeorge",
-        "DJ Snake",
-        "Steve Aoki",
-        "Major Lazer"
+        "Michael Jackson",
+        "Elton John",
+        "Bruno Mars",
+        "Justin Bieber"
       ],
-      "difficulty": "hard"
+      "difficulty": "easy"
     },
     {
       "id": "music-15",
@@ -7222,14 +7254,14 @@ export const triviaBank = {
       "difficulty": "easy"
     },
     {
-      "id": "music-17",
-      "question": "Who is the frontman of the band 30 Seconds to Mars?",
-      "answer": "Jared Leto",
+      "id": "music-friendly-12",
+      "question": "What is the name of the person who leads an orchestra?",
+      "answer": "Conductor",
       "choices": [
-        "Jared Leto",
-        "Gerard Way",
-        "Matthew Bellamy",
-        "Mike Shinoda"
+        "Conductor",
+        "Referee",
+        "Director of photography",
+        "Goalkeeper"
       ],
       "difficulty": "easy"
     },
@@ -7246,16 +7278,16 @@ export const triviaBank = {
       "difficulty": "medium"
     },
     {
-      "id": "music-19",
-      "question": "Which album was released by Kanye West in 2013?",
-      "answer": "Yeezus",
+      "id": "music-friendly-4",
+      "question": "What do drummers usually use to hit a drum kit?",
+      "answer": "Drumsticks",
       "choices": [
-        "Yeezus",
-        "My Beautiful Dark Twisted Fantasy",
-        "The Life of Pablo",
-        "Watch the Throne"
+        "Drumsticks",
+        "Bows",
+        "Guitar picks",
+        "Mallets only"
       ],
-      "difficulty": "hard"
+      "difficulty": "easy"
     },
     {
       "id": "music-20",
@@ -7280,16 +7312,16 @@ export const triviaBank = {
       "difficulty": "medium"
     },
     {
-      "id": "music-22",
-      "question": "How many members are there in the idol group \"µ's\"?",
-      "answer": "9",
+      "id": "music-friendly-5",
+      "question": "Which band recorded Hey Jude?",
+      "answer": "The Beatles",
       "choices": [
-        "9",
-        "48",
-        "6",
-        "3"
+        "The Beatles",
+        "Queen",
+        "ABBA",
+        "Nirvana"
       ],
-      "difficulty": "hard"
+      "difficulty": "easy"
     },
     {
       "id": "music-23",
@@ -7338,14 +7370,16 @@ export const triviaBank = {
       "difficulty": "medium"
     },
     {
-      "id": "music-27",
-      "question": "The song \"Mystery Train\" was released by artist \"Little Junior's Blue Flames\" in 1953.",
-      "answer": "True",
+      "id": "music-friendly-6",
+      "question": "What instrument is held under the chin and played with a bow?",
+      "answer": "Violin",
       "choices": [
-        "True",
-        "False"
+        "Violin",
+        "Trumpet",
+        "Piano",
+        "Trombone"
       ],
-      "difficulty": "hard"
+      "difficulty": "easy"
     },
     {
       "id": "music-28",
@@ -7360,16 +7394,16 @@ export const triviaBank = {
       "difficulty": "medium"
     },
     {
-      "id": "music-29",
-      "question": "Which band is the longest active band in the world with no breaks or line-up changes?",
-      "answer": "U2",
+      "id": "music-friendly-7",
+      "question": "Which singer is associated with Shake It Off?",
+      "answer": "Taylor Swift",
       "choices": [
-        "U2",
-        "Radiohead",
-        "Rush",
-        "Rolling Stones"
+        "Taylor Swift",
+        "Adele",
+        "Beyoncé",
+        "Rihanna"
       ],
-      "difficulty": "hard"
+      "difficulty": "easy"
     },
     {
       "id": "music-30",
@@ -7442,12 +7476,14 @@ export const triviaBank = {
       "difficulty": "medium"
     },
     {
-      "id": "music-36",
-      "question": "The 2011 movie \"The Adventures of Tintin\" was directed by Steven Spielberg.",
-      "answer": "True",
+      "id": "music-friendly-13",
+      "question": "What is a song performed by one singer alone called?",
+      "answer": "Solo",
       "choices": [
-        "True",
-        "False"
+        "Solo",
+        "Duet",
+        "Trio",
+        "Quartet"
       ],
       "difficulty": "easy"
     },
@@ -7464,36 +7500,38 @@ export const triviaBank = {
       "difficulty": "medium"
     },
     {
-      "id": "music-38",
-      "question": "Stevie Wonder's real name is Stevland Hardaway Morris.",
-      "answer": "True",
+      "id": "music-friendly-14",
+      "question": "How many performers usually sing in a duet?",
+      "answer": "2",
       "choices": [
-        "True",
-        "False"
+        "2",
+        "1",
+        "3",
+        "4"
       ],
       "difficulty": "easy"
     },
     {
-      "id": "music-39",
-      "question": "\"The Singing Cowboy\" Gene Autry is credited with the first recording for all but which classic Christmas jingle?",
-      "answer": "White Christmas",
+      "id": "music-friendly-15",
+      "question": "Which instrument has a slide that moves in and out to change notes?",
+      "answer": "Trombone",
       "choices": [
-        "White Christmas",
-        "Frosty the Snowman",
-        "Rudolph the Red-Nosed Reindeer",
-        "Here Comes Santa Claus"
+        "Trombone",
+        "Flute",
+        "Violin",
+        "Piano"
       ],
       "difficulty": "easy"
     },
     {
-      "id": "music-40",
-      "question": "Where does the Mac part of the name Fleetwood Mac come from?",
-      "answer": "John McVie",
+      "id": "music-friendly-16",
+      "question": "Which band is associated with We Will Rock You?",
+      "answer": "Queen",
       "choices": [
-        "John McVie",
-        "Christine McVie",
-        "Mac McAnally",
-        "David Tennant"
+        "Queen",
+        "ABBA",
+        "Coldplay",
+        "The Beatles"
       ],
       "difficulty": "easy"
     },
@@ -7522,28 +7560,28 @@ export const triviaBank = {
       "difficulty": "medium"
     },
     {
-      "id": "music-43",
-      "question": "What song originally performed by The Bee Gees in 1978 had a cover version by Steps 20 years later?",
-      "answer": "Tragedy",
+      "id": "music-friendly-8",
+      "question": "What do you call a group of people singing together?",
+      "answer": "Choir",
       "choices": [
-        "Tragedy",
-        "Night Fever",
-        "Stayin' Alive",
-        "You Should Be Dancing"
+        "Choir",
+        "Orchestra",
+        "Trio of drums",
+        "Quartet of flutes"
       ],
-      "difficulty": "hard"
+      "difficulty": "easy"
     },
     {
-      "id": "music-44",
-      "question": "What is the name of the song by Beyoncé and Alejandro Fernández released in 2007?",
-      "answer": "Amor Gitano",
+      "id": "music-friendly-9",
+      "question": "Which instrument is usually played by blowing across a small opening and pressing keys?",
+      "answer": "Flute",
       "choices": [
-        "Amor Gitano",
-        "La ultima vez",
-        "Rocket",
-        "Hasta Dondes Estes"
+        "Flute",
+        "Guitar",
+        "Harp",
+        "Drum"
       ],
-      "difficulty": "hard"
+      "difficulty": "easy"
     },
     {
       "id": "music-45",
@@ -7570,14 +7608,14 @@ export const triviaBank = {
       "difficulty": "medium"
     },
     {
-      "id": "music-47",
-      "question": "Who was featured in the song \"Words\" by Feint? ",
-      "answer": "Laura Brehm",
+      "id": "music-friendly-17",
+      "question": "Which singer is associated with Umbrella?",
+      "answer": "Rihanna",
       "choices": [
-        "Laura Brehm",
-        "Anna Yvette ",
-        "Danyka Nadeau",
-        "Veela"
+        "Rihanna",
+        "Adele",
+        "Taylor Swift",
+        "Céline Dion"
       ],
       "difficulty": "easy"
     },
@@ -7606,14 +7644,14 @@ export const triviaBank = {
       "difficulty": "medium"
     },
     {
-      "id": "music-50",
-      "question": "What Led Zeppelin album contains \"Stairway to Heaven\"?",
-      "answer": "Led Zeppelin IV",
+      "id": "music-friendly-18",
+      "question": "What musical term describes how fast or slow a piece is played?",
+      "answer": "Tempo",
       "choices": [
-        "Led Zeppelin IV",
-        "Houses of the Holy",
-        "Physical Graffiti",
-        "Led Zeppelin III"
+        "Tempo",
+        "Volume",
+        "Pitch",
+        "Harmony"
       ],
       "difficulty": "easy"
     },
@@ -7642,16 +7680,16 @@ export const triviaBank = {
       "difficulty": "medium"
     },
     {
-      "id": "music-53",
-      "question": "Which of Michael Jackson's albums sold the most copies?",
-      "answer": "Thriller",
+      "id": "music-friendly-10",
+      "question": "Who sings Rolling in the Deep?",
+      "answer": "Adele",
       "choices": [
-        "Thriller",
-        "Dangerous",
-        "Bad",
-        "Off the Wall"
+        "Adele",
+        "Lady Gaga",
+        "Madonna",
+        "Katy Perry"
       ],
-      "difficulty": "hard"
+      "difficulty": "easy"
     },
     {
       "id": "music-54",
@@ -7678,14 +7716,14 @@ export const triviaBank = {
       "difficulty": "medium"
     },
     {
-      "id": "music-56",
-      "question": "When was Gangnam Style uploaded to YouTube?",
-      "answer": "2012",
+      "id": "music-friendly-19",
+      "question": "Which singer is associated with Single Ladies?",
+      "answer": "Beyoncé",
       "choices": [
-        "2012",
-        "2013",
-        "2014",
-        "2011"
+        "Beyoncé",
+        "Adele",
+        "Cher",
+        "Rihanna"
       ],
       "difficulty": "easy"
     },
@@ -7844,14 +7882,14 @@ export const triviaBank = {
       "difficulty": "medium"
     },
     {
-      "id": "music-70",
-      "question": "\"Grande Valse\" is a phrase from the song \"Gran Vals\". What is that song segment known as?",
-      "answer": "Nokia Tune",
+      "id": "music-friendly-20",
+      "question": "What do singers commonly use to make their voices louder for an audience?",
+      "answer": "Microphone",
       "choices": [
-        "Nokia Tune",
-        "Hello Moto [Motorola Ringtone]",
-        "Droid Ringtone",
-        "Microsoft Ringtone"
+        "Microphone",
+        "Telescope",
+        "Keyboard cable",
+        "Drumstick"
       ],
       "difficulty": "easy"
     },
@@ -7923,7 +7961,7 @@ export const triviaBank = {
         "Future",
         "Fatman Scoop"
       ],
-      "difficulty": "easy"
+      "difficulty": "medium"
     },
     {
       "id": "music-77",
@@ -7935,7 +7973,7 @@ export const triviaBank = {
         "Bombtrack",
         "The Battle Of Los Angeles"
       ],
-      "difficulty": "easy"
+      "difficulty": "medium"
     },
     {
       "id": "music-78",
@@ -7959,7 +7997,7 @@ export const triviaBank = {
         "6",
         "2"
       ],
-      "difficulty": "easy"
+      "difficulty": "medium"
     },
     {
       "id": "music-80",
@@ -7983,7 +8021,7 @@ export const triviaBank = {
         "The Grateful Dead",
         "Destiny's Child"
       ],
-      "difficulty": "easy"
+      "difficulty": "medium"
     },
     {
       "id": "music-82",
@@ -8019,7 +8057,7 @@ export const triviaBank = {
         "Matt Helders",
         "Nick O'Malley"
       ],
-      "difficulty": "easy"
+      "difficulty": "medium"
     },
     {
       "id": "music-85",
@@ -8029,7 +8067,7 @@ export const triviaBank = {
         "False",
         "True"
       ],
-      "difficulty": "easy"
+      "difficulty": "medium"
     },
     {
       "id": "music-86",
@@ -8220,50 +8258,50 @@ export const triviaBank = {
       "difficulty": "easy"
     },
     {
-      "id": "television-2",
-      "question": "In \"Donkey Kong Country\", why does Donkey Kong want to know the secret of the crystal coconut?",
-      "answer": "He's the big kahuna.",
+      "id": "television-friendly-1",
+      "question": "What color is SpongeBob SquarePants?",
+      "answer": "Yellow",
       "choices": [
-        "He's the big kahuna.",
-        "To find out where all the bananas are.",
-        "Because Diddy Kong forced him.",
-        "He wants to punish brutes."
-      ],
-      "difficulty": "hard"
-    },
-    {
-      "id": "television-3",
-      "question": "Which PBS station was the first station to air \"Monty Python's Flying Circus\" (1969-1974) in the United States?",
-      "answer": "KERA (Dallas-Fort Worth)",
-      "choices": [
-        "KERA (Dallas-Fort Worth)",
-        "KLCS (Los Angeles)",
-        "WETA (Washington D.C.)",
-        "WNET (New York City)"
-      ],
-      "difficulty": "hard"
-    },
-    {
-      "id": "television-4",
-      "question": "When Donkey Kong died in the \"Donkey Kong Country\" episode \"It's a Wonderful Life\", who was his guardian angel?",
-      "answer": "Eddie the Mean Old Yeti",
-      "choices": [
-        "Eddie the Mean Old Yeti",
-        "Kiddy Kong",
-        "Diddy Kong",
-        "King K. Rool"
+        "Yellow",
+        "Blue",
+        "Purple",
+        "Red"
       ],
       "difficulty": "easy"
     },
     {
-      "id": "television-5",
-      "question": "How many seasons did the Sci-Fi television show \"Stargate Universe\" have?",
-      "answer": "2",
+      "id": "television-friendly-2",
+      "question": "What is the name of the Simpsons' father?",
+      "answer": "Homer",
       "choices": [
-        "2",
-        "10",
-        "5",
-        "3"
+        "Homer",
+        "Bart",
+        "Ned",
+        "Moe"
+      ],
+      "difficulty": "easy"
+    },
+    {
+      "id": "television-friendly-11",
+      "question": "What kind of animal is Bluey in the animated series Bluey?",
+      "answer": "Dog",
+      "choices": [
+        "Dog",
+        "Cat",
+        "Rabbit",
+        "Koala"
+      ],
+      "difficulty": "easy"
+    },
+    {
+      "id": "television-friendly-12",
+      "question": "What color is Elmo from Sesame Street?",
+      "answer": "Red",
+      "choices": [
+        "Red",
+        "Blue",
+        "Yellow",
+        "Green"
       ],
       "difficulty": "easy"
     },
@@ -8326,52 +8364,52 @@ export const triviaBank = {
       "difficulty": "medium"
     },
     {
-      "id": "television-11",
-      "question": "Which character was played by Dustin Diamond in the sitcom 'Saved by the Bell'?",
-      "answer": "Screech",
+      "id": "television-friendly-13",
+      "question": "Which Sesame Street character loves cookies?",
+      "answer": "Cookie Monster",
       "choices": [
-        "Screech",
-        "Zack",
-        "Mr. Belding",
-        "A.C. Slater"
+        "Cookie Monster",
+        "Big Bird",
+        "Oscar the Grouch",
+        "Elmo"
       ],
       "difficulty": "easy"
     },
     {
-      "id": "television-12",
-      "question": "What was the date of original airing of the pilot episode of My Little Pony: Friendship is Magic?",
-      "answer": "October 10th, 2010",
+      "id": "television-friendly-3",
+      "question": "Which TV show features a coffee shop called Central Perk?",
+      "answer": "Friends",
       "choices": [
-        "October 10th, 2010",
-        "November 6th, 2010",
-        "April 14th, 1984",
-        "May 18th, 2015"
+        "Friends",
+        "Seinfeld",
+        "The Office",
+        "Cheers"
       ],
-      "difficulty": "hard"
+      "difficulty": "easy"
     },
     {
-      "id": "television-13",
-      "question": "Prior to working at Wizards of the Coast, \"Mark Rosewater\" was a writer for which show?",
-      "answer": "Roseanne",
+      "id": "television-friendly-4",
+      "question": "What kind of animal is Peppa Pig?",
+      "answer": "Pig",
       "choices": [
-        "Roseanne",
-        "Boy Meets World",
-        "The X-Files",
-        "NYPD Blue"
+        "Pig",
+        "Rabbit",
+        "Dog",
+        "Elephant"
       ],
-      "difficulty": "hard"
+      "difficulty": "easy"
     },
     {
-      "id": "television-14",
-      "question": "What was the name of the inflatable duck sacrified to the crowd at the end of Episode 34 of the 18th season of Big Brother?",
-      "answer": "Pablo",
+      "id": "television-friendly-5",
+      "question": "Which cartoon family lives in Bedrock?",
+      "answer": "The Flintstones",
       "choices": [
-        "Pablo",
-        "Esteban",
-        "Carlos",
-        "Duckster"
+        "The Flintstones",
+        "The Jetsons",
+        "The Simpsons",
+        "The Griffins"
       ],
-      "difficulty": "hard"
+      "difficulty": "easy"
     },
     {
       "id": "television-15",
@@ -8386,16 +8424,16 @@ export const triviaBank = {
       "difficulty": "easy"
     },
     {
-      "id": "television-16",
-      "question": "What's Dr. Doofenshmirtz first name?",
-      "answer": "Heinz",
+      "id": "television-friendly-6",
+      "question": "What is the name of the dog in Scooby-Doo?",
+      "answer": "Scooby-Doo",
       "choices": [
-        "Heinz",
-        "Hans",
-        "Hank",
-        "Heidi"
+        "Scooby-Doo",
+        "Snoopy",
+        "Pluto",
+        "Brian"
       ],
-      "difficulty": "hard"
+      "difficulty": "easy"
     },
     {
       "id": "television-17",
@@ -8410,26 +8448,26 @@ export const triviaBank = {
       "difficulty": "medium"
     },
     {
-      "id": "television-18",
-      "question": "Which of these Nickelodeon game shows aired first?",
-      "answer": "Double Dare",
+      "id": "television-friendly-7",
+      "question": "What is the name of the main character in Dora the Explorer?",
+      "answer": "Dora",
       "choices": [
-        "Double Dare",
-        "Nick Arcade",
-        "Finders Keepers",
-        "Nickelodeon Guts"
+        "Dora",
+        "Diego",
+        "Boots",
+        "Swiper"
       ],
-      "difficulty": "hard"
+      "difficulty": "easy"
     },
     {
-      "id": "television-19",
-      "question": "What is the real name of the famous spanish humorist, El Risitas?",
-      "answer": "Juan Joya Borga",
+      "id": "television-friendly-14",
+      "question": "What is the name of the cat who chases Jerry in Tom and Jerry?",
+      "answer": "Tom",
       "choices": [
-        "Juan Joya Borga",
-        "Gabriel Garcia Marquez",
-        "Jesus Quintero",
-        "Ernesto Guevara"
+        "Tom",
+        "Garfield",
+        "Felix",
+        "Sylvester"
       ],
       "difficulty": "easy"
     },
@@ -8446,26 +8484,26 @@ export const triviaBank = {
       "difficulty": "medium"
     },
     {
-      "id": "television-21",
-      "question": "In the show \"Dragonball Z\", what is the name of Cell's most powerful attack?",
-      "answer": "Solar Kamehameha",
+      "id": "television-friendly-15",
+      "question": "What type of animal is Jerry in Tom and Jerry?",
+      "answer": "Mouse",
       "choices": [
-        "Solar Kamehameha",
-        "Super Kamehameha",
-        "Cell Kamehameha",
-        "Android Kamehameha"
+        "Mouse",
+        "Hamster",
+        "Rabbit",
+        "Squirrel"
       ],
       "difficulty": "easy"
     },
     {
-      "id": "television-22",
-      "question": "On the NBC show Community, whose catch-phrase was \"Pop! Pop!\"?",
-      "answer": "Magnitude",
+      "id": "television-friendly-16",
+      "question": "Which TV superhero is also known as the Fastest Man Alive?",
+      "answer": "The Flash",
       "choices": [
-        "Magnitude",
-        "Star Burns",
-        "Leonard",
-        "Senoir Chang"
+        "The Flash",
+        "Batman",
+        "Aquaman",
+        "Green Arrow"
       ],
       "difficulty": "easy"
     },
@@ -8519,7 +8557,7 @@ export const triviaBank = {
     },
     {
       "id": "television-27",
-      "question": "Who is the star of the AMC series Breaking Bad?",
+      "question": "What is the name of the chemistry teacher who becomes the main character of Breaking Bad?",
       "answer": "Walter White",
       "choices": [
         "Walter White",
@@ -8530,28 +8568,28 @@ export const triviaBank = {
       "difficulty": "easy"
     },
     {
-      "id": "television-28",
-      "question": "What is the name of the pirate that sings the intro to \"Spongebob Squarepants\"?",
-      "answer": "Painty",
+      "id": "television-friendly-8",
+      "question": "In Pokémon, which yellow creature is Ash's famous partner?",
+      "answer": "Pikachu",
       "choices": [
-        "Painty",
-        "Patchy",
-        "Lloyd",
-        "Larry"
+        "Pikachu",
+        "Squirtle",
+        "Bulbasaur",
+        "Charmander"
       ],
-      "difficulty": "hard"
+      "difficulty": "easy"
     },
     {
-      "id": "television-29",
-      "question": "Which country does the YouTuber \"SinowBeats\" originate from?",
-      "answer": "Scotland",
+      "id": "television-friendly-9",
+      "question": "Which animated family has a dog named Santa's Little Helper?",
+      "answer": "The Simpsons",
       "choices": [
-        "Scotland",
-        "England",
-        "Sweden",
-        "Germany"
+        "The Simpsons",
+        "The Flintstones",
+        "The Jetsons",
+        "The Addams Family"
       ],
-      "difficulty": "hard"
+      "difficulty": "easy"
     },
     {
       "id": "television-30",
@@ -8586,14 +8624,14 @@ export const triviaBank = {
       "difficulty": "easy"
     },
     {
-      "id": "television-33",
-      "question": "In Game of Thrones, what is Littlefinger's real name?",
-      "answer": "Petyr Baelish",
+      "id": "television-friendly-17",
+      "question": "What is the name of the optimistic soccer coach played by Jason Sudeikis?",
+      "answer": "Ted Lasso",
       "choices": [
-        "Petyr Baelish",
-        "Podrick Payne",
-        "Lancel Lannister",
-        "Torrhen Karstark"
+        "Ted Lasso",
+        "Michael Scott",
+        "Leslie Knope",
+        "Ron Swanson"
       ],
       "difficulty": "easy"
     },
@@ -8610,12 +8648,14 @@ export const triviaBank = {
       "difficulty": "easy"
     },
     {
-      "id": "television-35",
-      "question": "In Battlestar Galactica (2004), Cylons were created by man as cybernetic workers and soldiers.",
-      "answer": "True",
+      "id": "television-friendly-18",
+      "question": "Which TV series follows Wednesday Addams at Nevermore Academy?",
+      "answer": "Wednesday",
       "choices": [
-        "True",
-        "False"
+        "Wednesday",
+        "Riverdale",
+        "Stranger Things",
+        "The Umbrella Academy"
       ],
       "difficulty": "easy"
     },
@@ -8644,16 +8684,16 @@ export const triviaBank = {
       "difficulty": "medium"
     },
     {
-      "id": "television-38",
-      "question": "Who was the winner of \"Big Brother\" Season 10?",
-      "answer": "Dan Gheesling",
+      "id": "television-friendly-10",
+      "question": "Which TV character lives in a pineapple under the sea?",
+      "answer": "SpongeBob SquarePants",
       "choices": [
-        "Dan Gheesling",
-        "Bryce Kranyik",
-        "Ryan Sutfin",
-        "Chris Mundorf"
+        "SpongeBob SquarePants",
+        "Scooby-Doo",
+        "Bluey",
+        "Garfield"
       ],
-      "difficulty": "hard"
+      "difficulty": "easy"
     },
     {
       "id": "television-39",
@@ -8680,12 +8720,14 @@ export const triviaBank = {
       "difficulty": "medium"
     },
     {
-      "id": "television-41",
-      "question": "Klingons express emotion in art through opera and poetry.",
-      "answer": "True",
+      "id": "television-friendly-19",
+      "question": "What is the name of the yellow bird on Sesame Street?",
+      "answer": "Big Bird",
       "choices": [
-        "True",
-        "False"
+        "Big Bird",
+        "Tweety",
+        "Woodstock",
+        "Donald Duck"
       ],
       "difficulty": "easy"
     },
@@ -8770,14 +8812,14 @@ export const triviaBank = {
       "difficulty": "hard"
     },
     {
-      "id": "television-49",
-      "question": "In the show, Doctor Who, what does T.A.R.D.I.S stand for?",
-      "answer": "Time And Relative Dimensions In Space",
+      "id": "television-friendly-20",
+      "question": "What is the name of the duck who often appears with Mickey Mouse?",
+      "answer": "Donald Duck",
       "choices": [
-        "Time And Relative Dimensions In Space",
-        "Time And Resting Dimensions In Space",
-        "Time And Relative Dimensions In Style",
-        "Toilet Aid Rope Dog Is Soup"
+        "Donald Duck",
+        "Daffy Duck",
+        "Scrooge McDuck",
+        "Howard the Duck"
       ],
       "difficulty": "easy"
     },
@@ -8827,7 +8869,7 @@ export const triviaBank = {
         "DuckTales",
         "Tom and Jerry"
       ],
-      "difficulty": "easy"
+      "difficulty": "medium"
     },
     {
       "id": "television-54",
@@ -8911,7 +8953,7 @@ export const triviaBank = {
         "Greg",
         "Joe"
       ],
-      "difficulty": "easy"
+      "difficulty": "medium"
     },
     {
       "id": "television-61",
@@ -8945,7 +8987,7 @@ export const triviaBank = {
         "Baltimore Orioles",
         "Milwaukee Brewers"
       ],
-      "difficulty": "easy"
+      "difficulty": "medium"
     },
     {
       "id": "television-64",
@@ -9049,7 +9091,7 @@ export const triviaBank = {
         "President",
         "Chief of Staff"
       ],
-      "difficulty": "easy"
+      "difficulty": "medium"
     },
     {
       "id": "television-73",
@@ -9085,7 +9127,7 @@ export const triviaBank = {
         "Bournemouth",
         "Great Yarmouth"
       ],
-      "difficulty": "easy"
+      "difficulty": "medium"
     },
     {
       "id": "television-76",
@@ -9107,7 +9149,7 @@ export const triviaBank = {
         "John Ashbury",
         "Michael \"Mikey\" Wilhelm"
       ],
-      "difficulty": "easy"
+      "difficulty": "medium"
     },
     {
       "id": "television-78",
@@ -9119,7 +9161,7 @@ export const triviaBank = {
         "Billy Familia",
         "VeganGainz"
       ],
-      "difficulty": "easy"
+      "difficulty": "medium"
     },
     {
       "id": "television-79",
@@ -9167,7 +9209,7 @@ export const triviaBank = {
         "Mahoney",
         "Murphy"
       ],
-      "difficulty": "easy"
+      "difficulty": "medium"
     },
     {
       "id": "television-83",
@@ -9309,7 +9351,7 @@ export const triviaBank = {
         "Tony",
         "Grammy"
       ],
-      "difficulty": "easy"
+      "difficulty": "medium"
     },
     {
       "id": "television-95",
@@ -9321,7 +9363,7 @@ export const triviaBank = {
         "Lord Genome",
         "King Loname"
       ],
-      "difficulty": "easy"
+      "difficulty": "medium"
     },
     {
       "id": "television-96",
@@ -9381,7 +9423,7 @@ export const triviaBank = {
         "Tom",
         "Kitty"
       ],
-      "difficulty": "easy"
+      "difficulty": "medium"
     }
   ],
   "computers": [
@@ -9454,14 +9496,14 @@ export const triviaBank = {
       "difficulty": "medium"
     },
     {
-      "id": "computers-7",
-      "question": "What does the computer software acronym JVM stand for?",
-      "answer": "Java Virtual Machine",
+      "id": "computers-friendly-11",
+      "question": "Which device is commonly used to record your voice on a computer?",
+      "answer": "Microphone",
       "choices": [
-        "Java Virtual Machine",
-        "Java Vendor Machine",
-        "Java Visual Machine",
-        "Just Virtual Machine"
+        "Microphone",
+        "Monitor",
+        "Mouse",
+        "Scanner"
       ],
       "difficulty": "easy"
     },
@@ -9490,16 +9532,16 @@ export const triviaBank = {
       "difficulty": "medium"
     },
     {
-      "id": "computers-10",
-      "question": "What was the first company to use the term \"Golden Master\"?",
-      "answer": "Apple",
+      "id": "computers-friendly-1",
+      "question": "What device is used to type letters into a desktop computer?",
+      "answer": "Keyboard",
       "choices": [
-        "Apple",
-        "IBM",
-        "Microsoft",
-        "Google"
+        "Keyboard",
+        "Monitor",
+        "Speaker",
+        "Printer"
       ],
-      "difficulty": "hard"
+      "difficulty": "easy"
     },
     {
       "id": "computers-11",
@@ -9604,12 +9646,14 @@ export const triviaBank = {
       "difficulty": "medium"
     },
     {
-      "id": "computers-20",
-      "question": "The name of the programming language AWK is abbreviated from the names of the developers – Aho, Weinberger, and Kernighan.",
-      "answer": "True",
+      "id": "computers-friendly-12",
+      "question": "Which pair is used for listening to computer audio privately?",
+      "answer": "Headphones",
       "choices": [
-        "True",
-        "False"
+        "Headphones",
+        "Keyboard keys",
+        "USB drives",
+        "Webcams"
       ],
       "difficulty": "easy"
     },
@@ -9684,52 +9728,52 @@ export const triviaBank = {
       "difficulty": "medium"
     },
     {
-      "id": "computers-27",
-      "question": "What is the domain name for the country Tuvalu?",
-      "answer": ".tv",
+      "id": "computers-friendly-13",
+      "question": "What does a webcam capture?",
+      "answer": "Video images",
       "choices": [
-        ".tv",
-        ".tu",
-        ".tt",
-        ".tl"
+        "Video images",
+        "Printed pages",
+        "Keyboard shortcuts",
+        "Electric power"
       ],
       "difficulty": "easy"
     },
     {
-      "id": "computers-28",
-      "question": "The programming language 'Swift' was created to replace what other programming language?",
-      "answer": "Objective-C",
+      "id": "computers-friendly-14",
+      "question": "Which keyboard shortcut commonly pastes copied text on Windows?",
+      "answer": "Ctrl + V",
       "choices": [
-        "Objective-C",
-        "C#",
-        "Ruby",
-        "C++"
+        "Ctrl + V",
+        "Ctrl + C",
+        "Ctrl + X",
+        "Ctrl + Z"
       ],
       "difficulty": "easy"
     },
     {
-      "id": "computers-29",
-      "question": "Which computer language would you associate Django framework with?",
-      "answer": "Python",
+      "id": "computers-friendly-15",
+      "question": "Which key commonly removes the character just before the typing cursor?",
+      "answer": "Backspace",
       "choices": [
-        "Python",
-        "C#",
-        "C++",
-        "Java"
+        "Backspace",
+        "Shift",
+        "Tab",
+        "Caps Lock"
       ],
       "difficulty": "easy"
     },
     {
-      "id": "computers-30",
-      "question": "What was the name of the first Bulgarian personal computer?",
-      "answer": "IMKO-1",
+      "id": "computers-friendly-2",
+      "question": "What device displays pictures from a computer?",
+      "answer": "Monitor",
       "choices": [
-        "IMKO-1",
-        "Pravetz 82",
-        "Pravetz 8D",
-        "IZOT 1030"
+        "Monitor",
+        "Mouse",
+        "Router",
+        "Microphone"
       ],
-      "difficulty": "hard"
+      "difficulty": "easy"
     },
     {
       "id": "computers-31",
@@ -9780,16 +9824,16 @@ export const triviaBank = {
       "difficulty": "medium"
     },
     {
-      "id": "computers-35",
-      "question": "How many Hz does the video standard PAL support?",
-      "answer": "50",
+      "id": "computers-friendly-3",
+      "question": "What does a computer mouse usually control on the screen?",
+      "answer": "Pointer",
       "choices": [
-        "50",
-        "59",
-        "60",
-        "25"
+        "Pointer",
+        "Volume only",
+        "Power supply",
+        "Internet speed"
       ],
-      "difficulty": "hard"
+      "difficulty": "easy"
     },
     {
       "id": "computers-36",
@@ -9804,16 +9848,16 @@ export const triviaBank = {
       "difficulty": "easy"
     },
     {
-      "id": "computers-37",
-      "question": "Which of these was the name of a bug found in April 2014 in the publicly available OpenSSL cryptography library?",
-      "answer": "Heartbleed",
+      "id": "computers-friendly-4",
+      "question": "What symbol commonly appears in an email address?",
+      "answer": "@",
       "choices": [
-        "Heartbleed",
-        "Shellshock",
-        "Corrupted Blood",
-        "Shellscript"
+        "@",
+        "#",
+        "$",
+        "%"
       ],
-      "difficulty": "hard"
+      "difficulty": "easy"
     },
     {
       "id": "computers-38",
@@ -9838,24 +9882,26 @@ export const triviaBank = {
       "difficulty": "medium"
     },
     {
-      "id": "computers-40",
-      "question": "In most programming languages, the operator ++ is equivalent to the statement \"+= 1\".",
-      "answer": "True",
+      "id": "computers-friendly-16",
+      "question": "What is the purpose of the Caps Lock key?",
+      "answer": "Type capital letters continuously",
       "choices": [
-        "True",
-        "False"
+        "Type capital letters continuously",
+        "Delete a file",
+        "Open the browser",
+        "Mute the speakers"
       ],
       "difficulty": "easy"
     },
     {
-      "id": "computers-41",
-      "question": "Which SQL keyword is used to fetch data from a database?",
-      "answer": "SELECT",
+      "id": "computers-friendly-17",
+      "question": "Which app is primarily used to make spreadsheets?",
+      "answer": "Microsoft Excel",
       "choices": [
-        "SELECT",
-        "INDEX",
-        "VALUES",
-        "EXEC"
+        "Microsoft Excel",
+        "Microsoft Paint",
+        "Notepad",
+        "Windows Media Player"
       ],
       "difficulty": "easy"
     },
@@ -9872,16 +9918,16 @@ export const triviaBank = {
       "difficulty": "medium"
     },
     {
-      "id": "computers-43",
-      "question": "America Online (AOL) started out as which of these online service providers?",
-      "answer": "Quantum Link",
+      "id": "computers-friendly-5",
+      "question": "What does Wi-Fi let devices connect to without a cable?",
+      "answer": "A wireless network",
       "choices": [
-        "Quantum Link",
-        "CompuServe",
-        "Prodigy",
-        "GEnie"
+        "A wireless network",
+        "A power outlet",
+        "A paper printer only",
+        "A camera lens"
       ],
-      "difficulty": "hard"
+      "difficulty": "easy"
     },
     {
       "id": "computers-44",
@@ -9896,14 +9942,14 @@ export const triviaBank = {
       "difficulty": "medium"
     },
     {
-      "id": "computers-45",
-      "question": "According to the International System of Units, how many bytes are in a kilobyte of RAM?",
-      "answer": "1000",
+      "id": "computers-friendly-18",
+      "question": "Which service is mainly used to watch online videos?",
+      "answer": "YouTube",
       "choices": [
-        "1000",
-        "512",
-        "1024",
-        "500"
+        "YouTube",
+        "Google Maps",
+        "Excel",
+        "Calculator"
       ],
       "difficulty": "easy"
     },
@@ -9974,16 +10020,16 @@ export const triviaBank = {
       "difficulty": "medium"
     },
     {
-      "id": "computers-52",
-      "question": "What internet protocol was documented in RFC 1459?",
-      "answer": "IRC",
+      "id": "computers-friendly-6",
+      "question": "Which company makes the iPhone?",
+      "answer": "Apple",
       "choices": [
-        "IRC",
-        "HTTP",
-        "HTTPS",
-        "FTP"
+        "Apple",
+        "Microsoft",
+        "Nintendo",
+        "Sony"
       ],
-      "difficulty": "hard"
+      "difficulty": "easy"
     },
     {
       "id": "computers-53",
@@ -10008,14 +10054,14 @@ export const triviaBank = {
       "difficulty": "easy"
     },
     {
-      "id": "computers-55",
-      "question": "What is the most preferred image format used for logos in the Wikimedia database?",
-      "answer": ".svg",
+      "id": "computers-friendly-19",
+      "question": "What does a battery allow a laptop to do?",
+      "answer": "Run without being plugged in",
       "choices": [
-        ".svg",
-        ".png",
-        ".jpeg",
-        ".gif"
+        "Run without being plugged in",
+        "Print without paper",
+        "Connect without a network",
+        "Store unlimited files"
       ],
       "difficulty": "easy"
     },
@@ -10042,14 +10088,14 @@ export const triviaBank = {
       "difficulty": "easy"
     },
     {
-      "id": "computers-58",
-      "question": "This mobile OS held the largest market share in 2012.",
-      "answer": "iOS",
+      "id": "computers-friendly-20",
+      "question": "What is a touchscreen controlled by directly touching?",
+      "answer": "The screen",
       "choices": [
-        "iOS",
-        "Android",
-        "BlackBerry",
-        "Symbian"
+        "The screen",
+        "The charging cable",
+        "The speaker",
+        "The computer fan"
       ],
       "difficulty": "easy"
     },
@@ -10075,7 +10121,7 @@ export const triviaBank = {
         "64 bits",
         "128 bytes"
       ],
-      "difficulty": "easy"
+      "difficulty": "medium"
     },
     {
       "id": "computers-61",
@@ -10099,7 +10145,7 @@ export const triviaBank = {
         "1000",
         "1048576"
       ],
-      "difficulty": "easy"
+      "difficulty": "medium"
     },
     {
       "id": "computers-63",
@@ -10111,7 +10157,7 @@ export const triviaBank = {
         "al-Khwārizmī",
         "Willis Ware"
       ],
-      "difficulty": "easy"
+      "difficulty": "medium"
     },
     {
       "id": "computers-64",
@@ -10135,7 +10181,7 @@ export const triviaBank = {
         "Network",
         "Present"
       ],
-      "difficulty": "easy"
+      "difficulty": "medium"
     },
     {
       "id": "computers-66",
@@ -10147,19 +10193,19 @@ export const triviaBank = {
         "Modular Interface of Digital Instruments",
         "Musical Instrument Data Interface"
       ],
-      "difficulty": "easy"
+      "difficulty": "medium"
     },
     {
-      "id": "computers-67",
-      "question": "Who invented the \"Spanning Tree Protocol\"?",
-      "answer": "Radia Perlman",
+      "id": "computers-friendly-7",
+      "question": "What application do you use to open websites?",
+      "answer": "Web browser",
       "choices": [
-        "Radia Perlman",
-        "Paul Vixie",
-        "Vint Cerf",
-        "Michael Roberts"
+        "Web browser",
+        "Calculator",
+        "Paint editor",
+        "File compressor"
       ],
-      "difficulty": "hard"
+      "difficulty": "easy"
     },
     {
       "id": "computers-68",
@@ -10181,7 +10227,7 @@ export const triviaBank = {
         "False",
         "True"
       ],
-      "difficulty": "easy"
+      "difficulty": "medium"
     },
     {
       "id": "computers-70",
@@ -10196,16 +10242,16 @@ export const triviaBank = {
       "difficulty": "medium"
     },
     {
-      "id": "computers-71",
-      "question": "Which of these is not a layer in the OSI model for data communications?",
-      "answer": "Connection Layer",
+      "id": "computers-friendly-8",
+      "question": "What should you keep secret to protect an online account?",
+      "answer": "Password",
       "choices": [
-        "Connection Layer",
-        "Application Layer",
-        "Transport Layer",
-        "Physical Layer"
+        "Password",
+        "Username only",
+        "Profile color",
+        "Display language"
       ],
-      "difficulty": "hard"
+      "difficulty": "easy"
     },
     {
       "id": "computers-72",
@@ -10240,14 +10286,16 @@ export const triviaBank = {
       "difficulty": "medium"
     },
     {
-      "id": "computers-75",
-      "question": "The IBM PC used an Intel 8008 microprocessor clocked at 4.77 MHz and 8 kilobytes of memory.",
-      "answer": "False",
+      "id": "computers-friendly-9",
+      "question": "What is the purpose of a printer?",
+      "answer": "Make paper copies",
       "choices": [
-        "False",
-        "True"
+        "Make paper copies",
+        "Cool the computer",
+        "Charge a phone",
+        "Record sound"
       ],
-      "difficulty": "hard"
+      "difficulty": "easy"
     },
     {
       "id": "computers-76",
@@ -10281,7 +10329,7 @@ export const triviaBank = {
         "2",
         "64"
       ],
-      "difficulty": "easy"
+      "difficulty": "medium"
     },
     {
       "id": "computers-79",
@@ -10291,7 +10339,7 @@ export const triviaBank = {
         "False",
         "True"
       ],
-      "difficulty": "easy"
+      "difficulty": "medium"
     },
     {
       "id": "computers-80",
@@ -10306,16 +10354,16 @@ export const triviaBank = {
       "difficulty": "medium"
     },
     {
-      "id": "computers-81",
-      "question": "Which of the following is the oldest of these computers by release date?",
-      "answer": "TRS-80",
+      "id": "computers-friendly-10",
+      "question": "Which key is commonly used to add a blank space while typing?",
+      "answer": "Space bar",
       "choices": [
-        "TRS-80",
-        "Commodore 64",
-        "ZX Spectrum",
-        "Apple 3"
+        "Space bar",
+        "Escape",
+        "Caps Lock",
+        "Backspace"
       ],
-      "difficulty": "hard"
+      "difficulty": "easy"
     },
     {
       "id": "computers-82",
@@ -10337,7 +10385,7 @@ export const triviaBank = {
         "True",
         "False"
       ],
-      "difficulty": "easy"
+      "difficulty": "medium"
     },
     {
       "id": "computers-84",
@@ -10409,7 +10457,7 @@ export const triviaBank = {
         "Order Sense Ping Find",
         "Open Signal Path Finder"
       ],
-      "difficulty": "easy"
+      "difficulty": "medium"
     },
     {
       "id": "computers-90",
@@ -10491,7 +10539,7 @@ export const triviaBank = {
         "False",
         "True"
       ],
-      "difficulty": "easy"
+      "difficulty": "medium"
     },
     {
       "id": "computers-97",
@@ -10542,14 +10590,16 @@ export const triviaBank = {
   ],
   "games": [
     {
-      "id": "games-1",
-      "question": "The first Grand Theft Auto was also planned for the Nintendo 64.",
-      "answer": "True",
+      "id": "games-friendly-1",
+      "question": "Which game features a plumber named Mario?",
+      "answer": "Super Mario",
       "choices": [
-        "True",
-        "False"
+        "Super Mario",
+        "Sonic the Hedgehog",
+        "Halo",
+        "Minecraft"
       ],
-      "difficulty": "hard"
+      "difficulty": "easy"
     },
     {
       "id": "games-2",
@@ -10562,12 +10612,14 @@ export const triviaBank = {
       "difficulty": "medium"
     },
     {
-      "id": "games-3",
-      "question": "Ryuji Sakamoto is a character from Final Fantasy.",
-      "answer": "False",
+      "id": "games-friendly-11",
+      "question": "What is the name of Mario's brother?",
+      "answer": "Luigi",
       "choices": [
-        "False",
-        "True"
+        "Luigi",
+        "Wario",
+        "Bowser",
+        "Yoshi"
       ],
       "difficulty": "easy"
     },
@@ -10608,12 +10660,14 @@ export const triviaBank = {
       "difficulty": "medium"
     },
     {
-      "id": "games-7",
-      "question": "In Splatoon, the Squid Sisters are named Tako and Yaki.",
-      "answer": "False",
+      "id": "games-friendly-12",
+      "question": "What kind of creature is Yoshi usually described as?",
+      "answer": "Dinosaur",
       "choices": [
-        "False",
-        "True"
+        "Dinosaur",
+        "Hedgehog",
+        "Fox",
+        "Turtle"
       ],
       "difficulty": "easy"
     },
@@ -10630,12 +10684,14 @@ export const triviaBank = {
       "difficulty": "medium"
     },
     {
-      "id": "games-9",
-      "question": "In \"Tony Hawk's Underground\", the main character's friend turned rival is named \"Jeff Sampson\"",
-      "answer": "False",
+      "id": "games-friendly-13",
+      "question": "Which character is Mario's famous princess friend?",
+      "answer": "Princess Peach",
       "choices": [
-        "False",
-        "True"
+        "Princess Peach",
+        "Princess Zelda",
+        "Princess Jasmine",
+        "Princess Fiona"
       ],
       "difficulty": "easy"
     },
@@ -10664,50 +10720,50 @@ export const triviaBank = {
       "difficulty": "medium"
     },
     {
-      "id": "games-12",
-      "question": "In Counter Strike: Global Offensive, what is the code implanted onto the C4 as the Terrorists plant the bomb?",
-      "answer": "7355608",
+      "id": "games-friendly-2",
+      "question": "What color is Sonic the Hedgehog?",
+      "answer": "Blue",
       "choices": [
-        "7355608",
-        "7890728",
-        "7256380",
-        "7726354"
-      ],
-      "difficulty": "hard"
-    },
-    {
-      "id": "games-13",
-      "question": "What was the release date of \"Grand Theft Auto IV\"?",
-      "answer": "April 29, 2008",
-      "choices": [
-        "April 29, 2008",
-        "May 21, 2009",
-        "June 22, 2010",
-        "July 28, 2008"
+        "Blue",
+        "Red",
+        "Green",
+        "Yellow"
       ],
       "difficulty": "easy"
     },
     {
-      "id": "games-14",
-      "question": "In the original \"Super Mario Bros.\", what is the acceleration of Mario if he was in free fall?",
-      "answer": "91.28 m/s^2",
+      "id": "games-friendly-14",
+      "question": "Which racing series features Mario, Luigi and banana peel items?",
+      "answer": "Mario Kart",
       "choices": [
-        "91.28 m/s^2",
-        "110  m/s^2",
-        "9.42  m/s^2",
-        "4.4  m/s^2"
+        "Mario Kart",
+        "Gran Turismo",
+        "Forza Motorsport",
+        "Need for Speed"
       ],
-      "difficulty": "hard"
+      "difficulty": "easy"
     },
     {
-      "id": "games-15",
-      "question": "In Dota 2, Wraith King was previously known as...",
-      "answer": "Skeleton King",
+      "id": "games-friendly-3",
+      "question": "Which game lets players build with blocks and encounter Creepers?",
+      "answer": "Minecraft",
       "choices": [
-        "Skeleton King",
-        "Reaper King",
-        "Skull King",
-        "Hell King"
+        "Minecraft",
+        "Fortnite",
+        "The Sims",
+        "Rocket League"
+      ],
+      "difficulty": "easy"
+    },
+    {
+      "id": "games-friendly-15",
+      "question": "Which game asks players to fit falling blocks into complete lines?",
+      "answer": "Tetris",
+      "choices": [
+        "Tetris",
+        "Pac-Man",
+        "Pong",
+        "Minesweeper"
       ],
       "difficulty": "easy"
     },
@@ -10748,16 +10804,16 @@ export const triviaBank = {
       "difficulty": "medium"
     },
     {
-      "id": "games-19",
-      "question": "What Pokémon's Base Stat Total does not change when it evolves?",
-      "answer": "Scyther",
+      "id": "games-friendly-4",
+      "question": "Which game series features the Triforce and a hero named Link?",
+      "answer": "The Legend of Zelda",
       "choices": [
-        "Scyther",
-        "Pikachu",
-        "Sneasel",
-        "Larvesta"
+        "The Legend of Zelda",
+        "Final Fantasy",
+        "Metroid",
+        "Pokémon"
       ],
-      "difficulty": "hard"
+      "difficulty": "easy"
     },
     {
       "id": "games-20",
@@ -10784,14 +10840,14 @@ export const triviaBank = {
       "difficulty": "medium"
     },
     {
-      "id": "games-22",
-      "question": "Who is the protagonist in Dead Rising (2006)?",
-      "answer": "Frank West",
+      "id": "games-friendly-16",
+      "question": "Which classic game has two paddles hitting a ball back and forth?",
+      "answer": "Pong",
       "choices": [
-        "Frank West",
-        "Chuck Greene",
-        "John North",
-        "Jason Grey"
+        "Pong",
+        "Tetris",
+        "Space Invaders",
+        "Donkey Kong"
       ],
       "difficulty": "easy"
     },
@@ -10844,16 +10900,16 @@ export const triviaBank = {
       "difficulty": "medium"
     },
     {
-      "id": "games-27",
-      "question": "Which team won the \"Tom Clancy's Rainbow Six Siege\" Invitational Event February 2017 in the PC Category?",
-      "answer": "Continuum",
+      "id": "games-friendly-5",
+      "question": "Which classic arcade character eats dots while avoiding ghosts?",
+      "answer": "Pac-Man",
       "choices": [
-        "Continuum",
-        "GIFU",
-        "Santos Dexterity",
-        "eRa Eternity"
+        "Pac-Man",
+        "Mario",
+        "Sonic",
+        "Kirby"
       ],
-      "difficulty": "hard"
+      "difficulty": "easy"
     },
     {
       "id": "games-28",
@@ -10890,26 +10946,26 @@ export const triviaBank = {
       "difficulty": "medium"
     },
     {
-      "id": "games-31",
-      "question": "In the video game Team Fortress 2, which of these is NOT a primary?",
-      "answer": "Medigun",
+      "id": "games-friendly-17",
+      "question": "What color is a Creeper in Minecraft?",
+      "answer": "Green",
       "choices": [
-        "Medigun",
-        "Scattergun",
-        "Grenade Launcher",
-        "Rocket Launcher"
+        "Green",
+        "Blue",
+        "Purple",
+        "Orange"
       ],
       "difficulty": "easy"
     },
     {
-      "id": "games-32",
-      "question": "In Fallout: New Vegas, which one of these casinos can you not play in?",
-      "answer": "Lucky 38",
+      "id": "games-friendly-18",
+      "question": "Which handheld game franchise asks players to catch creatures using Poké Balls?",
+      "answer": "Pokémon",
       "choices": [
-        "Lucky 38",
-        "The Tops",
-        "Gammorah",
-        "Ultra-Luxe"
+        "Pokémon",
+        "Sonic",
+        "Halo",
+        "The Sims"
       ],
       "difficulty": "easy"
     },
@@ -10948,14 +11004,14 @@ export const triviaBank = {
       "difficulty": "medium"
     },
     {
-      "id": "games-36",
-      "question": "Which of the following characters is NOT a female marriage candidate in the game Stardew Valley?",
-      "answer": "Caroline",
+      "id": "games-friendly-19",
+      "question": "Which social deduction game uses the words crewmate and impostor?",
+      "answer": "Among Us",
       "choices": [
-        "Caroline",
-        "Abigail",
-        "Haley",
-        "Leah"
+        "Among Us",
+        "Stardew Valley",
+        "Rocket League",
+        "Tetris"
       ],
       "difficulty": "easy"
     },
@@ -10984,12 +11040,14 @@ export const triviaBank = {
       "difficulty": "medium"
     },
     {
-      "id": "games-39",
-      "question": "The Konami Code is known as Up, Up, Down, Down, Left, Right, Right, Left, B, A, Start.",
-      "answer": "False",
+      "id": "games-friendly-20",
+      "question": "Which game franchise features the villain Bowser?",
+      "answer": "Super Mario",
       "choices": [
-        "False",
-        "True"
+        "Super Mario",
+        "The Legend of Zelda",
+        "Metroid",
+        "Kirby"
       ],
       "difficulty": "easy"
     },
@@ -11003,7 +11061,7 @@ export const triviaBank = {
         "I Would Hate Being Your Driver",
         "I Would Have Bought Your Dog"
       ],
-      "difficulty": "easy"
+      "difficulty": "medium"
     },
     {
       "id": "games-41",
@@ -11018,28 +11076,28 @@ export const triviaBank = {
       "difficulty": "medium"
     },
     {
-      "id": "games-42",
-      "question": "The Internet Meme \"All your base are belong to us\" is based on the poorly translated English Version of which Video Game?",
-      "answer": "Zero Wing",
+      "id": "games-friendly-6",
+      "question": "Which Nintendo character is a pink, round hero who can inhale enemies?",
+      "answer": "Kirby",
       "choices": [
-        "Zero Wing",
-        "F-Zero",
-        "Wing Commander",
-        "Star Wars: X-Wing"
+        "Kirby",
+        "Pikachu",
+        "Yoshi",
+        "Donkey Kong"
       ],
-      "difficulty": "hard"
+      "difficulty": "easy"
     },
     {
-      "id": "games-43",
-      "question": "In the \"Ace Attorney\" series, who was the truly responsible of the forging of the autopsy report of the pivotal IS-7 incident?",
-      "answer": "Bansai Ichiyanagi",
+      "id": "games-friendly-7",
+      "question": "Which game mixes soccer with rocket-powered cars?",
+      "answer": "Rocket League",
       "choices": [
-        "Bansai Ichiyanagi",
-        "Manfred Von Karma",
-        "Gregory Edgeworth",
-        "Tateyuki Shigaraki"
+        "Rocket League",
+        "Mario Kart",
+        "Gran Turismo",
+        "FIFA"
       ],
-      "difficulty": "hard"
+      "difficulty": "easy"
     },
     {
       "id": "games-44",
@@ -11073,7 +11131,7 @@ export const triviaBank = {
         "2004",
         "2003"
       ],
-      "difficulty": "easy"
+      "difficulty": "medium"
     },
     {
       "id": "games-47",
@@ -11143,7 +11201,7 @@ export const triviaBank = {
         "The Dentist",
         "The Elephant"
       ],
-      "difficulty": "easy"
+      "difficulty": "medium"
     },
     {
       "id": "games-53",
@@ -11153,7 +11211,7 @@ export const triviaBank = {
         "True",
         "False"
       ],
-      "difficulty": "easy"
+      "difficulty": "medium"
     },
     {
       "id": "games-54",
@@ -11168,16 +11226,16 @@ export const triviaBank = {
       "difficulty": "medium"
     },
     {
-      "id": "games-55",
-      "question": "In the Half-Life mod \"Afraid of Monsters\" what was the name of the main protagonist?",
-      "answer": "David Leatherhoff",
+      "id": "games-friendly-8",
+      "question": "What do players collect in Pokémon?",
+      "answer": "Pokémon",
       "choices": [
-        "David Leatherhoff",
-        "Daniel Featherhoff",
-        "Damon Weatherhoff",
-        "Damien Teatherhoff"
+        "Pokémon",
+        "Sports cars",
+        "Chess pieces",
+        "Playing cards only"
       ],
-      "difficulty": "hard"
+      "difficulty": "easy"
     },
     {
       "id": "games-56",
@@ -11199,7 +11257,7 @@ export const triviaBank = {
         "False",
         "True"
       ],
-      "difficulty": "easy"
+      "difficulty": "medium"
     },
     {
       "id": "games-58",
@@ -11223,19 +11281,19 @@ export const triviaBank = {
         "Extreme",
         "Guru"
       ],
-      "difficulty": "easy"
+      "difficulty": "medium"
     },
     {
-      "id": "games-60",
-      "question": "Prior to his appearance in Super Smash Bros. Ultimate, What was King K. Rool's last appearance in any game?",
-      "answer": "Mario Super Sluggers",
+      "id": "games-friendly-9",
+      "question": "Which game series features a life simulation with characters called Sims?",
+      "answer": "The Sims",
       "choices": [
-        "Mario Super Sluggers",
-        "Donkey Kong 64",
-        "Donkey Kong Country 3",
-        "Donkey Kong: King Of Swing"
+        "The Sims",
+        "Civilization",
+        "Age of Empires",
+        "Animal Crossing"
       ],
-      "difficulty": "hard"
+      "difficulty": "easy"
     },
     {
       "id": "games-61",
@@ -11293,7 +11351,7 @@ export const triviaBank = {
         "True",
         "False"
       ],
-      "difficulty": "easy"
+      "difficulty": "medium"
     },
     {
       "id": "games-66",
@@ -11305,19 +11363,19 @@ export const triviaBank = {
         "2009",
         "2007"
       ],
-      "difficulty": "easy"
+      "difficulty": "medium"
     },
     {
-      "id": "games-67",
-      "question": "GoldenEye 007 on the Nintendo 64 was planned to allow you to play as all previous Bond actors, with the exception of who?",
-      "answer": "George Lazenby",
+      "id": "games-friendly-10",
+      "question": "What object is commonly rolled to move in Monopoly?",
+      "answer": "Dice",
       "choices": [
-        "George Lazenby",
-        "Roger Moore",
-        "Sean Connery",
-        "Timothy Dalton"
+        "Dice",
+        "A coin",
+        "A spinning top",
+        "A marble"
       ],
-      "difficulty": "hard"
+      "difficulty": "easy"
     },
     {
       "id": "games-68",
@@ -11375,7 +11433,7 @@ export const triviaBank = {
         "Cube",
         "Sphere"
       ],
-      "difficulty": "easy"
+      "difficulty": "medium"
     },
     {
       "id": "games-73",
@@ -11495,7 +11553,7 @@ export const triviaBank = {
         "November 18th, 2011",
         "October 7th, 2011"
       ],
-      "difficulty": "easy"
+      "difficulty": "medium"
     },
     {
       "id": "games-83",
@@ -11519,7 +11577,7 @@ export const triviaBank = {
         "Mirage",
         "Cache"
       ],
-      "difficulty": "easy"
+      "difficulty": "medium"
     },
     {
       "id": "games-85",
@@ -11543,7 +11601,7 @@ export const triviaBank = {
         "Gordon Freeman",
         "Master Chief"
       ],
-      "difficulty": "easy"
+      "difficulty": "medium"
     },
     {
       "id": "games-87",
@@ -11667,7 +11725,7 @@ export const triviaBank = {
         "2014",
         "2011"
       ],
-      "difficulty": "easy"
+      "difficulty": "medium"
     },
     {
       "id": "games-98",
@@ -11701,7 +11759,7 @@ export const triviaBank = {
         "True",
         "False"
       ],
-      "difficulty": "easy"
+      "difficulty": "medium"
     }
   ]
-} as const;
+};

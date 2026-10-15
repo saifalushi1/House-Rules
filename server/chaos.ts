@@ -1,4 +1,4 @@
-import {charadeTeamMembers} from '../shared/charades.js';
+import {charadePair,charadeTeamMembers} from '../shared/charades.js';
 import {beginBlackout,resetBlackout} from './blackout.js';
 import {randomUUID,randomInt} from 'node:crypto';
 import type {Action,Room,Card} from '../shared/types.js';
@@ -45,7 +45,10 @@ function rotate(r:Room,right=r.rules.chaosDirection==='right'){
 }
 function seats(r:Room){const c=r.chaos!,old=[...c.seats],updated=shuffle([...old]);if(updated.length>1&&updated.every((id,i)=>id===old[i]))updated.push(updated.shift()!);
   if(!r.rules.chaosHandsTravel&&cardGame(r)){const hands=old.map(id=>r.players.find(p=>p.id===id)!.hand);updated.forEach((id,i)=>r.players.find(p=>p.id===id)!.hand=hands[i]);}
-  c.seats=updated;r.busyUntil=Math.max(r.busyUntil,Date.now()+1800);effect(r,'Seats',undefined,undefined,{from:old,to:updated});recordMessage(r,'Seat Roulette! Identities, teams and properties stay with their owners.');
+  c.seats=updated;c.order=[...updated];if(r.scribble){const s=r.scribble,i=s.index%s.order.length;s.order=[...s.order.slice(0,i+1),...s.order.slice(i+1).sort((a,b)=>updated.indexOf(a)-updated.indexOf(b))];}
+  if(r.charadeSession){const s=r.charadeSession,n=r.players.length,currentPair=charadePair(r,s.order[s.index]);let from=s.index+1;while(from<s.order.length&&Math.floor(from/n)===Math.floor(s.index/n)&&charadePair(r,s.order[from])===currentPair)from++;
+   while(from<s.order.length){const end=Math.min(s.order.length,(Math.floor(from/n)+1)*n),groups=new Map<number,string[]>();for(const id of s.order.slice(from,end)){const pair=charadePair(r,id);groups.set(pair,[...(groups.get(pair)||[]),id]);}const remaining=[...groups.values()].sort((a,b)=>Math.min(...a.map(id=>updated.indexOf(id)))-Math.min(...b.map(id=>updated.indexOf(id)))).flat();s.order.splice(from,end-from,...remaining);from=end;}}
+ r.busyUntil=Math.max(r.busyUntil,Date.now()+1800);effect(r,'Seats',undefined,undefined,{from:old,to:updated});recordMessage(r,'Seat Roulette! Seats and turn order shuffled. Team identities stay with their owners.');
 }
 function blackout(r:Room){if(r.chaos!.blackoutUntil>Date.now())return;r.chaos!.blackoutUntil=Date.now()+10000;r.chaos!.blackoutPlayer=r.players[r.turn]?.id;beginBlackout(r);effect(r,'Blackout',r.chaos!.blackoutPlayer);}
 function roundKey(r:Room){if(r.rules.game==='scribble')return 'sketch'+(r.scribble?.index??-1);if(r.rules.game==='rpg')return 'rpg'+r.round;if(r.rules.game==='trivia')return 'quiz'+(r.trivia?.index??-1);if(r.rules.game==='charades')return 'prompt'+(r.charade?.actor||'')+':'+(r.charade?.ends||0)+':'+r.charadeBag.length;if(r.rules.game==='tarneeb')return `${r.round}:${r.tricks.join('-')}`;return String(r.round);}
@@ -53,7 +56,7 @@ function chooseWord(r:Room){const words=r.rules.chaosWords.split('\n').map(w=>w.
 function roundStart(r:Room){const c=r.chaos!;if(r.rules.chaosBanned)chooseWord(r);if(!r.rules.chaosDie)return;const face=randomInt(1,13);c.modifier={face,name:dieModifiers[face-1]};effect(r,'Die',undefined,undefined,{face,text:c.modifier.name});recordMessage(r,`Chaos Die: ${face} · ${c.modifier.name}.`);
   if(face===3)c.reversed=!c.reversed;if(face===6)blackout(r);if(face===7||face===8)c.pendingCyclone=true;if(face===9)c.pendingSeats=true;if(face===10)r.players.forEach(p=>dare(r,p.id,true));if(face===11)for(const u of chaosUnits(r)){setUnit(r,u.id,u.value+1);if(!['cards','bluff'].includes(r.rules.game))u.players.forEach(id=>{c.points[id]=(c.points[id]||0)+1;});}
 }
-function turnStart(r:Room){const c=r.chaos!;c.turns++;const active=r.rules.game==='trivia'?r.trivia?.activePlayer||r.trivia?.master:r.players[r.turn]?.id;
+function turnStart(r:Room){const c=r.chaos!;c.turns++;const active=r.rules.game==='trivia'?r.trivia?.activePlayer||r.trivia?.master||r.players[r.turn]?.id:r.players[r.turn]?.id;
   if((r.rules.chaosHotPotato||c.modifier?.face===4)&&active){const duration=Math.max(r.rules.chaosMinSeconds,r.rules.chaosHotSeconds-(c.turns-1)*r.rules.chaosShrinkSeconds)*(c.modifier?.face===4?.5:1);c.hot={player:active,ends:Date.now()+duration*1000,duration:duration*1000};effect(r,'Hot',active,undefined,{duration});}
   if(r.rules.chaosSeatRoulette&&c.turns>1&&(c.turns-1)%r.rules.chaosSeatEvery===0)c.pendingSeats=true;
   if(r.rules.chaosBlackout&&randomInt(100)<r.rules.chaosRandomPercent)blackout(r);
@@ -83,7 +86,7 @@ export function tickChaos(r:Room){const c=r.chaos;if(!c||r.phase==='lobby')retur
   if(c.canUndo&&Date.now()>c.undoUntil){c.canUndo=false;changed=true;}
   if(c.blackoutUntil&&c.blackoutUntil<=Date.now()){c.blackoutUntil=0;changed=true;}
   if(c.hot){const blocked=!!r.raid||!!c.vote||r.busyUntil>Date.now()||!!r.lastPlay||!!r.duel||!!r.clash||(r.rules.game==='trivia'&&r.trivia?.phase!=='question')||(r.rules.game==='tarneeb'&&r.tarneebPhase==='handEnd')||(r.rules.game==='poker'&&r.poker?.street==='handEnd');if(blocked){c.hot.ends=Date.now()+c.hot.duration;changed=true;}
-    else if(c.hot.ends<=Date.now()){const id=c.hot.player;c.hot=undefined;const forced=r.rules.chaosHotOutcome==='forced'||r.rules.chaosHotOutcome==='random'&&randomInt(2)===1;if(c.modifier?.face===12)chaosPenalty(r,id,'Hot Potato blocked');else if(forced){forcedActions.set(r,id);dare(r,id);recordMessage(r,'Hot Potato forces a legal action for '+r.players.find(p=>p.id===id)?.name);}else chaosPenalty(r,id,'Hot Potato exploded',randomInt(2)===1);effect(r,'Boom',id);invalidate(r);changed=true;}}
+    else if(c.hot.ends<=Date.now()){const id=c.hot.player;c.hot=undefined;const forced=true;if(c.modifier?.face===12)chaosPenalty(r,id,'Hot Potato blocked');else if(forced){forcedActions.set(r,id);dare(r,id);recordMessage(r,'Hot Potato forces a legal action for '+r.players.find(p=>p.id===id)?.name);}else chaosPenalty(r,id,'Hot Potato exploded',randomInt(2)===1);effect(r,'Boom',id);invalidate(r);changed=true;}}
   const pending=c.pendingSeats||c.pendingCyclone;if(r.phase==='playing')flush(r);return changed||pending!==!!(c.pendingSeats||c.pendingCyclone);
 }
 const ignored=new Set(['chat','ready','rules','start','restart','endGame','lobby','kick','peek','catch','triviaVolunteer']);

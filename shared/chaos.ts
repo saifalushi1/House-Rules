@@ -1,7 +1,7 @@
 export const chaosRules = {
   chaosRaid:['Winner Takes It','Challenge an opponent to a three-beat duel. Winner takes their hand (swap), score or money.'],
-  chaosHotPotato:['Hot Potato','A shrinking turn timer; expiry gives a random penalty or forces a legal action.'],
-  chaosSeatRoulette:['Seat Roulette','Swap physical seats every N turns; keep hands or leave them at the seat.'],
+  chaosHotPotato:['Hot Potato','A shrinking fuse explodes on the active player: skip their turn, auto-play a legal Tarneeb card, or fold in Poker.'],
+  chaosSeatRoulette:['Seat Roulette','Shuffle seats and future turn order every N turns; keep hands or leave them at the seat.'],
   chaosCyclone:['Cyclone','Pass hands at safe round boundaries; other games pass chaos points.'],
   chaosDouble:['Double or Nothing','A random coin flip doubles or erases card pickups, or positive score/cash gains.'],
   chaosDie:['Chaos Die','A d12 chooses a shared modifier for each round.'],

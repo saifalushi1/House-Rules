@@ -10,5 +10,5 @@ export type RpgClass=keyof typeof classes;
 export interface Character{owner:string;name:string;class:RpgClass;level:number;xp:number;gold:number;hp:number;maxHp:number;ac:number;stats:Record<'str'|'dex'|'con'|'int'|'wis'|'cha',number>;slots:number;inventory:string;notes:string}
 export interface RpgPawn{id:string;owner?:string;name:string;kind:'hero'|'enemy';hp:number;maxHp:number;ac:number;x:number;y:number}
 export interface RpgState{dm:string;characters:Character[];pawns:RpgPawn[];walls:number[];map:'crypt'|'ruins'|'cavern';combat:boolean;initiative:{id:string;roll:number}[];index:number;moved:boolean;acted:boolean;narrative:string;encounter:number;lastRoll?:{player:string;sides:number;value:number;total:number;label:string}}
-export interface Raid{from:string;to:string;stake:'hand'|'score'|'cash';phase:'offer'|'fight';pausedAt:number;ends:number;round:number;wins:[number,number];choices:Record<string,'jab'|'hook'|'block'>}
+export interface Raid{from:string;to:string;stake:'hand'|'score'|'cash';phase:'offer'|'ready'|'fight'|'reveal';lastBeat?:{a:string;b:string;winner:number;at:number};pausedAt:number;ends:number;round:number;wins:[number,number];choices:Record<string,'jab'|'hook'|'block'>}
 export interface RaidView extends Omit<Raid,'choices'>{ready:string[]}

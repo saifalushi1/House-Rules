@@ -1,3 +1,4 @@
+import {BoxingVisuals} from './boxing-visuals';
 import {PartyVisuals} from './party-visuals';
 import {PokerVisuals} from './poker-visuals';
 import {ExpansionVisuals} from './expansion-visuals';
@@ -18,7 +19,7 @@ export class GameScene {
   closeBoard = true; mode = 'third'; self = 0; room?: View; game: Game = 'bluff'; resize: ResizeObserver;
   actorMap = new Map<string, THREE.Group>(); tokenMap = new Map<string, THREE.Mesh>(); tweens: Tween[] = [];
   slapShot?:{until:number;actor:string;target:string};
-  partyFX:PartyVisuals;rooftopShotUntil=0;pokerFX:PokerVisuals;expansionFX:ExpansionVisuals;chaosFX:ChaosVisuals; chaosShotUntil=0;
+  boxingFX:BoxingVisuals;partyFX:PartyVisuals;rooftopShotUntil=0;pokerFX:PokerVisuals;expansionFX:ExpansionVisuals;chaosFX:ChaosVisuals; chaosShotUntil=0;
   seatAngle(index:number){const id=this.room?.players[index]?.id,seat=id?this.room?.chaos?.seats.indexOf(id):undefined;return (seat!==undefined&&seat>=0?seat:index)*Math.PI*2/(this.room?.players.length||4);}
   actorKey = ''; pieceKey = ''; shake = 0; moving = new Set<string>();
   constructor(private el: HTMLElement) {
@@ -33,7 +34,7 @@ export class GameScene {
     this.resize = new ResizeObserver(() => { const w=el.clientWidth,h=el.clientHeight; this.renderer.setSize(w,h); this.camera.aspect=w/h; this.camera.updateProjectionMatrix(); this.handKey=''; this.updateOwnHand(); });
     this.renderer.domElement.addEventListener('pointerup',event=>{const pick=this.pick(event);if(pick)this.onPick?.(pick);});
     this.renderer.domElement.addEventListener('pointermove',event=>{const pick=this.pick(event);this.hoveredCard=pick?.card;this.renderer.domElement.style.cursor=pick?'pointer':'default';});
-    this.chaosFX=new ChaosVisuals(this);this.expansionFX=new ExpansionVisuals(this);this.pokerFX=new PokerVisuals(this);this.partyFX=new PartyVisuals(this);
+    this.boxingFX=new BoxingVisuals(this);this.chaosFX=new ChaosVisuals(this);this.expansionFX=new ExpansionVisuals(this);this.pokerFX=new PokerVisuals(this);this.partyFX=new PartyVisuals(this);
     this.resize.observe(el); this.update('bluff'); this.animate();
   }
   get board() { return this.game === 'property' || this.game === 'life'||this.game==='rpg'||!!this.room?.solitaire; }
@@ -146,8 +147,10 @@ export class GameScene {
 
     for(const [i,g] of [...this.actorMap.values()].entries()){g.visible=!(this.mode==='first'&&now>=this.chaosShotUntil&&i===this.self&&!(this.slapShot&&now<this.slapShot.until));const inBout=!!this.room?.duel&&[this.room.duel.acePlayer,this.room.duel.trumpPlayer].includes(g.userData.id);g.userData.chairParts?.forEach((part:THREE.Object3D)=>part.visible=!inBout&&!this.moving.has(g.userData.id));if(this.room?.duel&&[this.room.duel.acePlayer,this.room.duel.trumpPlayer].includes(g.userData.id)){const side=g.userData.id===this.room.duel.acePlayer?-1:1;g.position.set(side*.75,.9+Math.sin(now*.006)*.035,0);g.rotation.y=side<0?-Math.PI/2:Math.PI/2;}else if(['charades','scribble'].includes(this.game)&&this.room?.phase==='playing'&&this.room.turn===i){const arms=g.userData.arms as THREE.Group[];arms[0].rotation.x=.7+Math.sin(now*.002)*.4;arms[1].rotation.z=Math.sin(now*.002)*.3;}}
     for(const [playerId,g] of this.actorMap){const p=this.room?.players.find(p=>p.id===playerId);if(this.moving.has(playerId)||this.room?.duel)continue;const a=g.userData.baseAngle;const victim=this.actorMap.get(p?.peekTarget||'');const leaning=['bluff','tarneeb','cards','poker'].includes(this.game)&&!!p&&p.peekingUntil>Date.now()&&!!victim;const base=new THREE.Vector3(Math.sin(a)*this.radius,-.38,Math.cos(a)*this.radius);if(leaning){base.lerp(victim!.position,.38);base.y=-.12;g.rotation.y=Math.atan2(base.x-victim!.position.x,base.z-victim!.position.z);}else g.rotation.y=a;g.position.lerp(base,.18);g.rotation.x=THREE.MathUtils.lerp(g.rotation.x,leaning?.42:0,.18);}
+    this.boxingFX.update();
     let target:THREE.Vector3,look=new THREE.Vector3(0,this.mode==='first'?1:0,0);
-    if(now<this.rooftopShotUntil){target=new THREE.Vector3(12,12,16);look.set(0,-.8,0);}
+    if(this.room?.raid&&this.room.raid.phase!=='offer'){target=new THREE.Vector3(7.8,6.8,10);look.set(0,.5,0);}
+    else if(now<this.rooftopShotUntil){target=new THREE.Vector3(12,12,16);look.set(0,-.8,0);}
     else if(this.mode==='first'&&now<this.chaosShotUntil){target=new THREE.Vector3(6.7,7.4,8.8);look.set(0,1,0);}
     else if(this.slapShot&&now<this.slapShot.until){const a=this.actorMap.get(this.slapShot.actor),b=this.actorMap.get(this.slapShot.target),mid=a&&b?a.position.clone().add(b.position).multiplyScalar(.5):new THREE.Vector3();target=new THREE.Vector3(mid.x+6.7,7.4,mid.z+8.8);look.copy(mid).y=.4;}
     else if(this.room?.duel){target=this.mode==='first'?new THREE.Vector3(this.self===this.room.players.findIndex(p=>p.id===this.room!.duel!.acePlayer)?-.8:.8,2.3,1.2):new THREE.Vector3(0,4.5,6);look.set(0,1.8,0);}

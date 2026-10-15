@@ -12,7 +12,7 @@ export function recordBlackout(r:Room,b:ReturnType<typeof traceBlackout>,actor=b
   const removed=b.pile.filter(id=>!r.pile.some(c=>c.id===id));ledger.baseline.pile=ledger.baseline.pile.filter(c=>!removed.includes(c.id));ledger.baseline.pile.push(...r.pile.filter(c=>!b.pile.includes(c.id)));
   ledger.baseline.deck=Array.from({length:Math.max(0,ledger.baseline.deck.length+r.deck.length-b.deck)},(_,i)=>({id:'concealed-stock-'+i,rank:1,suit:'♠'}));
  }
- for(const e of r.events)if(e.id>b.event){const who=e.actor||actor;if(who&&who!==b.spot&&!['chaosBlackout','win','endGame','restart','lobby','chaosFlip'].includes(e.kind))ledger.events.set(e.id,who);}
+ for(const e of r.events)if(e.id>b.event){const who=e.actor||actor;if(who&&who!==b.spot&&!['chaosBlackout','win','endGame','restart','lobby','chaosFlip','scribbleChime'].includes(e.kind))ledger.events.set(e.id,who);}
  if(actor&&actor!==b.spot)for(const m of r.messages)if(m.id>b.message&&(!chat||m.id!==b.message+1))ledger.messages.set(m.id,actor);
  const retainedEvents=new Set(r.events.map(e=>e.id)),retainedMessages=new Set(r.messages.map(m=>m.id));for(const key of ledger.events.keys())if(!retainedEvents.has(key))ledger.events.delete(key);for(const key of ledger.messages.keys())if(!retainedMessages.has(key))ledger.messages.delete(key);
 }
