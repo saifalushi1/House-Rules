@@ -14,9 +14,9 @@ export interface BlackjackSeat {id:string;bet:number;pairBet:number;trioBet:numb
 export interface BlackjackState {phase:'betting'|'playing'|'dealer'|'result';round:number;ends:number;dealer:Card[];seats:BlackjackSeat[]}
 export interface BlackjackView extends Omit<BlackjackState,'dealer'|'seats'> {dealer:(Card|null)[];seats:Omit<BlackjackSeat,'startCash'>[]}
 export interface DartHit {player:string;x:number;y:number;points:number;multiplier:number;label:string;bust:boolean;at:number}
-export interface DartsState {remaining:Record<string,number>;turnStart:number;left:number;ends:number;aimAt:number;recent:DartHit[]}
+export interface DartsState {remaining:Record<string,number>;turnStart:number;left:number;ends:number;aimAt:number;aimLock?:{y:number;at:number};recent:DartHit[]}
 export interface PongShot {player:string;team:number;x:number;y:number;cup?:number;hit:boolean;at:number}
-export interface PongState {teams:string[][];cups:boolean[][];team:number;left:number;hits:number;shooters:number[];ends:number;aimAt:number;redemption:boolean;pendingWinner?:number;recent:PongShot[];overtime:number;winningTeam?:number}
+export interface PongState {teams:string[][];cups:boolean[][];team:number;left:number;hits:number;shooters:number[];ends:number;aimAt:number;aimLock?:{y:number;at:number};redemption:boolean;pendingWinner?:number;recent:PongShot[];overtime:number;winningTeam?:number}
 export const dartNumbers=[20,1,18,4,13,6,10,15,2,17,3,19,7,16,8,11,14,9,12,5];
 export function dartScore(x:number,y:number){const radius=Math.hypot(x,y);if(radius>1)return{points:0,multiplier:0,label:'Miss'};if(radius<=.035)return{points:50,multiplier:2,label:'Bullseye'};if(radius<=.085)return{points:25,multiplier:1,label:'Outer bull'};const angle=(Math.atan2(x,-y)+Math.PI/20+Math.PI*2)%(Math.PI*2),n=dartNumbers[Math.floor(angle/(Math.PI/10))%20],multiplier=radius>=.9?2:radius>=.52&&radius<=.59?3:1;return{points:n*multiplier,multiplier,label:(multiplier===3?'Triple ':multiplier===2?'Double ':'')+n};}
 export function cupPositions(count:number){const rows=count===10?4:count===6?3:2;const cups:{x:number;y:number}[]=[];for(let row=0;row<rows;row++)for(let col=0;col<=row;col++)cups.push({x:(col-row/2)*.38,y:(row-(rows-1)/2)*.34});return cups;}
@@ -31,3 +31,13 @@ export function sideBetReturns(cards:Card[],up:Card,pairBet:number,trioBet:numbe
 
 /** Fixed world-space rim position; independent of the viewing player's seat or camera. */
 export function pongRackPosition(team:number,x:number,y:number){return{x,y:1.3,z:(team===0?1:-1)*(1.15+y*.75)};}
+
+/** Fast triangular sweeps keep a constant speed through the target. */
+export const aimPeriods={vertical:820,horizontal:680};
+export function aimWave(elapsed:number,period:number){const phase=((Math.max(0,elapsed)%period)/period);return(phase<.5?phase*4-1:3-phase*4)*1.12;}
+export function sweepAim(g:{aimAt:number;aimLock?:{y:number;at:number}},now:number){return g.aimLock?{x:aimWave(now-g.aimLock.at,aimPeriods.horizontal),y:g.aimLock.y}:{x:0,y:aimWave(now-g.aimAt,aimPeriods.vertical)};}
+/** Dartboard face coordinates, including its physical tilt. */
+export function dartBoardPoint(x:number,y:number){return{x:x*.84,y:1.5-y*.84*Math.sin(.72)+.055*Math.cos(.72),z:-.6+y*.84*Math.cos(.72)+.055*Math.sin(.72)};}
+
+/** The height lock also controls the loft of a Shai Pong shot. */
+export function throwArcLift(pong:boolean,y:number){return pong?1.4+y*.4:.28;}

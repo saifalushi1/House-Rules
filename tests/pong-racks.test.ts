@@ -1,7 +1,8 @@
+import {scoringAction as act} from './aim-fixture.js';
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import * as THREE from 'three';
-import {act,makeRoom,player,start,view} from '../server/engine.js';
+import {makeRoom,player,start,view} from '../server/engine.js';
 import {defaults,type GameEvent} from '../shared/types.js';
 import {cupPositions,pongRackPosition} from '../shared/club.js';
 import {ClubVisuals} from '../src/club-visuals.js';
@@ -41,7 +42,4 @@ test('cup racks and ball landings use identical world coordinates for both viewe
  }
 });
 
-test('aiming panel identifies the opposing rack using its actual team color',()=>{
- const r=room();let html=clubPlay(view(r,'p0'),'p0');assert.ok(html.includes('TARGET · TEAM 2 · BLUE CUPS'));assert.ok(html.includes('fill="#6b9cbb"'));assert.ok(!html.includes('fill="#c66652"'));
- r.pong!.team=1;r.turn=1;html=clubPlay(view(r,'p1'),'p1');assert.ok(html.includes('TARGET · TEAM 1 · RED CUPS'));assert.ok(html.includes('fill="#c66652"'));assert.ok(!html.includes('fill="#6b9cbb"'));
-});
+test('compact status identifies the opponent without a separate aiming panel',()=>{const r=room();let html=clubPlay(view(r,'p0'),'p0');assert.ok(html.includes('Target: Team 2 · blue cups'));r.pong!.team=1;r.turn=1;html=clubPlay(view(r,'p1'),'p1');assert.ok(html.includes('Target: Team 1 · red cups'));assert.ok(!html.includes('<svg'));});

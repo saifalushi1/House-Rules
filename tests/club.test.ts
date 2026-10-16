@@ -1,5 +1,6 @@
+import {scoringAction as act} from './aim-fixture.js';
 import {test} from 'node:test';import assert from 'node:assert/strict';
-import {act,makeRoom,player,start,tick,view,validateRules} from '../server/engine.js';
+import {makeRoom,player,start,tick,view,validateRules} from '../server/engine.js';
 import {defaults,type Card,type Game,type Room,type Rules,type Suit} from '../shared/types.js';
 import {blackjackTotal,sideBetReturns,dartScore,cupPositions} from '../shared/club.js';
 import {beginBlackout} from '../server/blackout.js';import {resultLosers} from '../shared/aftermath.js';

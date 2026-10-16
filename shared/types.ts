@@ -66,7 +66,7 @@ export const games: Record<Game, {
     werewolf:{name:'Werewolf / Mafia',category:'PARTY',description:'Secret roles. Quiet nights. Very loud accusations.',icon:'☾',players:'4–8'},
     blackjack:{name:'Blackjack',category:'CARDS',description:'Beat the house. Play your chips, or try a side bet.',icon:'♣',players:'1–8'},
     darts:{name:'Darts',category:'TABLETOP',description:'Aim. Time your release. Race from 301 or 501 to zero.',icon:'◎',players:'1–8'},
-    beerpong:{name:'Beer pong',category:'PARTY',description:'Two teams, a row of cups, and one perfect shot.',icon:'◡',players:'2, 4, 6, 8'},
+    beerpong:{name:'Shai Pong',category:'PARTY',description:'Two teams, a row of cups, and one perfect shot.',icon:'◡',players:'2, 4, 6, 8'},
     poker:{name:'Poker',category:'CARDS',description:'Texas Hold’em. Read the room. Bet, bluff, and chase the pot.',icon:'♠',players:'2–8'},
     scribble:{name:'Scribble',category:'PARTY',description:'Draw a secret word. Guess your friends’ doodles.',icon:'✎',players:'2–8'},
     rpg:{name:'D&D tabletop',category:'TABLETOP',description:'Character sheets, dice and a dungeon master. Your adventure.',icon:'⚔',players:'1–8'},
@@ -192,7 +192,7 @@ export type PublicPlayer = Omit<Player, 'hand'> & {
     handCount: number;
 };
 export type View = Omit<Room, 'players' | 'deck' | 'charadeBag' | 'lastPlay' | 'charade' | 'duel' | 'tradeOffers' | 'trivia' | 'solitaire' | 'scribble' | 'raid' | 'poker' | 'werewolf' | 'blackjack'> & {
-    blackoutHidden?:boolean;werewolf?:WerewolfView;blackjack?:BlackjackView;
+    serverNow?:number;blackoutHidden?:boolean;werewolf?:WerewolfView;blackjack?:BlackjackView;
     poker?:PokerView;
     solitaire?:SolitaireView; scribble?:ScribbleView; raid?:RaidView;
     trivia?: TriviaView;
