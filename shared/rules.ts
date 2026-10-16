@@ -24,7 +24,7 @@ export function validateRules(input: unknown): Rules {
   for(const [key,values] of Object.entries({triviaFormat:['typed','choices'],triviaDifficulty:['easy','mixed'],triviaHostMode:['everyone','master'],cardLayout:['free','solitaire'],rpgMap:['crypt','ruins','cavern'],chaosHotOutcome:['penalty','forced','random'],chaosDirection:['left','right'],chaosCycloneTrigger:['round','random'],chaosFlipMode:['scores','order']})){require(values.includes(String(x[key])),'Unknown chaos option.');(r as unknown as Record<string,unknown>)[key]=x[key];}
   for(const key of ['chaosWords','chaosDares']){require(typeof x[key]==='string'&&(x[key] as string).length<=4000,'Chaos lists must be text up to 4000 characters.');const list=(x[key] as string).split('\n').map(v=>v.trim()).filter(Boolean);require(list.length>0&&list.length<=50&&list.every(v=>v.length<=120),'Use 1–50 entries, at most 120 characters each.');if(key==='chaosWords')require(list.every(v=>/^[\p{L}\p{N}]+$/u.test(v)),'Banned words must be single words.');(r as unknown as Record<string,unknown>)[key]=list.join('\n');}
   require(typeof x.triviaCategory==='string'&&Object.hasOwn(triviaCategories,x.triviaCategory),'Unknown trivia category.');r.triviaCategory=x.triviaCategory as Rules['triviaCategory'];
-  const ranges: Record<string, [number, number]> = {wolfCount:[1,2],wolfNightSeconds:[10,120],wolfDaySeconds:[15,300],wolfVoteSeconds:[10,120],blackjackDecks:[1,6],blackjackSeconds:[10,120],blackjackRounds:[1,50],blackjackMin:[1,1000],blackjackMax:[1,10000],aimSeconds:[10,120],aimRounds:[0,100],dartsStart:[301,501],pongCups:[6,10],
+  const ranges: Record<string, [number, number]> = {wolfCount:[1,2],wolfNightSeconds:[10,120],wolfDaySeconds:[15,300],wolfVoteSeconds:[10,120],blackjackDecks:[1,6],blackjackSeconds:[10,120],blackjackRounds:[1,50],blackjackMin:[1,1000],blackjackMax:[1,10000],dartsAimSpeed:[.25,3],pongAimSpeed:[.25,3],aimSeconds:[10,120],aimRounds:[0,100],dartsStart:[301,501],pongCups:[6,10],
     chaosHotSeconds:[5,120],chaosMinSeconds:[2,30],chaosShrinkSeconds:[0,10],chaosSeatEvery:[1,20],chaosRandomPercent:[0,100],chaosDoublePercent:[0,100],
     pokerStack:[100,10000],pokerSmallBlind:[1,100],pokerBigBlind:[2,200],pokerSeconds:[10,120],pokerHands:[0,100],
     charadeRounds:[1,5],scribbleSeconds:[20,180],scribbleRounds:[1,8],
@@ -35,7 +35,7 @@ export function validateRules(input: unknown): Rules {
   for (const [key, [min, max]] of Object.entries(ranges)) {
     const value = x[key];
     require(typeof value === 'number' && Number.isFinite(value) && value >= min && value <= max, 'Parameter outside its allowed range.');
-    require(key === 'rentMultiplier' || Number.isInteger(value), 'Use a whole number.');
+    require(['rentMultiplier','dartsAimSpeed','pongAimSpeed'].includes(key) || Number.isInteger(value), 'Use a whole number.');
     (r as unknown as Record<string, unknown>)[key] = value;
   }
   for (const key of ['wolfSeer','wolfDoctor','wolfReveal','wolfRepeatSave','blackjackSideBets','blackjackHitSoft17','dartsDoubleOut','pongRedemption','pongBallsBack','rooftopAntics','soreLoser','allowTrading', 'tradeSlaps', 'boxingDuels', 'allowPeeking', 'catchPeeking', 'followSuit', 'reverseTurns', 'allowSkipping', 'freeParking']) {

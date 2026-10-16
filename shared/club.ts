@@ -35,7 +35,7 @@ export function pongRackPosition(team:number,x:number,y:number){return{x,y:1.3,z
 /** Fast triangular sweeps keep a constant speed through the target. */
 export const aimPeriods={vertical:820,horizontal:680};
 export function aimWave(elapsed:number,period:number){const phase=((Math.max(0,elapsed)%period)/period);return(phase<.5?phase*4-1:3-phase*4)*1.12;}
-export function sweepAim(g:{aimAt:number;aimLock?:{y:number;at:number}},now:number){return g.aimLock?{x:aimWave(now-g.aimLock.at,aimPeriods.horizontal),y:g.aimLock.y}:{x:0,y:aimWave(now-g.aimAt,aimPeriods.vertical)};}
+export function sweepAim(g:{aimAt:number;aimLock?:{y:number;at:number}},now:number,speed=1){return g.aimLock?{x:aimWave((now-g.aimLock.at)*speed,aimPeriods.horizontal),y:g.aimLock.y}:{x:0,y:aimWave((now-g.aimAt)*speed,aimPeriods.vertical)};}
 /** Dartboard face coordinates, including its physical tilt. */
 export function dartBoardPoint(x:number,y:number){return{x:x*.84,y:1.5-y*.84*Math.sin(.72)+.055*Math.cos(.72),z:-.6+y*.84*Math.cos(.72)+.055*Math.sin(.72)};}
 

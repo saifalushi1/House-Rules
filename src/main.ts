@@ -407,7 +407,7 @@ app.addEventListener('input', e => { const el = e.target as HTMLInputElement; if
     if (el.type === 'range') {
         const output = el.parentElement?.querySelector('output');
         if (output)
-            output.textContent = el.value;
+            output.textContent = el.value + (['dartsAimSpeed','pongAimSpeed'].includes(key)?'×':'');
     }
     if(key==='background'){scene?.environment.update(draft.background);renderRules();}
     if (key === 'camera') {
