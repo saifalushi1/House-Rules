@@ -4,13 +4,34 @@
 
 A self-hosted TypeScript game-night sandbox with 14 game presets. Low-poly 3D table and avatars, private hands, live shared rooms, and host-editable presets. Version 0.12 adds chosen Charades teammates and full timed turns, four-player Scribble scoring receipts, shared peek/slap rules for all multiplayer card presets, a game-ending d6 Table Flip, and rooftop animations with cosmetic paintball retaliation. No-limit Texas Hold’em includes private cards, betting rounds, side pots and showdown. Also includes Scribble, a D&D-style tabletop RPG, Klondike Solitaire, optional-master Trivia, a challenge-and-steal chaos rule, and seven environments. Trivia has 1,000 questions across ten categories; pair Charades has 1,900 prompts across 19 categories.
 
-## Version 0.17 · gameplay chaos audit
+## Rules
+
+This is the current **v0.17 chaos rule reference**. It covers all twelve rules, their effects on every game, all game-specific Chaos Die faces, compatibility restrictions, animations, sounds and timing safeguards.
 
 All twelve chaos rules now have a game-specific adapter or are hidden for an incompatible preset. They change **actual cards, points, cash, chips, XP, darts remainders or cup racks**; there is no separate bonus scoreboard. The lobby and **Info → Modifiers & custom rules** explain effects for the selected game. Imported rules are normalized by the server, so a hidden rule cannot be enabled by editing JSON.
 
 Double or Nothing uses the host's probability **per eligible gain/pickup**, followed by a fair double/zero coin; it does not flip on every button press. Direct dice scoring and cup effects happen before checkout, bust, redemption or victory checks. Poker pots and Blackjack escrow remain accounted for. Seat exchanges and resource passing wait for safe boundaries; Tarneeb partners and Shai Pong teams stay fixed. Tarneeb's thirteen-card deal is preserved.
 
 All rules retain their action animations and synthesized sounds: fuse/explosion, hopping seats, orbiting cards/resources, coin, oversized die, d6/table flip, spotlight blackout, flying coins, red-X word penalty, spinning dare wheel, rewind and three-beat boxing ring. Darts/Pong use the same live modifier for scoring, sweep preview and cup geometry. Table Flip includes the new game props.
+
+### Chaos rule overview
+
+Open **House rules → Chaos** before starting, enable compatible rules, adjust their parameters and apply the draft. During play, expand **✹ Chaos** on the left side of the table for actual standings, timers, modifiers, dares and voting. **Info → Modifiers & custom rules** shows the reference for the current game and player count.
+
+| Rule | Gameplay behavior | Animation and sound |
+| --- | --- | --- |
+| Hot Potato | A shrinking fuse forfeits the current opportunity or forces a legal game action. Card turns skip, Tarneeb auto-plays, Poker folds, darts forfeits remaining throws and Pong misses a shot. Full party, casino, RPG and Werewolf effects appear below. | Bomb and burning fuse, accelerating ticks, explosion and boom. |
+| Seat Roulette | Shuffle seats and future turns every N turns. Keep partners fixed, paired Charades turns together and every Scribble drawer’s opportunity. Casino changes wait for settlement. | Avatars hop in arcs; whoosh and boing. |
+| Cyclone | Rotate real hands, scores, pair totals, cash, chips, gold, darts checkout remainders or cup racks according to the game. Wait for safe boundaries. | Orbiting cards/resources; shuffle riffle and wind. |
+| Double or Nothing | A configurable chance per eligible pickup/gain triggers a fair double/zero coin. It modifies actual cards, points, cash, XP, dart points, cups or Blackjack net profit. Hidden in Poker and fixed-deck Solitaire. | Giant spinning coin; ring, jackpot or sad trombone. |
+| Chaos Die | Roll an applicable game-specific modifier. This can change score multipliers, dart/shot counts, trajectory speed, cup size, clocks, resources or other chaos effects. Exact face lists appear under each preset below. | Oversized numbered polygon die; rattle and thud. |
+| Table Flip | A lowest actual scorer rolls a d6 and ends the entire game with no winner, on every face. Refund unsettled casino escrow. Any living Werewolf player qualifies; solo Solitaire can quit this way. | Tumbling d6 and whole-table flip including game props; crash and rumble. |
+| Blackout | Ten seconds with one fixed spotlight. Conceal unlit observations, actions, system messages and sounds while keeping own controls and live phase information usable. | Lights cut to one cone; power-down hum and thunder. |
+| Robin Hood | A gaining leader pays one actual point, chip, cash unit or XP to last place. Team/pair totals count as one unit. Casino taxes wait for settlement. Hidden where a point tax conflicts with the core game. | Coins arc between players; register ka-ching. |
+| Banned Word | Choose a host-visible word each round/phase/teammate turn. Whole-word typed slips and host-reported voice slips cause the game-specific penalty listed below. | Sealed-word stamp and red X; thunk and buzzer. |
+| Dare Wheel | Penalties and misses spin a host-defined task. The offender acknowledges completion before their next manual play; automatic deadlines continue. Physical completion is on trust. | Descending wheel and flicking pointer; slowing clicks and fanfare. |
+| Time Warp | Request a rewind within 30 seconds. A strict majority of connected players must approve within 12 seconds. Restore eligible state and timers; Poker stays within the same street. Hidden in Blackjack and Werewolf. | Desaturation, backward cards/tokens and rewind squeal. |
+| Winner Takes It | An accepted three-beat boxing challenge transfers actual hands, score, cash, chips, gold, darts progress or cups. Opposing teams only; game-specific safe boundaries and final-checkout/cup protections apply. | Everyone moves to the boxing ring; jab/hook/block action reveals with matching impact sounds. |
 
 ### Compatibility at a glance
 
@@ -609,7 +630,7 @@ Choose a preset from **Games**, edit **Game rules** in the lobby, then start. Al
 
 **Shai Pong:** alternating lobby seats create fixed teams, shown at the table. Teammates rotate each shot. Players line up at their team’s end of the table. A dotted trajectory sweeps vertically over the opposing rack; lock height using the character-side floating button, then lock the faster horizontal sweep to throw. Opponents target separate, fixed red/blue racks. Hits remove cups on the server. Each team gets two shots; sinking both returns the balls if enabled. After a rack is cleared, optional redemption gives the other team two shots to clear the remaining opposing cups. Success starts three-cup overtime; failure awards the original clearing team. At the round limit the team with more surviving cups wins; equal counts tie. No drinking is required.
 
-**Chaos in these modes:** the original bonus-tally behavior from 0.15 is superseded by the actual-resource adapters and compatibility policy in Version 0.17 above.
+**Chaos in these modes:** the original bonus-tally behavior from 0.15 is superseded by the actual-resource adapters and compatibility policy in the [Rules section](#rules).
 
 ## Version 0.14 · paced chaos and easier party play
 
@@ -720,33 +741,15 @@ In **House rules → Game rules → Who plays?**, choose **Everyone plays** to l
 
 Each correct answer gives one point, plays a success sound, and pops a gold star above the scorer. A timeout gives no point. After the configured questions, the scoreboard shows contestant totals and the winner or tied winners. The host can end early or restart. The full question bank is bundled with the server, so playing does not depend on an external trivia API.
 
-## Shared chaos rules (v0.10)
+## Playing with chaos
 
-Before starting, open **House rules → Chaos**. Enable any combination of the twelve rules, configure their parameters, and **Apply house rules** or start the game. Everything is off by default. All players share the same server-controlled outcomes and receive corresponding 3D animations and synthesized action sounds. During play, expand **✹ Chaos** on the left edge of the table, below the player totals for timers, the current die modifier, turn order, bonus tallies, dares, flip controls and rewind voting.
+The [Rules section](#rules) is the complete current reference, including all twelve rules, per-game effects, hidden combinations and exact Chaos Die profiles. All chaos toggles default off. Enable compatible rules in **House rules → Chaos**, then apply the draft or start the game. Die-selected effects may run even when their individual toggle is off; unavailable game/player-count combinations remain excluded.
 
-| Rule | Behavior and controls | Animation and sound |
-| --- | --- | --- |
-| Hot Potato | Configurable fuse, minimum and shrink per turn. Expiry forfeits the current opportunity using the game-specific behavior described above. | Small explosion over the owner, bomb fuse, accelerating ticks and boom. |
-| Seat Roulette | Shuffle seats and future turn order every N turns. Hands travel or stay according to the toggle; team identities stay fixed. | Avatars hop to their new seats; whoosh and boing. |
-| Cyclone | At round boundaries or random turn starts, pass hands left/right. In games without hands, pass the bonus chaos tallies instead. | Cards fan out and orbit; shuffle riffle and wind. |
-| Double or Nothing | A separate chance slider (20% by default) rolls once per eligible gain, then flips a fair coin. Bluff pile pickups and free card-sandbox draws/collections receive twice as many real cards or none. Extra cards have unique IDs; erased pickups return to the stock. A room-wide 1,040-card guard skips the wager before excessive growth. Tarneeb and party/board games wager positive score or cash gains. Ordinary card plays do not trigger a flip. Fixed Poker and Solitaire hands stay intact. | Giant spinning coin; ring, jackpot or sad trombone. |
-| Chaos Die | Roll a d12 each round for a shared modifier, listed below. | Oversized polygon die tumbles above the table with its numbered result; rattle and thud. |
-| Table Flip | Once per match, a lowest-scoring player rolls a d6 and ends the entire game. Every result (1–6) ends with nobody winning. Ties for lowest qualify. | Six-sided die tumbles, then the table flips; rattle, crash and rumble. |
-| Blackout | Ten seconds with a fixed spotlight on the player active when darkness starts. Unlit players’ actions, sounds and system messages are concealed from other clients; card totals and table observations stay at their last visible values. Your own hand and turn controls stay usable. An unseen Bluff play retains an anonymous call window. Concealed activity never reappears in the feed when lights return. | Lights cut to one spotlight; power-down hum and thunder. |
-| Robin Hood | A gaining leader transfers one cash unit or point to last place, once per accepted action. Team/pair totals are treated as one score. | Coins arc between players; ka-ching. |
-| Banned Word | A random single word from the host's list changes each round. Only the host sees the active word until an offence reveals it. Chat and typed guesses are checked as whole words, ignoring case. The host reports voice slips with the player selector. | Sealed-word stamp, red X over the offender; thunk and buzzer. |
-| Dare Wheel | Penalties spin a dare from the host's list, one per line. Hot Potato and banned-word penalties, caught peeking/bluffs, skips, timeouts and rejected offers can trigger it. Dares are social instructions carried out by the group. | Descending spinning wheel and flicking pointer; slowing clicks and fanfare. |
-| Time Warp | Any player can request undo of the last accepted gameplay action within 30 seconds. A strict majority of connected players must vote yes within 12 seconds; the requester votes yes automatically. Gameplay actions pause during voting. | Scene desaturates; cards and board tokens move backward; rewind squeal. |
+**Round boundaries:** full turn cycles in Bluff, free card sandbox, darts, Shai Pong and board games; completed tricks in Tarneeb; each teammate’s full timed turn in Charades; each drawing in Scribble; each question in Trivia; each hand in Poker/Blackjack; and encounter rounds in D&D. Werewolf uses phase boundaries for its supported rules. Trivia waits until the master selects a category before rolling its first Chaos Die modifier. Trivia round-end Cyclone also queues when a question resolves. Resource and seat exchanges wait for safe boundaries, with casino exchanges restricted to settled hands and Pong rack swaps excluded during redemption.
 
-**Chaos Die faces:** 1 double gains, 2 zero gains, 3 reverse turn direction, 4 half-length hot fuse, 5 Robin's tax, 6 blackout, 7 Cyclone left, 8 Cyclone right, 9 seat shuffle, 10 a dare for everyone, 11 bonus point for each scoring unit, 12 shield from chaos penalties and score doubling/tax for that round. Die-selected effects can run even when their individual toggle is off.
+Time Warp preserves chat, connection status and the current host. Private snapshots and future questions remain on the server. A successful rewind consumes the snapshot; automatic timer actions or a newer gameplay action invalidate older snapshots. A disconnected voter cancels voting. Eligible match-ending actions can be rewound from the results screen, subject to each game’s restrictions. Restarting clears votes, flip usage, dares and timers.
 
-**Round boundaries:** a full turn cycle in Bluff, Card sandbox and board games; each completed trick in Tarneeb; a new Charades prompt; a new Trivia question. A round-end Cyclone in Trivia also queues when the current question resolves. Seat and hand swaps wait until deal/dice animations, Bluff challenge windows, boxing, pending life choices and partially played Tarneeb tricks are clear. Physical swaps do not change who owns the current turn or which players are teammates. Seat Roulette makes the new seat order the future turn order.
-
-Chaos uses actual game resources, as documented in Version 0.17. Tarneeb still requires the final chaos-adjusted team total to reach its target. Correct-answer counts remain a count of correct answers even when actual scores double, rotate or are erased.
-
-Time Warp restores hands, piles, positions, cash, scores, rules-derived state and remaining timer durations; it preserves chat, connection status and the current host. Undo snapshots and future questions remain private on the server. A successful rewind consumes the snapshot. Timer expiry or a new gameplay action invalidates an older snapshot; voting is cancelled if a voter disconnects. An action that ends the match can be rewound from the results screen. Rewinding cannot make players forget a card, prompt or answer already revealed. Restarting clears votes, flip usage, tallies, dares and timers.
-
-Voice is still provided by your group call, so Banned Word does not automatically transcribe microphones. On-screen effects and action audio work in both camera modes; first-person briefly pulls back for large chaos events so they remain visible. Use the header sound control to mute all action sounds.
+External voice comes from the group’s call; Banned Word does not record or transcribe microphones. Action animations and audio work in both camera modes, with brief camera pullbacks for large events. Use the header sound control to mute action sounds.
 
 ## House rules
 
