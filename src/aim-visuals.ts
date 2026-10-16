@@ -1,3 +1,4 @@
+import {chaosAimSpeed} from '../shared/chaos-policy';
 import * as THREE from 'three';
 import type {Action} from '../shared/types';
 import {dartBoardPoint,pongRackPosition,sweepAim,throwArcLift} from '../shared/club';
@@ -49,7 +50,7 @@ export class AimVisuals {
   this.dots.visible=this.reticle.visible=visible&&!concealed;
   this.overlay.hidden=!visible||!mine;
   if(!visible||!g||!r||!actor)return;
-  const pong=r.rules.game==='beerpong',aim=sweepAim(g,now,r.rules.game==='darts'?r.rules.dartsAimSpeed:r.rules.pongAimSpeed),point=pong?pongRackPosition(1-r.pong!.team,aim.x,aim.y):dartBoardPoint(aim.x,aim.y);
+  const pong=r.rules.game==='beerpong',aim=sweepAim(g,now,chaosAimSpeed(r.rules,r.chaos)),point=pong?pongRackPosition(1-r.pong!.team,aim.x,aim.y):dartBoardPoint(aim.x,aim.y);
   const end=new THREE.Vector3(point.x,point.y,point.z),from=actor.position.clone().add(new THREE.Vector3(0,1.58,0));
   from.add(end.clone().sub(from).setY(0).normalize().multiplyScalar(.33));
   const color=g.aimLock?0x9be5d0:0xffdf9a;

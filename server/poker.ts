@@ -7,7 +7,7 @@ function need(ok:unknown,text:string):asserts ok{if(!ok)throw Error(text);}
 const alive=(r:Room)=>r.poker!.seats.filter(s=>!s.folded);
 const stack=(r:Room,s:PokerSeat)=>r.players.find(p=>p.id===s.id)!.cash;
 function after(r:Room,index:number,eligible:(i:number)=>boolean){const order=r.chaos?.order||r.players.map(p=>p.id),direction=r.rules.reverseTurns!==!!r.chaos?.reversed?-1:1,from=order.indexOf(r.players[index].id);for(let n=1;n<=order.length;n++){const id=order[(from+direction*n+order.length*2)%order.length],i=r.players.findIndex(p=>p.id===id);if(eligible(i))return i;}return -1;}
-function clock(r:Room){r.poker!.ends=Math.max(Date.now(),r.busyUntil)+r.rules.pokerSeconds*1000;}
+function clock(r:Room){r.poker!.ends=Math.max(Date.now(),r.busyUntil)+r.rules.pokerSeconds*1000*(r.chaos?.modifier?.face===1?1.5:r.chaos?.modifier?.face===2?.5:1);}
 function commit(r:Room,s:PokerSeat,amount:number){const p=r.players.find(p=>p.id===s.id)!;const paid=Math.min(p.cash,amount);p.cash-=paid;s.bet+=paid;s.total+=paid;r.poker!.pot+=paid;return paid;}
 function deck():Card[]{const cards=(['♠','♥','♦','♣'] as Suit[]).flatMap(suit=>Array.from({length:13},(_,i)=>({id:`p-${suit}-${i+1}`,rank:i+1,suit})));for(let i=51;i>0;i--){const j=randomInt(i+1);[cards[i],cards[j]]=[cards[j],cards[i]];}return cards;}
 export function pokerView(r:Room):PokerView|undefined{if(r.rules.game!=='poker'||!r.poker)return;const {burned,...publicState}=r.poker;return publicState;}

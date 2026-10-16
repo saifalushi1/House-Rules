@@ -2,19 +2,19 @@ export const chaosRules = {
   chaosRaid:['Winner Takes It','Challenge an opponent to a three-beat duel. Winner takes their hand (swap), score or money.'],
   chaosHotPotato:['Hot Potato','A shrinking fuse explodes on the active player: skip their turn, auto-play a legal Tarneeb card, or fold in Poker.'],
   chaosSeatRoulette:['Seat Roulette','Shuffle seats and future turn order every N turns; keep hands or leave them at the seat.'],
-  chaosCyclone:['Cyclone','Pass hands at safe round boundaries; other games pass chaos points.'],
+  chaosCyclone:['Cyclone','Rotate real hands, scores, chips, gold, darts remainders or cup racks at safe boundaries.'],
   chaosDouble:['Double or Nothing','A random coin flip doubles or erases card pickups, or positive score/cash gains.'],
-  chaosDie:['Chaos Die','A d12 chooses a shared modifier for each round.'],
+  chaosDie:['Chaos Die','A d12 chooses a game-specific modifier: real scoring, throw counts, aiming, money and more.'],
   chaosTableFlip:['Table Flip','The lowest scorer rolls a d6, flips the table and ends the game. Nobody wins.'],
   chaosBlackout:['Blackout','Ten seconds with one fixed spotlight; other players’ actions and sounds are concealed.'],
   chaosRobin:['Robin Hood','A gaining leader pays one point or coin to last place.'],
-  chaosBanned:['Banned Word','A secret host-visible word changes each round; chat slips cost a point/coin.'],
+  chaosBanned:['Banned Word','A secret host-visible word changes each round; chat slips incur a game-specific card, score, cash or opportunity penalty.'],
   chaosDare:['Dare Wheel','Every penalty spins a dare from the host’s list.'],
   chaosWarp:['Time Warp','Vote to undo the last gameplay action within 30 seconds.'],
 } as const;
 export type ChaosToggle = keyof typeof chaosRules;
 export interface ChaosState {
-  seats:string[]; order:string[]; turns:number; roundKey:string; points:Record<string,number>;
+  pendingMisses?:Record<string,number>;pendingFines?:Record<string,number>;dares?:Record<string,string>;lightenPending?:boolean;tipPending?:boolean;pendingReverse?:boolean;seats:string[]; order:string[]; turns:number; roundKey:string; points:Record<string,number>;
   hot?:{player:string;ends:number;duration:number}; blackoutUntil:number; blackoutPlayer?:string;
   modifier?:{face:number;name:string}; flipUsed:boolean; reversed:boolean;
   lastDare?:{player:string;text:string}; word?:string;

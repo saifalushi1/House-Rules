@@ -1,3 +1,4 @@
+import {normalizeChaos} from './chaos-policy.js';
 import {backgrounds} from './expansion.js';
 import {triviaCategories} from './trivia.js';
 import {chaosRules} from './chaos.js';
@@ -52,5 +53,5 @@ export function validateRules(input: unknown): Rules {
   if(r.game==='poker')r.decks=1;
   if (r.game === 'tarneeb') { r.decks = 1; r.maxPlayers = 4; }
   if(r.cardLayout==='solitaire'&&r.game==='cards')r.decks=1;
-  require([301,501].includes(r.dartsStart),'Choose 301 or 501.');require([6,10].includes(r.pongCups),'Choose six or ten cups.');require(r.blackjackMin<=r.blackjackMax&&r.blackjackMin<=r.pokerStack,'Blackjack minimum must fit the maximum and starting stack.');return r;
+  require([301,501].includes(r.dartsStart),'Choose 301 or 501.');require([6,10].includes(r.pongCups),'Choose six or ten cups.');require(r.blackjackMin<=r.blackjackMax&&r.blackjackMin<=r.pokerStack,'Blackjack minimum must fit the maximum and starting stack.');return normalizeChaos(r);
 }

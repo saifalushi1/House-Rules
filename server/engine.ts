@@ -1,3 +1,4 @@
+import {normalizeChaos} from '../shared/chaos-policy.js';
 import {initWerewolf,handleWerewolf,tickWerewolf,werewolfView,skipWerewolf} from './werewolf.js';
 import {initBlackjack,handleBlackjack,tickBlackjack,blackjackView,abortBlackjack,forfeitBlackjack} from './blackjack.js';
 import {initDarts,handleDarts,tickDarts,skipDarts,initPong,handlePong,tickPong,skipPong} from './aim-games.js';
@@ -10,7 +11,7 @@ import {initSolitaire,solitaireView,handleSolitaire} from './solitaire.js';
 import {initScribble,scribbleView,handleScribble,tickScribble} from './scribble.js';
 import {initRpg,handleRpg} from './rpg.js';
 import {handleRaid,tickRaid} from './raid.js';
-import {chaosCardGain,initChaos,chaosWord,chaosBefore,chaosAfter,tickChaos,handleChaos,saveChaosAction,commitChaosAction,checkBanned,chaosGuard,invalidateChaos,chaosPenaltiesForAction,takeChaosForcedAction,chaosPenalty} from './chaos.js';
+import {chaosCardGain,initChaos,chaosWord,chaosBefore,chaosAfter,tickChaos,handleChaos,saveChaosAction,commitChaosAction,checkBanned,chaosGuard,invalidateChaos,chaosPenaltiesForAction,takeChaosForcedAction,chaosPenalty,withChaosForce} from './chaos.js';
 import {handleTrivia,initializeTrivia,tickTrivia,triviaView} from "./trivia.js";
 import {charadePrompts} from "./charade-prompts.js";
 import { emit, handleInteraction, tickInteractions } from './interactions.js';
@@ -44,6 +45,7 @@ function validateClub(r:Room,rules:Rules=r.rules){if(rules.game==='werewolf'){ne
 export function start(r: Room) {
 validateClub(r);
     need(r.phase === 'lobby', 'Return to the lobby before starting.');
+    normalizeChaos(r.rules,r.players.length);
     const min = ['cards','rpg','blackjack','darts'].includes(r.rules.game) ? 1 : 2;
     need(r.rules.game!=='cards'||r.rules.cardLayout!=='solitaire'||r.players.length===1,'Solitaire needs exactly one player.');
     need(r.players.length >= min, `This game needs at least ${min} players.`);
@@ -480,17 +482,13 @@ function actPresented(r: Room, id: string, a: Action): { peek?: Card[] } | void 
     need(!r.raid||!a.type.startsWith('chaos'),'Finish the challenge before using other chaos controls.');
     if(handleChaos(r,id,a)){finishEffects(r);return;}
     need(!r.raid||['chat','endGame','lobby','restart'].includes(a.type),'Finish the challenge first.');
-    chaosGuard(r,a);
+    chaosGuard(r,a,id);
     const chaosBeforeAction=chaosBefore(r),snapshot=saveChaosAction(r,a);
     const from = p?.position, oldScore = p?.score, oldHandLength=p.hand.length;
     const challenged = a.type === "challenge" && r.lastPlay ? {player:r.lastPlay.player, liar:r.lastPlay.cards.some(c=>c.rank!==r.lastPlay!.claim), cards:r.lastPlay.cards.map(c=>({...c})), count:r.pile.length} : undefined;
     const allPassed = a.type === 'bid' && a.value === 0 && r.bidPassed.length === 3 && !r.bidder;
     const result = actInternal(r, id, a);
     if(a.type==='play'&&r.rules.game==='cards')r.bluffPlays++;
-    if(r.chaos&&!r.clash&&['play','award','triviaAward','triviaAnswer','guess','endTurn'].includes(a.type)){
-      const gained=chaosBeforeAction.units.some(u=>u.value<(chaosBefore(r).units.find(n=>n.id===u.id)?.value??u.value));
-      if(a.type==='play'||a.type==='endTurn'||gained)r.chaos.points[id]=(r.chaos.points[id]||0)+1;
-    }
     if(['chat','guess','triviaAnswer','scribbleGuess'].includes(a.type)&&typeof a.text==='string')checkBanned(r,id,a.text,chaosBeforeAction.phase==='playing');
     chaosAfter(r,chaosBeforeAction,a.type);
     commitChaosAction(r,a,snapshot);finishEffects(r);
@@ -523,7 +521,8 @@ function actPresented(r: Room, id: string, a: Action): { peek?: Card[] } | void 
     return result;
 }
 
-function forceChaosAction(r:Room,id:string){
+function forceChaosAction(r:Room,id:string){return withChaosForce(r,()=>forceChaosActionInternal(r,id));}
+function forceChaosActionInternal(r:Room,id:string){
  if(r.phase!=='playing'||r.players[r.turn]?.id!==id)return;
  const p=r.players[r.turn];let action:Action|undefined;
  if(r.werewolf||r.blackjack||r.darts||r.pong){const before=chaosBefore(r);if(r.werewolf)skipWerewolf(r,id);if(r.blackjack)forfeitBlackjack(r,id);if(r.darts)skipDarts(r,id);if(r.pong)skipPong(r,id);chaosAfter(r,before,'hotSkip');finishEffects(r);return;}
@@ -535,8 +534,8 @@ function forceChaosAction(r:Room,id:string){
   else if(r.tarneebPhase==='trump')action={type:'trump',suit:suits[randomInt(4)]};
   else if(r.tarneebPhase==='play'){const led=r.trick[0]?.card.suit,legal=r.rules.followSuit&&led&&p.hand.some(c=>c.suit===led)?p.hand.filter(c=>c.suit===led):p.hand;if(legal.length)action={type:'play',cards:[legal[randomInt(legal.length)].id]};}
  }
- if(r.rules.game==='scribble'&&r.scribble){r.scribble.ends=Date.now();tick(r);return;}
- if(r.rules.game==='rpg'){action=r.rpg?.combat?{type:'rpgEndTurn',pawn:r.rpg.initiative[r.rpg.index]?.id}:{type:'rpgRoll',sides:20,ability:'none'};}
+ if(r.rules.game==='scribble'&&r.scribble){if(r.scribble.phase==='choose'){r.scribble.ends=Date.now();tick(r);}r.scribble.ends=Date.now();tick(r);return;}
+ if(r.rules.game==='rpg'){if(r.rpg?.combat)action={type:'rpgEndTurn',pawn:r.rpg.initiative[r.rpg.index]?.id};else{const c=r.rpg?.characters.find(c=>c.owner===id),pawn=r.rpg?.pawns.find(p=>p.owner===id);if(c){c.hp=Math.max(0,c.hp-2);if(pawn)pawn.hp=c.hp;emit(r,'rpgAttack',id,id,{hit:true,damage:2,text:'Hot Potato · 2 HP lost'});}return;}}
  if(r.rules.game==='charades'&&r.charadeSession){r.charadeSession.turnEnds=Date.now();tick(r);return;}
  if(r.rules.game==='trivia'&&r.trivia?.phase==='question'){if(r.trivia.activePlayer||r.trivia.master===id){r.trivia.ends=Date.now();tick(r);}else{r.trivia.excluded=[...new Set([...(r.trivia.excluded||[]),id])];note(r,p.name+' is out for this question after Hot Potato.');const available=r.players.filter(p=>p.id!==r.trivia!.master&&!r.trivia!.excluded!.includes(p.id));if(!available.length){r.trivia.ends=Date.now();tick(r);}}return;}
  if(['property','life'].includes(r.rules.game)){if(!r.rolled)act(r,id,{type:'roll'});r.busyUntil=0;if(r.pendingLife)act(r,id,{type:'lifeChoice',choice:0});r.busyUntil=0;action={type:'endTurn'};}

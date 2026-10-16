@@ -30,7 +30,7 @@ let seenEvent = 0, eventRoom = '', effectTimer: ReturnType<typeof setTimeout>;
 document.addEventListener('pointerdown', () => void audio.unlock(), {capture:true});
 document.addEventListener('keydown', () => void audio.unlock(), {capture:true});
 const app = document.querySelector<HTMLDivElement>('#app')!;
-app.innerHTML = `<div class="shell"><aside class="sidebar" id="sidebar"></aside><main><header id="header"></header><div class="workspace"><section class="table-area"><div id="intro"></div><div class="stage"><div class="stage-top" id="stage-top"></div><div id="scene" aria-label="Low polygon multiplayer game table"></div><div id="stage-bottom"></div><div id="effects-layer" aria-live="polite"></div></div><div id="play-panel"></div></section><aside class="right-rail"><button id="rules-toggle" data-action="toggleRules"></button><section class="rules-panel" id="rules-panel"></section><div id="activity"></div></aside></div><footer><span>MADE FOR GAME NIGHT. BUILT FOR YOUR RULES.</span><span>SELF-HOSTED <i></i> VERSION 0.16</span></footer></main></div><div id="toast" role="status" aria-live="polite"></div><div id="modal-root"></div>`;
+app.innerHTML = `<div class="shell"><aside class="sidebar" id="sidebar"></aside><main><header id="header"></header><div class="workspace"><section class="table-area"><div id="intro"></div><div class="stage"><div class="stage-top" id="stage-top"></div><div id="scene" aria-label="Low polygon multiplayer game table"></div><div id="stage-bottom"></div><div id="effects-layer" aria-live="polite"></div></div><div id="play-panel"></div></section><aside class="right-rail"><button id="rules-toggle" data-action="toggleRules"></button><section class="rules-panel" id="rules-panel"></section><div id="activity"></div></aside></div><footer><span>MADE FOR GAME NIGHT. BUILT FOR YOUR RULES.</span><span>SELF-HOSTED <i></i> VERSION 0.17</span></footer></main></div><div id="toast" role="status" aria-live="polite"></div><div id="modal-root"></div>`;
 try {
     scene = new GameScene(document.querySelector('#scene')!);scene.onAim=send;
 }
@@ -154,7 +154,7 @@ function renderRules() {
     if(rulesTab==='game'&&clubGames.includes(draft.game))fields=clubSettings(draft,locked());
     if(rulesTab==='game'&&draft.game==='poker')fields=pokerSettings(draft,locked());
     if(rulesTab==='game'&&['scribble','rpg'].includes(draft.game))fields=expansionSettings(draft,locked());
-    if(rulesTab==='chaos')fields=chaosFields(draft,locked());
+    if(rulesTab==='chaos')fields=chaosFields(draft,locked(),room?.players.length);
     if (rulesTab === 'notes')
         fields = `<div class="rules-section-title">YOUR HOUSE CONTRACT</div>${textfield('customNotes', 'Rules everyone agrees to', 'e.g. Winner picks the next game. No table talk after a bid.', true)}<p class="rule-callout">Written rules and funny penalties are carried out by your group. Toggles and parameters are enforced by the game.</p><div class="rules-section-title">SAVE YOUR RECIPE</div>${button('↓ Export rules', 'export', false, 'secondary full')}<label class="import-label">↑ Import rules<input type="file" id="import-rules" accept="application/json,.json" ${locked() ? 'disabled' : ''}></label>`;
     document.querySelector('#rules-panel')!.innerHTML = `<div class="rules-heading"><span class="rules-icon">☷</span><div><h2>House rules</h2><p>A classic, with your signature.</p></div><span class="rule-count">${draft.allowPeeking ? '✦' : '◈'}</span></div><div class="rule-tabs">${['general', 'game', 'chaos', 'notes'].map(t => `<button data-tab="${t}" class="${rulesTab === t ? 'active' : ''}">${t === 'general' ? 'The basics' : t === 'game' ? 'Game rules' : t==='chaos'?'Chaos':'Custom'}</button>`).join('')}</div><div class="rule-fields">${fields}</div><div class="rules-bottom"><span><i class="${locked() ? 'locked' : ''}"></i>${locked() ? room?.phase === 'lobby' ? 'Host controls the rules' : 'Rules locked during play' : room ? 'Changes apply to everyone' : 'Set the tone before you host'}</span>${room?.host === id && room.phase === 'lobby' ? button('Apply house rules ↗', 'apply', false, 'primary full') : !room ? '<div class="rules-tip">A little chaos makes a great story.</div>' : ''}</div>`;
@@ -455,7 +455,7 @@ app.addEventListener('submit', e => {
         input.value = '';
     }
 });
-function showHelp(){document.querySelector('#modal-root')!.innerHTML=infoHtml(infoTab);}
+function showHelp(){document.querySelector('#modal-root')!.innerHTML=infoHtml(infoTab,draft,room?.players.length);}
 
 
 

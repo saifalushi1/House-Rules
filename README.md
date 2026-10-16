@@ -4,6 +4,584 @@
 
 A self-hosted TypeScript game-night sandbox with 14 game presets. Low-poly 3D table and avatars, private hands, live shared rooms, and host-editable presets. Version 0.12 adds chosen Charades teammates and full timed turns, four-player Scribble scoring receipts, shared peek/slap rules for all multiplayer card presets, a game-ending d6 Table Flip, and rooftop animations with cosmetic paintball retaliation. No-limit Texas Hold’em includes private cards, betting rounds, side pots and showdown. Also includes Scribble, a D&D-style tabletop RPG, Klondike Solitaire, optional-master Trivia, a challenge-and-steal chaos rule, and seven environments. Trivia has 1,000 questions across ten categories; pair Charades has 1,900 prompts across 19 categories.
 
+## Version 0.17 · gameplay chaos audit
+
+All twelve chaos rules now have a game-specific adapter or are hidden for an incompatible preset. They change **actual cards, points, cash, chips, XP, darts remainders or cup racks**; there is no separate bonus scoreboard. The lobby and **Info → Modifiers & custom rules** explain effects for the selected game. Imported rules are normalized by the server, so a hidden rule cannot be enabled by editing JSON.
+
+Double or Nothing uses the host's probability **per eligible gain/pickup**, followed by a fair double/zero coin; it does not flip on every button press. Direct dice scoring and cup effects happen before checkout, bust, redemption or victory checks. Poker pots and Blackjack escrow remain accounted for. Seat exchanges and resource passing wait for safe boundaries; Tarneeb partners and Shai Pong teams stay fixed. Tarneeb's thirteen-card deal is preserved.
+
+All rules retain their action animations and synthesized sounds: fuse/explosion, hopping seats, orbiting cards/resources, coin, oversized die, d6/table flip, spotlight blackout, flying coins, red-X word penalty, spinning dare wheel, rewind and three-beat boxing ring. Darts/Pong use the same live modifier for scoring, sweep preview and cup geometry. Table Flip includes the new game props.
+
+### Compatibility at a glance
+
+| Preset | Hidden rules | Reason |
+| --- | --- | --- |
+| Werewolf / Mafia | Winner Takes It, Seat Roulette, Cyclone, Double or Nothing, Chaos Die, Robin Hood, Time Warp | Preserve hidden roles, simultaneous phases and faction victory. |
+| Blackjack | Time Warp | Preserve the mode’s turn, wager, scoring or team structure. |
+| Darts | Robin Hood | Preserve the mode’s turn, wager, scoring or team structure. |
+| Shai Pong | Seat Roulette, Robin Hood | Preserve the mode’s turn, wager, scoring or team structure. |
+| Poker | Double or Nothing | Preserve the mode’s turn, wager, scoring or team structure. |
+| Scribble | None | All effects have direct adapters. |
+| D&D tabletop | Seat Roulette | Preserve the mode’s turn, wager, scoring or team structure. |
+| Bluff | Robin Hood | Preserve the mode’s turn, wager, scoring or team structure. |
+| Tarneeb | None | All effects have direct adapters. |
+| Card sandbox · free sandbox | Robin Hood | Preserve the mode’s turn, wager, scoring or team structure. |
+| Charades | None | All effects have direct adapters. |
+| Trivia · free-for-all | Seat Roulette | Preserve the mode’s turn, wager, scoring or team structure. |
+| Block Party | None | All effects have direct adapters. |
+| Life Paths | None | All effects have direct adapters. |
+| Trivia · turns with master | None | All effects have direct adapters. |
+| Card sandbox · Solitaire | Winner Takes It, Hot Potato, Seat Roulette, Cyclone, Double or Nothing, Chaos Die, Blackout, Robin Hood, Banned Word, Dare Wheel | Keep the fixed puzzle deck intact. |
+
+Additionally, effects requiring opponents are hidden when there are fewer than two opposing scoring units: Winner Takes It, Seat Roulette, Cyclone, Robin Hood and Blackout. A lone Charades pair counts as one unit; the Trivia master does not count as a contestant. Applicable die faces follow these restrictions.
+
+### Full rule effects and die faces by preset
+
+Expand a game below for all twelve rules and its exact die faces. Trivia's everyone/master choice does not change score adapters; FFA hides Seat Roulette and replaces the reverse die face with a shorter question. Turn-based Trivia supports Seat Roulette. Solitaire is listed separately from free card sandbox.
+
+<details>
+<summary><strong>Werewolf / Mafia</strong></summary>
+
+| Rule | Direct effect |
+| --- | --- |
+| Winner Takes It | Hidden: Hidden roles, simultaneous phases and faction victory must stay intact. |
+| Hot Potato | Cancel the current night action and forfeit the next vote; during voting, abstain immediately. |
+| Seat Roulette | Hidden: Hidden roles, simultaneous phases and faction victory must stay intact. |
+| Cyclone | Hidden: Hidden roles, simultaneous phases and faction victory must stay intact. |
+| Double or Nothing | Hidden: Hidden roles, simultaneous phases and faction victory must stay intact. |
+| Chaos Die | Hidden: Hidden roles, simultaneous phases and faction victory must stay intact. |
+| Table Flip | A lowest actual scorer rolls a d6 and ends the whole game with no winner. In Werewolf, any living player may flip; solo Solitaire may also quit by flipping. |
+| Blackout | For ten seconds, conceal other unlit players’ actions, effects, sounds and public results; own controls and live turn/phase information remain usable. The fixed spotlight stays visible. |
+| Robin Hood | Hidden: Hidden roles, simultaneous phases and faction victory must stay intact. |
+| Banned Word | The living offender loses their next vote. Night and eliminated public chat remain locked. |
+| Dare Wheel | Penalties and misses spin a task from the host’s list. The offender must acknowledge completion in Chaos controls before their next manual play; automatic timeouts still work. Physical completion is on the group’s honor system. |
+| Time Warp | Hidden: Hidden roles, simultaneous phases and faction victory must stay intact. |
+
+</details>
+
+<details>
+<summary><strong>Blackjack</strong></summary>
+
+| Rule | Direct effect |
+| --- | --- |
+| Winner Takes It | The winner takes the loser’s remaining chips between hands; escrow and pots are untouched. |
+| Hot Potato | Forfeit an active main bet; during betting, refund any locked wager and sit out. |
+| Seat Roulette | Shuffle physical seats and future turn order. Wait until between hands. Current play stays active. |
+| Cyclone | Rotate actual chip stacks between settled hands; pots and live wagers stay intact. |
+| Double or Nothing | Double or erase positive net hand profit after ordinary wagers and side bets settle; the original stakes remain accounted for. |
+| Chaos Die | Roll only applicable faces for this game and player count. See the game-specific face list below. |
+| Table Flip | A lowest actual scorer rolls a d6 and ends the whole game with no winner. In Werewolf, any living player may flip; solo Solitaire may also quit by flipping. |
+| Blackout | For ten seconds, conceal other unlit players’ actions, effects, sounds and public results; own controls and live turn/phase information remain usable. The fixed spotlight stays visible. |
+| Robin Hood | After a positive gain, a leading player pays one real chip / cash unit to last place. Poker and Blackjack apply this only on settlement. |
+| Banned Word | Lose one uncommitted chip; active wagers remain untouched. |
+| Dare Wheel | Penalties and misses spin a task from the host’s list. The offender must acknowledge completion in Chaos controls before their next manual play; automatic timeouts still work. Physical completion is on the group’s honor system. |
+| Time Warp | Hidden: Rewinding a deal or hit would reveal future shoe cards. |
+
+| Die face | Modifier | Effect |
+| --- | --- | --- |
+| 1 | Double gains | Double positive game points, XP or cash gains. |
+| 2 | Zero gains | Positive gains are erased. |
+| 3 | Reverse order | Reverse future turn order; current play and teams stay fixed. |
+| 4 | Hot fuse | A half-length Hot Potato fuse forces the active opportunity. |
+| 5 | Robin’s tax | A gaining leader pays one actual point or chip to last place. |
+| 6 | Blackout | Conceal unlit actions for ten seconds. |
+| 7 | Cyclone left | Rotate hands or the game’s real score/cash resource left at a safe boundary. |
+| 8 | Cyclone right | Rotate hands or the game’s real score/cash resource right at a safe boundary. |
+| 9 | Seat shuffle | Shuffle seats and future turns at a safe boundary. |
+| 10 | Dare everyone | Everyone must confirm their custom dare before their next manual play. |
+| 11 | House rebate | Every player receives the minimum main bet in play chips. |
+| 12 | Shield round | Block chaos penalties, coin gambles and Robin Hood taxes. |
+
+</details>
+
+<details>
+<summary><strong>Darts</strong></summary>
+
+| Rule | Direct effect |
+| --- | --- |
+| Winner Takes It | The boxing winner takes the loser’s earned checkout progress, capped so a final legal dart is still required. Challenge before the first dart of a turn. |
+| Hot Potato | Explosion forfeits all remaining darts this turn. |
+| Seat Roulette | Shuffle physical seats and future turn order. Current play stays active. |
+| Cyclone | Rotate actual remaining checkout scores before aiming; the new turn baseline follows the score. |
+| Double or Nothing | A chance-based coin doubles or zeroes the next hit’s points before bust and exact-checkout checks. |
+| Chaos Die | Roll only applicable faces for this game and player count. See the game-specific face list below. |
+| Table Flip | A lowest actual scorer rolls a d6 and ends the whole game with no winner. In Werewolf, any living player may flip; solo Solitaire may also quit by flipping. |
+| Blackout | For ten seconds, conceal other unlit players’ actions, effects, sounds and public results; own controls and live turn/phase information remain usable. The fixed spotlight stays visible. |
+| Robin Hood | Hidden: A point tax does not fit card shedding, exact checkout or cup racks. |
+| Banned Word | Add 5 to the offender’s remaining score; the turn baseline includes the fine so busting cannot erase it. |
+| Dare Wheel | Penalties and misses spin a task from the host’s list. The offender must acknowledge completion in Chaos controls before their next manual play; automatic timeouts still work. Physical completion is on the group’s honor system. |
+| Time Warp | Majority vote restores the last eligible gameplay state and timers. Revealed information cannot be forgotten; secret role actions are excluded. |
+
+| Die face | Modifier | Effect |
+| --- | --- | --- |
+| 1 | Double scoring | Multiply each dart’s physical ring score by two before bust/checkout checks. |
+| 2 | Half scoring | Halve each ring score, rounded down, before bust/checkout checks. |
+| 3 | Reverse order | Reverse future turn order; current play and teams stay fixed. |
+| 4 | Hot fuse | A half-length Hot Potato fuse forces the active opportunity. |
+| 5 | Four darts | Each turn has four darts this round. |
+| 6 | Blackout | Conceal unlit actions for ten seconds. |
+| 7 | Two darts | Each turn has two darts this round. |
+| 8 | Fast trajectory | Both aiming sweeps run at 1.5× the configured speed. |
+| 9 | Seat shuffle | Shuffle seats and future turns at a safe boundary. |
+| 10 | Dare everyone | Everyone must confirm their custom dare before their next manual play. |
+| 11 | Slow trajectory | Both aiming sweeps run at 0.6× the configured speed. |
+| 12 | Shield round | Block chaos penalties, coin gambles and Robin Hood taxes. |
+
+</details>
+
+<details>
+<summary><strong>Shai Pong</strong></summary>
+
+| Rule | Direct effect |
+| --- | --- |
+| Winner Takes It | The winner removes one opposing cup and restores one of their own sunk cups if available. Both racks must have at least two cups; no redemption challenges. |
+| Hot Potato | Explosion forfeits one shot, then teammates rotate normally. |
+| Seat Roulette | Hidden: Fixed teams must alternate turns at their own end of the table. |
+| Cyclone | Swap the two surviving cup racks outside redemption; team identities stay fixed. |
+| Double or Nothing | A chance-based coin sinks two cups (if available) or leaves the struck cup standing. |
+| Chaos Die | Roll only applicable faces for this game and player count. See the game-specific face list below. |
+| Table Flip | A lowest actual scorer rolls a d6 and ends the whole game with no winner. In Werewolf, any living player may flip; solo Solitaire may also quit by flipping. |
+| Blackout | For ten seconds, conceal other unlit players’ actions, effects, sounds and public results; own controls and live turn/phase information remain usable. The fixed spotlight stays visible. |
+| Robin Hood | Hidden: A point tax does not fit card shedding, exact checkout or cup racks. |
+| Banned Word | Forfeit the offender’s next shot, even if their next turn has not started. |
+| Dare Wheel | Penalties and misses spin a task from the host’s list. The offender must acknowledge completion in Chaos controls before their next manual play; automatic timeouts still work. Physical completion is on the group’s honor system. |
+| Time Warp | Majority vote restores the last eligible gameplay state and timers. Revealed information cannot be forgotten; secret role actions are excluded. |
+
+| Die face | Modifier | Effect |
+| --- | --- | --- |
+| 1 | Double cups | A successful shot sinks the struck cup and the nearest other cup, if present. |
+| 2 | One-shot turns | Each ordinary team turn has one shot. Redemption still has two. |
+| 3 | Narrow cups | Cup rims and hit radius shrink to 0.11. |
+| 4 | Hot fuse | A half-length Hot Potato fuse forces the active opportunity. |
+| 5 | Three-shot turns | Each ordinary team turn has three shots. Redemption still has two. |
+| 6 | Blackout | Conceal unlit actions for ten seconds. |
+| 7 | Rack swap | Swap the two surviving cup racks outside redemption. Teams keep their identity. |
+| 8 | Fast trajectory | Both aiming sweeps run at 1.5× configured speed. |
+| 9 | Wide cups | Cup rims and hit radius grow to 0.18. |
+| 10 | Dare everyone | Everyone must confirm their custom dare before their next manual play. |
+| 11 | Slow trajectory | Both aiming sweeps run at 0.6× configured speed. |
+| 12 | Shield round | Block chaos penalties, coin gambles and Robin Hood taxes. |
+
+</details>
+
+<details>
+<summary><strong>Poker</strong></summary>
+
+| Rule | Direct effect |
+| --- | --- |
+| Winner Takes It | The winner takes the loser’s remaining chips between hands; escrow and pots are untouched. |
+| Hot Potato | Instantly fold, even when checking would be free. |
+| Seat Roulette | Shuffle physical seats and future turn order. Wait until between hands. Current play stays active. |
+| Cyclone | Rotate actual chip stacks between settled hands; pots and live wagers stay intact. |
+| Double or Nothing | Hidden: Doubling or deleting pot payouts would break pot accounting. |
+| Chaos Die | Roll only applicable faces for this game and player count. See the game-specific face list below. |
+| Table Flip | A lowest actual scorer rolls a d6 and ends the whole game with no winner. In Werewolf, any living player may flip; solo Solitaire may also quit by flipping. |
+| Blackout | For ten seconds, conceal other unlit players’ actions, effects, sounds and public results; own controls and live turn/phase information remain usable. The fixed spotlight stays visible. |
+| Robin Hood | After a positive gain, a leading player pays one real chip / cash unit to last place. Poker and Blackjack apply this only on settlement. |
+| Banned Word | Queue a one-chip fine until the hand is settled; never alter a live pot. |
+| Dare Wheel | Penalties and misses spin a task from the host’s list. The offender must acknowledge completion in Chaos controls before their next manual play; automatic timeouts still work. Physical completion is on the group’s honor system. |
+| Time Warp | Majority vote rewinds a betting action only within the same street. A new street, runout, reveal or settled hand cannot be rewound. |
+
+| Die face | Modifier | Effect |
+| --- | --- | --- |
+| 1 | Long decisions | Poker decision clocks run at 1.5× normal length. |
+| 2 | Quick decisions | Poker decision clocks run at half normal length. |
+| 3 | Reverse order | Reverse future turn order; current play and teams stay fixed. |
+| 4 | Hot fuse | A half-length Hot Potato fuse forces the active opportunity. |
+| 5 | Robin’s tax | A gaining leader pays one actual point or chip to last place. |
+| 6 | Blackout | Conceal unlit actions for ten seconds. |
+| 7 | Cyclone left | Rotate hands or the game’s real score/cash resource left at a safe boundary. |
+| 8 | Cyclone right | Rotate hands or the game’s real score/cash resource right at a safe boundary. |
+| 9 | Seat shuffle | Shuffle seats and future turns at a safe boundary. |
+| 10 | Dare everyone | Everyone must confirm their custom dare before their next manual play. |
+| 11 | Table tip | Between hands, every funded opponent pays one chip to the lowest funded stack. |
+| 12 | Shield round | Block chaos penalties, coin gambles and Robin Hood taxes. |
+
+</details>
+
+<details>
+<summary><strong>Scribble</strong></summary>
+
+| Rule | Direct effect |
+| --- | --- |
+| Winner Takes It | The winner takes the loser’s actual score; non-scoring trivia masters cannot challenge. |
+| Hot Potato | End the active drawing and enter intermission. |
+| Seat Roulette | Shuffle physical seats and future turn order. Every remaining drawer still draws exactly once. Current play stays active. |
+| Cyclone | Rotate actual player scores; earned-answer receipts stay with their original player. |
+| Double or Nothing | Double or erase positive point gains at the configured chance. |
+| Chaos Die | Roll only applicable faces for this game and player count. See the game-specific face list below. |
+| Table Flip | A lowest actual scorer rolls a d6 and ends the whole game with no winner. In Werewolf, any living player may flip; solo Solitaire may also quit by flipping. |
+| Blackout | For ten seconds, conceal other unlit players’ actions, effects, sounds and public results; own controls and live turn/phase information remain usable. The fixed spotlight stays visible. |
+| Robin Hood | After a positive gain, a leading player pays one real point to last place. Poker and Blackjack apply this only on settlement. |
+| Banned Word | Lose one actual point. |
+| Dare Wheel | Penalties and misses spin a task from the host’s list. The offender must acknowledge completion in Chaos controls before their next manual play; automatic timeouts still work. Physical completion is on the group’s honor system. |
+| Time Warp | Majority vote restores the last eligible gameplay state and timers. Revealed information cannot be forgotten; secret role actions are excluded. |
+
+| Die face | Modifier | Effect |
+| --- | --- | --- |
+| 1 | Double gains | Double positive game points, XP or cash gains. |
+| 2 | Zero gains | Positive gains are erased. |
+| 3 | Reverse order | Reverse future turn order; current play and teams stay fixed. |
+| 4 | Hot fuse | A half-length Hot Potato fuse forces the active opportunity. |
+| 5 | Robin’s tax | A gaining leader pays one actual point or chip to last place. |
+| 6 | Blackout | Conceal unlit actions for ten seconds. |
+| 7 | Cyclone left | Rotate hands or the game’s real score/cash resource left at a safe boundary. |
+| 8 | Cyclone right | Rotate hands or the game’s real score/cash resource right at a safe boundary. |
+| 9 | Seat shuffle | Shuffle seats and future turns at a safe boundary. |
+| 10 | Dare everyone | Everyone must confirm their custom dare before their next manual play. |
+| 11 | Bonus point | Each scoring player or team receives one actual point. |
+| 12 | Shield round | Block chaos penalties, coin gambles and Robin Hood taxes. |
+
+</details>
+
+<details>
+<summary><strong>D&D tabletop</strong></summary>
+
+| Rule | Direct effect |
+| --- | --- |
+| Winner Takes It | The winner takes the loser’s gold outside an encounter. |
+| Hot Potato | End the active initiative turn; outside combat the owner loses 2 HP. |
+| Seat Roulette | Hidden: Combat uses rolled initiative rather than table seats. |
+| Cyclone | Rotate character gold; HP, class, XP and inventory stay with their owners. |
+| Double or Nothing | Double or erase positive XP gains; level is recalculated. |
+| Chaos Die | Roll only applicable faces for this game and player count. See the game-specific face list below. |
+| Table Flip | A lowest actual scorer rolls a d6 and ends the whole game with no winner. In Werewolf, any living player may flip; solo Solitaire may also quit by flipping. |
+| Blackout | For ten seconds, conceal other unlit players’ actions, effects, sounds and public results; own controls and live turn/phase information remain usable. The fixed spotlight stays visible. |
+| Robin Hood | After a positive gain, a leading player pays one real XP to last place. Poker and Blackjack apply this only on settlement. |
+| Banned Word | Lose one XP, or one gold when no XP is available; levels are recalculated. |
+| Dare Wheel | Penalties and misses spin a task from the host’s list. The offender must acknowledge completion in Chaos controls before their next manual play; automatic timeouts still work. Physical completion is on the group’s honor system. |
+| Time Warp | Majority vote restores the last eligible gameplay state and timers. Revealed information cannot be forgotten; secret role actions are excluded. |
+
+| Die face | Modifier | Effect |
+| --- | --- | --- |
+| 1 | Double gains | Double positive game points, XP or cash gains. |
+| 2 | Zero gains | Positive gains are erased. |
+| 3 | Gold gift | Each character receives five gold. |
+| 4 | Hot fuse | A half-length Hot Potato fuse forces the active opportunity. |
+| 5 | Robin’s tax | A gaining leader pays one actual point or chip to last place. |
+| 6 | Blackout | Conceal unlit actions for ten seconds. |
+| 7 | Cyclone left | Rotate hands or the game’s real score/cash resource left at a safe boundary. |
+| 8 | Cyclone right | Rotate hands or the game’s real score/cash resource right at a safe boundary. |
+| 9 | Camp healing | Each hero heals three HP, capped at maximum HP. |
+| 10 | Dare everyone | Everyone must confirm their custom dare before their next manual play. |
+| 11 | XP lesson | Each character receives five XP and levels are recalculated. |
+| 12 | Shield round | Block chaos penalties, coin gambles and Robin Hood taxes. |
+
+</details>
+
+<details>
+<summary><strong>Bluff</strong></summary>
+
+| Rule | Direct effect |
+| --- | --- |
+| Winner Takes It | Accept a boxing duel to swap real hands; Tarneeb partners cannot challenge each other. |
+| Hot Potato | Skip the active card turn. |
+| Seat Roulette | Shuffle physical seats and future turn order. Current play stays active. |
+| Cyclone | Pass real hands left or right when no bluff call is pending. |
+| Double or Nothing | On each eligible pickup, the configured chance flips a coin: take twice the cards or none. |
+| Chaos Die | Roll only applicable faces for this game and player count. See the game-specific face list below. |
+| Table Flip | A lowest actual scorer rolls a d6 and ends the whole game with no winner. In Werewolf, any living player may flip; solo Solitaire may also quit by flipping. |
+| Blackout | For ten seconds, conceal other unlit players’ actions, effects, sounds and public results; own controls and live turn/phase information remain usable. The fixed spotlight stays visible. |
+| Robin Hood | Hidden: A point tax does not fit card shedding, exact checkout or cup racks. |
+| Banned Word | A typed slip or host-reported voice slip adds one real penalty card. |
+| Dare Wheel | Penalties and misses spin a task from the host’s list. The offender must acknowledge completion in Chaos controls before their next manual play; automatic timeouts still work. Physical completion is on the group’s honor system. |
+| Time Warp | Majority vote restores the last eligible gameplay state and timers. Revealed information cannot be forgotten; secret role actions are excluded. |
+
+| Die face | Modifier | Effect |
+| --- | --- | --- |
+| 1 | Double pickups | Every card pickup is doubled. |
+| 2 | No pickups | Incoming pickups go back into the stock. |
+| 3 | Reverse order | Reverse future turn order; current play and teams stay fixed. |
+| 4 | Hot fuse | A half-length Hot Potato fuse forces the active opportunity. |
+| 5 | Quick turns | Decision fuses shrink; a half-length Hot Potato fuse is active. |
+| 6 | Blackout | Conceal unlit actions for ten seconds. |
+| 7 | Cyclone left | Rotate hands or the game’s real score/cash resource left at a safe boundary. |
+| 8 | Cyclone right | Rotate hands or the game’s real score/cash resource right at a safe boundary. |
+| 9 | Seat shuffle | Shuffle seats and future turns at a safe boundary. |
+| 10 | Dare everyone | Everyone must confirm their custom dare before their next manual play. |
+| 11 | Lighten hands | At the next safe boundary, everyone with more than one card discards a random card. |
+| 12 | Shield round | Block chaos penalties, coin gambles and Robin Hood taxes. |
+
+</details>
+
+<details>
+<summary><strong>Tarneeb</strong></summary>
+
+| Rule | Direct effect |
+| --- | --- |
+| Winner Takes It | Accept a boxing duel to swap real hands; Tarneeb partners cannot challenge each other. |
+| Hot Potato | Pass a bid, choose a legal trump, or automatically play a random legal card. |
+| Seat Roulette | Shuffle physical seats and future turn order. Wait for a completed trick; partners remain fixed. Current play stays active. |
+| Cyclone | Pass all remaining hands after a completed trick; preserve equal hand sizes and fixed partners. |
+| Double or Nothing | Double or erase positive team point gains at the configured chance. |
+| Chaos Die | Roll only applicable faces for this game and player count. See the game-specific face list below. |
+| Table Flip | A lowest actual scorer rolls a d6 and ends the whole game with no winner. In Werewolf, any living player may flip; solo Solitaire may also quit by flipping. |
+| Blackout | For ten seconds, conceal other unlit players’ actions, effects, sounds and public results; own controls and live turn/phase information remain usable. The fixed spotlight stays visible. |
+| Robin Hood | After a positive gain, a leading team pays one real point to last place. Poker and Blackjack apply this only on settlement. |
+| Banned Word | Lose one actual team point. |
+| Dare Wheel | Penalties and misses spin a task from the host’s list. The offender must acknowledge completion in Chaos controls before their next manual play; automatic timeouts still work. Physical completion is on the group’s honor system. |
+| Time Warp | Majority vote restores the last eligible gameplay state and timers. Revealed information cannot be forgotten; secret role actions are excluded. |
+
+| Die face | Modifier | Effect |
+| --- | --- | --- |
+| 1 | Double gains | Double positive game points, XP or cash gains. |
+| 2 | Zero gains | Positive gains are erased. |
+| 3 | Reverse order | Reverse future turn order; current play and teams stay fixed. |
+| 4 | Hot fuse | A half-length Hot Potato fuse forces the active opportunity. |
+| 5 | Robin’s tax | A gaining leader pays one actual point or chip to last place. |
+| 6 | Blackout | Conceal unlit actions for ten seconds. |
+| 7 | Cyclone left | Rotate hands or the game’s real score/cash resource left at a safe boundary. |
+| 8 | Cyclone right | Rotate hands or the game’s real score/cash resource right at a safe boundary. |
+| 9 | Seat shuffle | Shuffle seats and future turns at a safe boundary. |
+| 10 | Dare everyone | Everyone must confirm their custom dare before their next manual play. |
+| 11 | Bonus point | Each scoring player or team receives one actual point. |
+| 12 | Shield round | Block chaos penalties, coin gambles and Robin Hood taxes. |
+
+</details>
+
+<details>
+<summary><strong>Card sandbox · free sandbox</strong></summary>
+
+| Rule | Direct effect |
+| --- | --- |
+| Winner Takes It | Accept a boxing duel to swap real hands; Tarneeb partners cannot challenge each other. |
+| Hot Potato | Skip the active card turn. |
+| Seat Roulette | Shuffle physical seats and future turn order. Current play stays active. |
+| Cyclone | Pass real hands left or right when no bluff call is pending. |
+| Double or Nothing | On each eligible pickup, the configured chance flips a coin: take twice the cards or none. |
+| Chaos Die | Roll only applicable faces for this game and player count. See the game-specific face list below. |
+| Table Flip | A lowest actual scorer rolls a d6 and ends the whole game with no winner. In Werewolf, any living player may flip; solo Solitaire may also quit by flipping. |
+| Blackout | For ten seconds, conceal other unlit players’ actions, effects, sounds and public results; own controls and live turn/phase information remain usable. The fixed spotlight stays visible. |
+| Robin Hood | Hidden: A point tax does not fit card shedding, exact checkout or cup racks. |
+| Banned Word | A typed slip or host-reported voice slip adds one real penalty card. |
+| Dare Wheel | Penalties and misses spin a task from the host’s list. The offender must acknowledge completion in Chaos controls before their next manual play; automatic timeouts still work. Physical completion is on the group’s honor system. |
+| Time Warp | Majority vote restores the last eligible gameplay state and timers. Revealed information cannot be forgotten; secret role actions are excluded. |
+
+| Die face | Modifier | Effect |
+| --- | --- | --- |
+| 1 | Double pickups | Every card pickup is doubled. |
+| 2 | No pickups | Incoming pickups go back into the stock. |
+| 3 | Reverse order | Reverse future turn order; current play and teams stay fixed. |
+| 4 | Hot fuse | A half-length Hot Potato fuse forces the active opportunity. |
+| 5 | Quick turns | Decision fuses shrink; a half-length Hot Potato fuse is active. |
+| 6 | Blackout | Conceal unlit actions for ten seconds. |
+| 7 | Cyclone left | Rotate hands or the game’s real score/cash resource left at a safe boundary. |
+| 8 | Cyclone right | Rotate hands or the game’s real score/cash resource right at a safe boundary. |
+| 9 | Seat shuffle | Shuffle seats and future turns at a safe boundary. |
+| 10 | Dare everyone | Everyone must confirm their custom dare before their next manual play. |
+| 11 | Lighten hands | At the next safe boundary, everyone with more than one card discards a random card. |
+| 12 | Shield round | Block chaos penalties, coin gambles and Robin Hood taxes. |
+
+</details>
+
+<details>
+<summary><strong>Charades</strong></summary>
+
+| Rule | Direct effect |
+| --- | --- |
+| Winner Takes It | The winner takes the loser’s earned personal points, updating both pair totals; challenge an opposing pair. |
+| Hot Potato | End the current teammate’s full guessing turn. |
+| Seat Roulette | Shuffle physical seats and future turn order. Keep paired teammates’ turns together. Current play stays active. |
+| Cyclone | Rotate actual combined pair scores; earned-answer receipts stay with their original player. |
+| Double or Nothing | Double or erase positive pair point gains at the configured chance. |
+| Chaos Die | Roll only applicable faces for this game and player count. See the game-specific face list below. |
+| Table Flip | A lowest actual scorer rolls a d6 and ends the whole game with no winner. In Werewolf, any living player may flip; solo Solitaire may also quit by flipping. |
+| Blackout | For ten seconds, conceal other unlit players’ actions, effects, sounds and public results; own controls and live turn/phase information remain usable. The fixed spotlight stays visible. |
+| Robin Hood | After a positive gain, a leading pair pays one real point to last place. Poker and Blackjack apply this only on settlement. |
+| Banned Word | Lose one actual pair point. |
+| Dare Wheel | Penalties and misses spin a task from the host’s list. The offender must acknowledge completion in Chaos controls before their next manual play; automatic timeouts still work. Physical completion is on the group’s honor system. |
+| Time Warp | Majority vote restores the last eligible gameplay state and timers. Revealed information cannot be forgotten; secret role actions are excluded. |
+
+| Die face | Modifier | Effect |
+| --- | --- | --- |
+| 1 | Double gains | Double positive game points, XP or cash gains. |
+| 2 | Zero gains | Positive gains are erased. |
+| 3 | Reverse order | Reverse future turn order; current play and teams stay fixed. |
+| 4 | Hot fuse | A half-length Hot Potato fuse forces the active opportunity. |
+| 5 | Robin’s tax | A gaining leader pays one actual point or chip to last place. |
+| 6 | Blackout | Conceal unlit actions for ten seconds. |
+| 7 | Cyclone left | Rotate hands or the game’s real score/cash resource left at a safe boundary. |
+| 8 | Cyclone right | Rotate hands or the game’s real score/cash resource right at a safe boundary. |
+| 9 | Seat shuffle | Shuffle seats and future turns at a safe boundary. |
+| 10 | Dare everyone | Everyone must confirm their custom dare before their next manual play. |
+| 11 | Bonus point | Each scoring player or team receives one actual point. |
+| 12 | Shield round | Block chaos penalties, coin gambles and Robin Hood taxes. |
+
+</details>
+
+<details>
+<summary><strong>Trivia · free-for-all</strong></summary>
+
+| Rule | Direct effect |
+| --- | --- |
+| Winner Takes It | The winner takes the loser’s actual score; non-scoring trivia masters cannot challenge. |
+| Hot Potato | Exclude the owner for this question; close their answering turn or the master’s question. |
+| Seat Roulette | Hidden: Everyone may answer; there is no answering turn order to shuffle. |
+| Cyclone | Rotate actual player scores; earned-answer receipts stay with their original player. |
+| Double or Nothing | Double or erase positive point gains at the configured chance. |
+| Chaos Die | Roll only applicable faces for this game and player count. See the game-specific face list below. |
+| Table Flip | A lowest actual scorer rolls a d6 and ends the whole game with no winner. In Werewolf, any living player may flip; solo Solitaire may also quit by flipping. |
+| Blackout | For ten seconds, conceal other unlit players’ actions, effects, sounds and public results; own controls and live turn/phase information remain usable. The fixed spotlight stays visible. |
+| Robin Hood | After a positive gain, a leading player pays one real point to last place. Poker and Blackjack apply this only on settlement. |
+| Banned Word | Lose one actual point. |
+| Dare Wheel | Penalties and misses spin a task from the host’s list. The offender must acknowledge completion in Chaos controls before their next manual play; automatic timeouts still work. Physical completion is on the group’s honor system. |
+| Time Warp | Majority vote restores the last eligible gameplay state and timers. Revealed information cannot be forgotten; secret role actions are excluded. |
+
+| Die face | Modifier | Effect |
+| --- | --- | --- |
+| 1 | Double gains | Double positive game points, XP or cash gains. |
+| 2 | Zero gains | Positive gains are erased. |
+| 3 | Quick question | The current question has half its remaining answering time. |
+| 4 | Hot fuse | A half-length Hot Potato fuse forces the active opportunity. |
+| 5 | Robin’s tax | A gaining leader pays one actual point or chip to last place. |
+| 6 | Blackout | Conceal unlit actions for ten seconds. |
+| 7 | Cyclone left | Rotate hands or the game’s real score/cash resource left at a safe boundary. |
+| 8 | Cyclone right | Rotate hands or the game’s real score/cash resource right at a safe boundary. |
+| 10 | Dare everyone | Everyone must confirm their custom dare before their next manual play. |
+| 11 | Bonus point | Each scoring player or team receives one actual point. |
+| 12 | Shield round | Block chaos penalties, coin gambles and Robin Hood taxes. |
+
+</details>
+
+<details>
+<summary><strong>Block Party</strong></summary>
+
+| Rule | Direct effect |
+| --- | --- |
+| Winner Takes It | The winner takes the loser’s cash, while properties and board positions stay owned. |
+| Hot Potato | Automatically finish the current board turn using legal defaults. |
+| Seat Roulette | Shuffle physical seats and future turn order. Current play stays active. |
+| Cyclone | Rotate cash balances; property ownership, careers and board positions remain unchanged. |
+| Double or Nothing | Double or erase positive cash gains at the configured chance. |
+| Chaos Die | Roll only applicable faces for this game and player count. See the game-specific face list below. |
+| Table Flip | A lowest actual scorer rolls a d6 and ends the whole game with no winner. In Werewolf, any living player may flip; solo Solitaire may also quit by flipping. |
+| Blackout | For ten seconds, conceal other unlit players’ actions, effects, sounds and public results; own controls and live turn/phase information remain usable. The fixed spotlight stays visible. |
+| Robin Hood | After a positive gain, a leading player pays one real chip / cash unit to last place. Poker and Blackjack apply this only on settlement. |
+| Banned Word | Lose one actual cash unit. |
+| Dare Wheel | Penalties and misses spin a task from the host’s list. The offender must acknowledge completion in Chaos controls before their next manual play; automatic timeouts still work. Physical completion is on the group’s honor system. |
+| Time Warp | Majority vote restores the last eligible gameplay state and timers. Revealed information cannot be forgotten; secret role actions are excluded. |
+
+| Die face | Modifier | Effect |
+| --- | --- | --- |
+| 1 | Double gains | Double positive game points, XP or cash gains. |
+| 2 | Zero gains | Positive gains are erased. |
+| 3 | Reverse order | Reverse future turn order; current play and teams stay fixed. |
+| 4 | Hot fuse | A half-length Hot Potato fuse forces the active opportunity. |
+| 5 | Robin’s tax | A gaining leader pays one actual point or chip to last place. |
+| 6 | Blackout | Conceal unlit actions for ten seconds. |
+| 7 | Cyclone left | Rotate hands or the game’s real score/cash resource left at a safe boundary. |
+| 8 | Cyclone right | Rotate hands or the game’s real score/cash resource right at a safe boundary. |
+| 9 | Seat shuffle | Shuffle seats and future turns at a safe boundary. |
+| 10 | Dare everyone | Everyone must confirm their custom dare before their next manual play. |
+| 11 | Bank gift | Every player receives one actual cash unit. |
+| 12 | Shield round | Block chaos penalties, coin gambles and Robin Hood taxes. |
+
+</details>
+
+<details>
+<summary><strong>Life Paths</strong></summary>
+
+| Rule | Direct effect |
+| --- | --- |
+| Winner Takes It | The winner takes the loser’s cash, while properties and board positions stay owned. |
+| Hot Potato | Automatically finish the current board turn using legal defaults. |
+| Seat Roulette | Shuffle physical seats and future turn order. Current play stays active. |
+| Cyclone | Rotate cash balances; property ownership, careers and board positions remain unchanged. |
+| Double or Nothing | Double or erase positive cash gains at the configured chance. |
+| Chaos Die | Roll only applicable faces for this game and player count. See the game-specific face list below. |
+| Table Flip | A lowest actual scorer rolls a d6 and ends the whole game with no winner. In Werewolf, any living player may flip; solo Solitaire may also quit by flipping. |
+| Blackout | For ten seconds, conceal other unlit players’ actions, effects, sounds and public results; own controls and live turn/phase information remain usable. The fixed spotlight stays visible. |
+| Robin Hood | After a positive gain, a leading player pays one real chip / cash unit to last place. Poker and Blackjack apply this only on settlement. |
+| Banned Word | Lose one actual cash unit. |
+| Dare Wheel | Penalties and misses spin a task from the host’s list. The offender must acknowledge completion in Chaos controls before their next manual play; automatic timeouts still work. Physical completion is on the group’s honor system. |
+| Time Warp | Majority vote restores the last eligible gameplay state and timers. Revealed information cannot be forgotten; secret role actions are excluded. |
+
+| Die face | Modifier | Effect |
+| --- | --- | --- |
+| 1 | Double gains | Double positive game points, XP or cash gains. |
+| 2 | Zero gains | Positive gains are erased. |
+| 3 | Reverse order | Reverse future turn order; current play and teams stay fixed. |
+| 4 | Hot fuse | A half-length Hot Potato fuse forces the active opportunity. |
+| 5 | Robin’s tax | A gaining leader pays one actual point or chip to last place. |
+| 6 | Blackout | Conceal unlit actions for ten seconds. |
+| 7 | Cyclone left | Rotate hands or the game’s real score/cash resource left at a safe boundary. |
+| 8 | Cyclone right | Rotate hands or the game’s real score/cash resource right at a safe boundary. |
+| 9 | Seat shuffle | Shuffle seats and future turns at a safe boundary. |
+| 10 | Dare everyone | Everyone must confirm their custom dare before their next manual play. |
+| 11 | Bank gift | Every player receives one actual cash unit. |
+| 12 | Shield round | Block chaos penalties, coin gambles and Robin Hood taxes. |
+
+</details>
+
+<details>
+<summary><strong>Trivia · turns with master</strong></summary>
+
+| Rule | Direct effect |
+| --- | --- |
+| Winner Takes It | The winner takes the loser’s actual score; non-scoring trivia masters cannot challenge. |
+| Hot Potato | Exclude the owner for this question; close their answering turn or the master’s question. |
+| Seat Roulette | Shuffle physical seats and future turn order. Current play stays active. |
+| Cyclone | Rotate actual player scores; earned-answer receipts stay with their original player. |
+| Double or Nothing | Double or erase positive point gains at the configured chance. |
+| Chaos Die | Roll only applicable faces for this game and player count. See the game-specific face list below. |
+| Table Flip | A lowest actual scorer rolls a d6 and ends the whole game with no winner. In Werewolf, any living player may flip; solo Solitaire may also quit by flipping. |
+| Blackout | For ten seconds, conceal other unlit players’ actions, effects, sounds and public results; own controls and live turn/phase information remain usable. The fixed spotlight stays visible. |
+| Robin Hood | After a positive gain, a leading player pays one real point to last place. Poker and Blackjack apply this only on settlement. |
+| Banned Word | Lose one actual point. |
+| Dare Wheel | Penalties and misses spin a task from the host’s list. The offender must acknowledge completion in Chaos controls before their next manual play; automatic timeouts still work. Physical completion is on the group’s honor system. |
+| Time Warp | Majority vote restores the last eligible gameplay state and timers. Revealed information cannot be forgotten; secret role actions are excluded. |
+
+| Die face | Modifier | Effect |
+| --- | --- | --- |
+| 1 | Double gains | Double positive game points, XP or cash gains. |
+| 2 | Zero gains | Positive gains are erased. |
+| 3 | Reverse order | Reverse future turn order; current play and teams stay fixed. |
+| 4 | Hot fuse | A half-length Hot Potato fuse forces the active opportunity. |
+| 5 | Robin’s tax | A gaining leader pays one actual point or chip to last place. |
+| 6 | Blackout | Conceal unlit actions for ten seconds. |
+| 7 | Cyclone left | Rotate hands or the game’s real score/cash resource left at a safe boundary. |
+| 8 | Cyclone right | Rotate hands or the game’s real score/cash resource right at a safe boundary. |
+| 9 | Seat shuffle | Shuffle seats and future turns at a safe boundary. |
+| 10 | Dare everyone | Everyone must confirm their custom dare before their next manual play. |
+| 11 | Bonus point | Each scoring player or team receives one actual point. |
+| 12 | Shield round | Block chaos penalties, coin gambles and Robin Hood taxes. |
+
+</details>
+
+<details>
+<summary><strong>Card sandbox · Solitaire</strong></summary>
+
+| Rule | Direct effect |
+| --- | --- |
+| Winner Takes It | Hidden: Solitaire keeps its fixed puzzle deck and has no opponents or score economy. |
+| Hot Potato | Hidden: Solitaire keeps its fixed puzzle deck and has no opponents or score economy. |
+| Seat Roulette | Hidden: Solitaire keeps its fixed puzzle deck and has no opponents or score economy. |
+| Cyclone | Hidden: Solitaire keeps its fixed puzzle deck and has no opponents or score economy. |
+| Double or Nothing | Hidden: Solitaire keeps its fixed puzzle deck and has no opponents or score economy. |
+| Chaos Die | Hidden: Solitaire keeps its fixed puzzle deck and has no opponents or score economy. |
+| Table Flip | A lowest actual scorer rolls a d6 and ends the whole game with no winner. In Werewolf, any living player may flip; solo Solitaire may also quit by flipping. |
+| Blackout | Hidden: Solitaire keeps its fixed puzzle deck and has no opponents or score economy. |
+| Robin Hood | Hidden: Solitaire keeps its fixed puzzle deck and has no opponents or score economy. |
+| Banned Word | Hidden: Solitaire keeps its fixed puzzle deck and has no opponents or score economy. |
+| Dare Wheel | Hidden: Solitaire keeps its fixed puzzle deck and has no opponents or score economy. |
+| Time Warp | Majority vote restores the last eligible gameplay state and timers. Revealed information cannot be forgotten; secret role actions are excluded. |
+
+</details>
+
+### Timing, penalties and limits
+
+- **Hot Potato:** timers pause for blocking animations, pending bluff calls, boxing, intermissions and hand settlement. RPG uses a legal initiative end; free exploration loses 2 HP. Werewolf cancels the selected owner's phase action and costs the next vote; a voting-phase explosion abstains immediately. Shai Pong loses one shot; darts loses the remainder of its turn.
+- **Dare Wheel:** missed/busted darts, missed Pong shots, failed bluff calls, caught peeks, Charades skips/timeouts, empty Scribble drawings, Trivia timeouts, Blackjack losses, board/team score penalties and hero damage can spin the wheel. Banned Word and Hot Potato also spin it. Manual play waits for the offender to press **I completed the dare**; normal automatic deadlines still run. Physical completion is on trust. Poker folds alone do not count as a penalty.
+- **Blackout:** the server conceals unlit observations, events, messages and correlated sounds; own controls and current turn/phase stay usable. Hidden history stays concealed after the lights return, while current public state becomes visible again. It never reveals private roles, hands, dealer cards or answer keys.
+- **Banned Word:** one whole normalized word is chosen per round/phase/teammate turn. Typed slips are automatic; the host reports slips in external voice. Voice is not recorded or recognized. Werewolf night/eliminated chat restrictions still apply.
+- **Winner Takes It:** consent is required; preparation, secret moves and visible reveals pause the underlying game. Card stakes swap hands; score/cash stakes transfer actual resources. Darts transfers earned progress but leaves a legal final checkout dart. Pong takes one opposing cup and restores one own sunk cup, requires at least two surviving cups on both sides and is disabled during redemption. Opposing teams only. Poker/Blackjack wait for settled hands, RPG for exploration.
+- **Table Flip:** a lowest actual scorer (most cards in a shedding game, greatest darts remainder, fewest cups sunk, lowest score/cash/XP otherwise) rolls a d6 and ends the game **without a winner**. Any living Werewolf player may flip. Unsettled Poker/Blackjack stakes are refunded. Solo Solitaire can deliberately quit this way.
+- **Time Warp:** a majority vote within thirty seconds restores the last eligible gameplay action and shifts paused clocks. Poker stays within the same betting street; new streets, runouts and settlement invalidate undo. It is hidden in Blackjack and Werewolf. Revealed information cannot be forgotten.
+- **Shield die face:** blocks chaos penalties, chance coin gambles, Robin Hood and dare penalties for that modifier round; ordinary gameplay rules and losses still apply.
+- **Fixed-size games:** no random extra cards are created in Tarneeb, Hold’em, Blackjack or Solitaire. Double card pickups apply only to Bluff/free sandbox and are capped to prevent uncontrolled deck growth. Final party and cash-game winners are recalculated from chaos-adjusted actual standings.
+
+Validated with the production client/server build and **280 automated tests**, including all preset/rule compatibility combinations, supported die profiles, real resource transfers, exact checkout, redemption, fixed deck integrity, role privacy, wagering escrow and final-hand penalties. Restart the server and refresh clients to load the new rule policy together. Existing in-memory rooms disappear when their server stops.
+
 ## Version 0.16 · in-scene skill shots
 
 Darts and **Shai Pong** now use fast two-stage aiming directly in the world. The dotted trajectory moves vertically until the active player locks height, then horizontally until their second click releases the throw. A floating button stays beside the active model. The old target panel, direct aiming, power slider and accuracy meter have been removed; only a compact score/turn strip remains. The close camera keeps the character and trajectory in view. Height locking has a confirmation sound and the character animates the release.
@@ -31,7 +609,7 @@ Choose a preset from **Games**, edit **Game rules** in the lobby, then start. Al
 
 **Shai Pong:** alternating lobby seats create fixed teams, shown at the table. Teammates rotate each shot. Players line up at their team’s end of the table. A dotted trajectory sweeps vertically over the opposing rack; lock height using the character-side floating button, then lock the faster horizontal sweep to throw. Opponents target separate, fixed red/blue racks. Hits remove cups on the server. Each team gets two shots; sinking both returns the balls if enabled. After a rack is cleared, optional redemption gives the other team two shots to clear the remaining opposing cups. Success starts three-cup overtime; failure awards the original clearing team. At the round limit the team with more surviving cups wins; equal counts tie. No drinking is required.
 
-**Chaos in these modes:** score-changing effects use a separate bonus tally, preserving faction victory, main wager payouts, X01 scores and cup racks. Cyclone passes that tally. Hot Potato skips the Werewolf owner’s action for the current phase, forfeits an active Blackjack main bet (or refunds a locked bet and sits out during betting), skips the rest of a darts turn, or misses one pong shot. Seat Roulette changes future turn order; pong teams stay fixed. Blackjack seat changes and cash challenges wait until between hands. Winner Takes It wagers bonus points in the other three games; Werewolf challengers must be alive and pong challengers must be opponents. Challenge and rewind timers pause/resume game deadlines. Blackout masks unlit public observations without exposing roles or dealer cards. Banned Word applies to allowed day chat and host-reported voice slips. Time Warp cannot erase information someone has already seen; secret night actions do not advertise an undo snapshot.
+**Chaos in these modes:** the original bonus-tally behavior from 0.15 is superseded by the actual-resource adapters and compatibility policy in Version 0.17 above.
 
 ## Version 0.14 · paced chaos and easier party play
 
@@ -125,7 +703,7 @@ Tarneeb uses the common scoring variation: a made bid scores tricks won, an unbi
 
 The compact panel shows community cards, your private cards, pot, blinds, turn timer, stacks and last actions. The polygon table shuffles/deals cards, reveals community cards, sends chip stacks into the pot and awards them to winners; checks knock, folds swish and chip wins chime. Both overview and first-person modes keep the board above the controls. Other players’ hole cards, undealt cards and burn cards remain server-private until an actual showdown.
 
-Shared chaos is optional. Poker uses a **separate bonus tally**, awarding a point to each pot winner; score doubling, taxes, penalties and score scrambles affect that tally without changing chips committed to a pot. Seat Roulette and Cyclone wait until a hand ends; Cyclone passes bonus tallies, and hole cards stay attached to their owners. Reverse direction and scrambled order affect subsequent action order as house rules. **Winner Takes It** wagers chip stacks only between completed hands. **Time Warp** restores private cards, bets, pot and stacks with a majority vote. Standard poker always determines the chip winner, regardless of bonus tallies. No real-money payments or buy-ins are implemented.
+Shared chaos is optional. Poker uses actual chip stacks for Cyclone, Robin Hood, penalties and between-hand Winner Takes It challenges. Double or Nothing is hidden to preserve pot accounting. Chaos Die changes decision clocks, turn order, taxes and between-hand effects instead of multiplying pots. Seat Roulette/Cyclone wait until settlement and hole cards remain attached to owners. Time Warp only rewinds betting actions within the same street. No real-money payments or buy-ins are implemented.
 
 Implementation: server/poker.ts, shared/poker.ts, src/poker-ui.ts, src/poker-visuals.ts. The 26 poker tests cover ranks/kickers, heads-up and multiway action, minimum raises, short all-ins, deterministic side pots, odd-chip ties, privacy, timeouts, lifecycle, challenge stakes, undo, and 75 randomized all-in tournaments with chip-conservation checks. Betting rules reference: [PokerStars Texas Hold’em rules](https://www.pokerstars.com/poker/games/texas-holdem/).
 
@@ -164,7 +742,7 @@ Before starting, open **House rules → Chaos**. Enable any combination of the t
 
 **Round boundaries:** a full turn cycle in Bluff, Card sandbox and board games; each completed trick in Tarneeb; a new Charades prompt; a new Trivia question. A round-end Cyclone in Trivia also queues when the current question resolves. Seat and hand swaps wait until deal/dice animations, Bluff challenge windows, boxing, pending life choices and partially played Tarneeb tricks are clear. Physical swaps do not change who owns the current turn or which players are teammates. Seat Roulette makes the new seat order the future turn order.
 
-Card-game chaos tallies do not replace the usual victory condition. Cardless Cyclone passes a separate bonus tally rather than moving property ownership, master roles or team membership. Tarneeb still requires the final chaos-adjusted team total to reach its target. Correct-answer counts remain a count of correct answers even when points double or are erased.
+Chaos uses actual game resources, as documented in Version 0.17. Tarneeb still requires the final chaos-adjusted team total to reach its target. Correct-answer counts remain a count of correct answers even when actual scores double, rotate or are erased.
 
 Time Warp restores hands, piles, positions, cash, scores, rules-derived state and remaining timer durations; it preserves chat, connection status and the current host. Undo snapshots and future questions remain private on the server. A successful rewind consumes the snapshot. Timer expiry or a new gameplay action invalidates an older snapshot; voting is cancelled if a voter disconnects. An action that ends the match can be rewound from the results screen. Rewinding cannot make players forget a card, prompt or answer already revealed. Restarting clears votes, flip usage, tallies, dares and timers.
 

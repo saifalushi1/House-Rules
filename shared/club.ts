@@ -4,7 +4,7 @@ export interface WerewolfState {
  phase:'night'|'day'|'vote';day:number;ends:number;roles:Record<string,Role>;alive:string[];
  night:Record<string,string>;votes:Record<string,string>;skipped:string[];lastProtected?:string;
  knowledge:Record<string,{day:number;player:string;wolf:boolean}[]>;
- revealed:Record<string,Role>;lastResult:string;winningTeam?:'village'|'werewolves';
+ revealed:Record<string,Role>;lastResult:string;winningTeam?:'village'|'werewolves';voteBans?:string[];
 }
 export interface WerewolfView extends Omit<WerewolfState,'roles'|'night'|'votes'|'knowledge'|'skipped'|'lastProtected'> {
  role:Role;allies:string[];ownTarget?:string;ownVote?:string;ownSkipped:boolean;
@@ -15,7 +15,7 @@ export interface BlackjackState {phase:'betting'|'playing'|'dealer'|'result';rou
 export interface BlackjackView extends Omit<BlackjackState,'dealer'|'seats'> {dealer:(Card|null)[];seats:Omit<BlackjackSeat,'startCash'>[]}
 export interface DartHit {player:string;x:number;y:number;points:number;multiplier:number;label:string;bust:boolean;at:number}
 export interface DartsState {remaining:Record<string,number>;turnStart:number;left:number;ends:number;aimAt:number;aimLock?:{y:number;at:number};recent:DartHit[]}
-export interface PongShot {player:string;team:number;x:number;y:number;cup?:number;hit:boolean;at:number}
+export interface PongShot {player:string;team:number;x:number;y:number;cup?:number;hit:boolean;cupsTaken?:number[];at:number}
 export interface PongState {teams:string[][];cups:boolean[][];team:number;left:number;hits:number;shooters:number[];ends:number;aimAt:number;aimLock?:{y:number;at:number};redemption:boolean;pendingWinner?:number;recent:PongShot[];overtime:number;winningTeam?:number}
 export const dartNumbers=[20,1,18,4,13,6,10,15,2,17,3,19,7,16,8,11,14,9,12,5];
 export function dartScore(x:number,y:number){const radius=Math.hypot(x,y);if(radius>1)return{points:0,multiplier:0,label:'Miss'};if(radius<=.035)return{points:50,multiplier:2,label:'Bullseye'};if(radius<=.085)return{points:25,multiplier:1,label:'Outer bull'};const angle=(Math.atan2(x,-y)+Math.PI/20+Math.PI*2)%(Math.PI*2),n=dartNumbers[Math.floor(angle/(Math.PI/10))%20],multiplier=radius>=.9?2:radius>=.52&&radius<=.59?3:1;return{points:n*multiplier,multiplier,label:(multiplier===3?'Triple ':multiplier===2?'Double ':'')+n};}
