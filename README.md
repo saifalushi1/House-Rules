@@ -106,7 +106,7 @@ Select 301 or 501 and optional double-out. Watch the animated dotted trajectory 
 
 ### Shai Pong
 
-Alternating lobby seats create fixed teams, shown at the table. Teammates rotate each shot. Players line up at their team’s end of the table. A dotted trajectory sweeps vertically over the opposing rack; lock height using the character-side floating button, then lock the faster horizontal sweep to throw. Opponents target separate, fixed red/blue racks. Hits remove cups on the server. Each team gets two shots; sinking both returns the balls if enabled. After a rack is cleared, optional redemption gives the other team two shots to clear the remaining opposing cups. Success starts three-cup overtime; failure awards the original clearing team. At the round limit the team with more surviving cups wins; equal counts tie. No drinking is required.
+Alternating lobby seats create fixed teams, shown at the table. Teammates rotate each shot. Players line up at their team’s end of the table. A dotted trajectory sweeps vertically over the opposing rack; lock height using the character-side floating button, then lock the faster horizontal sweep to throw. Opponents target separate, fixed red/blue racks. Hits are scored immediately on the server, while the struck cups remain visible until the ball lands. Two-cup chaos hits and new overtime racks use the same impact timing. Each team gets two shots; sinking both returns the balls if enabled. After a rack is cleared, optional redemption gives the other team two shots to clear the remaining opposing cups. Success starts three-cup overtime; failure awards the original clearing team. At the round limit the team with more surviving cups wins; equal counts tie. No drinking is required.
 
 ### Darts and Shai Pong trajectory speed
 
@@ -798,7 +798,7 @@ Expand a game below for all twelve rules and its exact die faces. Trivia's every
 - **Shield die face:** blocks chaos penalties, chance coin gambles, Robin Hood and dare penalties for that modifier round; ordinary gameplay rules and losses still apply.
 - **Fixed-size games:** no random extra cards are created in Tarneeb, Hold’em, Blackjack or Solitaire. Double card pickups apply only to Bluff/free sandbox and are capped to prevent uncontrolled deck growth. Final party and cash-game winners are recalculated from chaos-adjusted actual standings.
 
-Validated with the production client/server build and **280 automated tests**, including all preset/rule compatibility combinations, supported die profiles, real resource transfers, exact checkout, redemption, fixed deck integrity, role privacy, wagering escrow and final-hand penalties. Restart the server and refresh clients to load the new rule policy together. Existing in-memory rooms disappear when their server stops.
+Validated with the production client/server build and **286 automated tests**, including all preset/rule compatibility combinations, supported die profiles, real resource transfers, exact checkout, redemption, fixed deck integrity, role privacy, wagering escrow and final-hand penalties. Restart the server and refresh clients to load the new rule policy together. Existing in-memory rooms disappear when their server stops.
 
 ## Development
 
@@ -846,7 +846,7 @@ Rooms are in memory. Restarting the server clears games. Disconnected rooms expi
 
 ## Verification
 
-The v0.17 gameplay update passed the production client/server build and **280 automated tests**. Coverage includes all preset/rule compatibility combinations, supported die profiles, real resource transfers, fixed deck integrity, exact darts checkout, Pong redemption, wagering escrow, secret-role privacy, reconnects and final-hand penalties. Run `npm run build` before `npm test`, since integration tests use the production build.
+The v0.17 gameplay update passed the production client/server build and **286 automated tests**. Coverage includes all preset/rule compatibility combinations, supported die profiles, real resource transfers, fixed deck integrity, exact darts checkout, Pong redemption, wagering escrow, secret-role privacy, reconnects and final-hand penalties. Run `npm run build` before `npm test`, since integration tests use the production build.
 
 Browser checks cover room creation, joining, private hands, card play and bluff calls, camera switching, negotiations, host editing, direct aiming, actual standings, compatible-only chaos controls and the per-game Info reference.
 
