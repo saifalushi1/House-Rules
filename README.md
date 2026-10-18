@@ -55,6 +55,14 @@ The server prints your local network address, such as `http://10.0.0.99:3000`. F
 
 Use a private VPN connection such as [Tailscale machine sharing](https://tailscale.com/docs/features/sharing), or a WebSocket-capable HTTPS tunnel to local port 3000. A room code by itself does not make your computer reachable across the internet. With a private network, share the host computer's private-network IP and port 3000; follow the provider's access setup. This project has no built-in hosting account, tunnel, or matchmaking service.
 
+**Cloudflare Tunnel:** with House Rules running on port 3000 and `cloudflared` installed, open a second terminal and run:
+
+```powershell
+cloudflared tunnel --url http://localhost:3000
+```
+
+Share the public HTTPS URL printed by `cloudflared` with your friends. Open the game through that URL before copying room invites so they use the public address. Keep both the game server and tunnel terminals running while playing.
+
 Use it with trusted friends. Room codes are lightweight invite gates, not account authentication. No router or firewall changes have been made automatically. For an internet deployment, put the server behind HTTPS and authentication rather than exposing HTTP directly.
 
 ## Available games
