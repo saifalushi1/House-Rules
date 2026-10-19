@@ -15,7 +15,7 @@ export function validateRules(input: unknown): Rules {
   const require = (ok: unknown, message: string) => { if (!ok) throw new Error(message); };
   require(input && typeof input === 'object', 'Invalid rules.');
   const x: Record<string, unknown> = { ...defaults, ...(input as Record<string, unknown>) };
-  require(['bluff', 'tarneeb', 'cards', 'charades', 'trivia', 'property', 'life', 'scribble', 'rpg', 'poker', 'werewolf', 'blackjack', 'darts', 'beerpong'].includes(String(x.game)), 'Unknown game.');
+  require(['jackaroo','bluff', 'tarneeb', 'cards', 'charades', 'trivia', 'property', 'life', 'scribble', 'rpg', 'poker', 'werewolf', 'blackjack', 'darts', 'beerpong'].includes(String(x.game)), 'Unknown game.');
   require(['first', 'third'].includes(String(x.camera)), 'Unknown camera.');
   require(Object.hasOwn(backgrounds,String(x.background)), 'Unknown background.');
   require(typeof x.charadeCategory==='string' && Object.hasOwn(charadeCategories,x.charadeCategory), 'Unknown charades category.');
@@ -26,7 +26,7 @@ export function validateRules(input: unknown): Rules {
   for(const key of ['chaosWords','chaosDares']){require(typeof x[key]==='string'&&(x[key] as string).length<=4000,'Chaos lists must be text up to 4000 characters.');const list=(x[key] as string).split('\n').map(v=>v.trim()).filter(Boolean);require(list.length>0&&list.length<=50&&list.every(v=>v.length<=120),'Use 1–50 entries, at most 120 characters each.');if(key==='chaosWords')require(list.every(v=>/^[\p{L}\p{N}]+$/u.test(v)),'Banned words must be single words.');(r as unknown as Record<string,unknown>)[key]=list.join('\n');}
   require(typeof x.triviaCategory==='string'&&Object.hasOwn(triviaCategories,x.triviaCategory),'Unknown trivia category.');r.triviaCategory=x.triviaCategory as Rules['triviaCategory'];
   const ranges: Record<string, [number, number]> = {wolfCount:[1,2],wolfNightSeconds:[10,120],wolfDaySeconds:[15,300],wolfVoteSeconds:[10,120],blackjackDecks:[1,6],blackjackSeconds:[10,120],blackjackRounds:[1,50],blackjackMin:[1,1000],blackjackMax:[1,10000],dartsAimSpeed:[.25,3],pongAimSpeed:[.25,3],aimSeconds:[10,120],aimRounds:[0,100],dartsStart:[301,501],pongCups:[6,10],
-    chaosHotSeconds:[5,120],chaosMinSeconds:[2,30],chaosShrinkSeconds:[0,10],chaosSeatEvery:[1,20],chaosRandomPercent:[0,100],chaosDoublePercent:[0,100],
+    jackarooSeconds:[10,120],chaosHotSeconds:[5,120],chaosMinSeconds:[2,30],chaosShrinkSeconds:[0,10],chaosSeatEvery:[1,20],chaosRandomPercent:[0,100],chaosDoublePercent:[0,100],
     pokerStack:[100,10000],pokerSmallBlind:[1,100],pokerBigBlind:[2,200],pokerSeconds:[10,120],pokerHands:[0,100],
     charadeRounds:[1,5],scribbleSeconds:[20,180],scribbleRounds:[1,8],
     maxPlayers: [2, 8], decks: [1, 3], handSize: [1, 20], targetScore: [10, 100],
@@ -39,7 +39,7 @@ export function validateRules(input: unknown): Rules {
     require(['rentMultiplier','dartsAimSpeed','pongAimSpeed'].includes(key) || Number.isInteger(value), 'Use a whole number.');
     (r as unknown as Record<string, unknown>)[key] = value;
   }
-  for (const key of ['wolfSeer','wolfDoctor','wolfReveal','wolfRepeatSave','blackjackSideBets','blackjackHitSoft17','dartsDoubleOut','pongRedemption','pongBallsBack','rooftopAntics','soreLoser','allowTrading', 'tradeSlaps', 'boxingDuels', 'allowPeeking', 'catchPeeking', 'followSuit', 'reverseTurns', 'allowSkipping', 'freeParking']) {
+  for (const key of ['jackarooSplitSeven','jackarooFiveAny','jackarooRedQueenBurn','jackarooTenBurn','jackarooKingSweep','jackarooProtectedStart','wolfSeer','wolfDoctor','wolfReveal','wolfRepeatSave','blackjackSideBets','blackjackHitSoft17','dartsDoubleOut','pongRedemption','pongBallsBack','rooftopAntics','soreLoser','allowTrading', 'tradeSlaps', 'boxingDuels', 'allowPeeking', 'catchPeeking', 'followSuit', 'reverseTurns', 'allowSkipping', 'freeParking']) {
     require(typeof x[key] === 'boolean', 'Invalid toggle.');
     (r as unknown as Record<string, unknown>)[key] = x[key];
   }
@@ -51,6 +51,7 @@ export function validateRules(input: unknown): Rules {
   require(r.pokerSmallBlind<r.pokerBigBlind,'Small blind must be below the big blind.');
   require(r.pokerStack>=r.pokerBigBlind,'Starting chips must cover the big blind.');
   if(r.game==='poker')r.decks=1;
+  if(r.game==='jackaroo'){r.decks=1;r.maxPlayers=4;}
   if (r.game === 'tarneeb') { r.decks = 1; r.maxPlayers = 4; }
   if(r.cardLayout==='solitaire'&&r.game==='cards')r.decks=1;
   require([301,501].includes(r.dartsStart),'Choose 301 or 501.');require([6,10].includes(r.pongCups),'Choose six or ten cups.');require(r.blackjackMin<=r.blackjackMax&&r.blackjackMin<=r.pokerStack,'Blackjack minimum must fit the maximum and starting stack.');return normalizeChaos(r);

@@ -17,8 +17,8 @@ export class BoxingVisuals {
  update(){
   const s=this.s,d=s.room?.phase==='playing'?s.room.raid:undefined,on=!!d&&d.phase!=='offer';
   this.ring.visible=on;if(on)this.arenaLight.intensity=2.5;if(!on&&!this.active)return;this.active=on;
-  s.environment.group.visible=!on;s.group.visible=!on;s.pieces.visible=!on&&!s.room?.solitaire&&s.game!=='rpg';s.tokens.visible=!on&&!s.room?.solitaire&&s.game!=='rpg';s.dice.visible=!on;s.expansionFX.group.visible=!on;s.pokerFX.group.visible=!on;s.clubFX.group.visible=!on&&['werewolf','blackjack','darts','beerpong'].includes(s.game);
-  if(!on){s.actorKey='';s.handKey='';return;}s.ownHand.visible=false;
+  s.environment.group.visible=!on;s.group.visible=!on;s.pieces.visible=!on&&!s.room?.solitaire&&s.game!=='rpg'&&s.game!=='jackaroo';s.tokens.visible=!on&&!s.room?.solitaire&&s.game!=='rpg'&&s.game!=='jackaroo';s.dice.visible=!on;s.expansionFX.group.visible=!on;s.pokerFX.group.visible=!on;s.clubFX.group.visible=!on&&['werewolf','blackjack','darts','beerpong'].includes(s.game);
+  if(s.jackFX)s.jackFX.group.visible=!on&&s.game==='jackaroo';if(!on){s.actorKey='';s.handKey='';return;}s.ownHand.visible=false;
   const fighters=[d!.from,d!.to],spectators=[...s.actorMap.keys()].filter(id=>!fighters.includes(id));
   for(const [id,g] of s.actorMap){g.visible=true;g.userData.chairParts.forEach((o:THREE.Object3D)=>o.visible=false);g.rotation.set(0,0,0);const side=fighters.indexOf(id);
    if(side>=0){const sign=side===0?-1:1;g.position.set(sign*1.15,-.02,0);g.rotation.y=sign<0?-Math.PI/2:Math.PI/2;

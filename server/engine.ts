@@ -1,3 +1,4 @@
+import {initJackaroo,handleJackaroo,tickJackaroo,skipJackaroo} from './jackaroo.js';
 import {normalizeChaos} from '../shared/chaos-policy.js';
 import {initWerewolf,handleWerewolf,tickWerewolf,werewolfView,skipWerewolf} from './werewolf.js';
 import {initBlackjack,handleBlackjack,tickBlackjack,blackjackView,abortBlackjack,forfeitBlackjack} from './blackjack.js';
@@ -41,7 +42,7 @@ function need(ok: unknown, msg: string): asserts ok { if (!ok)
     throw new Error(msg); }
 function num(x: unknown, min: number, max: number) { need(typeof x === 'number' && Number.isFinite(x) && x >= min && x <= max, 'Parameter outside its allowed range.'); return x; }
 function dealTarneeb(r: Room) { clearPeeks(r); r.deck = makeDeck(); r.players.forEach(p => { p.hand = r.deck.splice(0, 13); }); r.bid = 6; r.bidder = undefined; r.bidPassed = []; r.passes = 0; r.tarneebPhase = 'bid'; r.tricks = [0, 0]; r.trick = []; r.lastTrick = undefined; r.trickCollectUntil=0; r.lastTrickTeam=0; }
-function validateClub(r:Room,rules:Rules=r.rules){if(rules.game==='werewolf'){need(r.players.length>=4,'Werewolf needs at least four players.');need(rules.wolfCount*2<r.players.length,'Werewolves must be fewer than half the players.');}if(rules.game==='beerpong')need([2,4,6,8].includes(r.players.length),'Shai Pong needs 2, 4, 6 or 8 players.');}
+function validateClub(r:Room,rules:Rules=r.rules){if(rules.game==='jackaroo')need(r.players.length===4,'Jackaroo needs four players, with partners opposite.');if(rules.game==='werewolf'){need(r.players.length>=4,'Werewolf needs at least four players.');need(rules.wolfCount*2<r.players.length,'Werewolves must be fewer than half the players.');}if(rules.game==='beerpong')need([2,4,6,8].includes(r.players.length),'Shai Pong needs 2, 4, 6 or 8 players.');}
 export function start(r: Room) {
 validateClub(r);
     need(r.phase === 'lobby', 'Return to the lobby before starting.');
@@ -55,7 +56,7 @@ validateClub(r);
     need(r.rules.game!=='trivia'||r.rules.triviaHostMode==='everyone'||r.players.some(p=>p.id===r.triviaMaster&&p.connected),'Choose a trivia master before starting.');
     if(r.rules.game==='charades')prepareCharadeTeams(r);
     r.retaliated=[];r.finishEffectsDone=false;r.endReason=undefined;r.charadeSession=undefined;
-    r.werewolf=undefined;r.blackjack=undefined;r.darts=undefined;r.pong=undefined;r.chaos=undefined;r.poker=undefined;r.trivia=undefined;r.solitaire=undefined;r.scribble=undefined;r.raid=undefined;
+    r.jackaroo=undefined;r.werewolf=undefined;r.blackjack=undefined;r.darts=undefined;r.pong=undefined;r.chaos=undefined;r.poker=undefined;r.trivia=undefined;r.solitaire=undefined;r.scribble=undefined;r.raid=undefined;
     r.charadeMatchEnds=r.rules.game==='charades'?Date.now()+r.rules.charadeMatchSeconds*1000:0;r.charadeCorrect=Array(r.players.length/2|0).fill(0);r.charadeScores=Array(r.players.length/2|0).fill(0);
     r.bluffPlays = 0; r.tradeOffers = []; r.clash = undefined; r.duel = undefined; r.deniedTrumps = []; r.busyUntil = 0; r.rollDice = [];
     r.gameInstance++;
@@ -91,7 +92,7 @@ validateClub(r);
         if(r.rules.cardLayout==='solitaire')initSolitaire(r,r.deck);else r.players.forEach(p => p.hand = r.deck.splice(0, r.rules.handSize));
     }
     else if (r.rules.game === 'charades')initCharades(r);
-    if(r.rules.game==='werewolf')initWerewolf(r);if(r.rules.game==='blackjack')initBlackjack(r);if(r.rules.game==='darts')initDarts(r);if(r.rules.game==='beerpong')initPong(r);if(r.rules.game==='poker')initPoker(r);
+    if(r.rules.game==='jackaroo')initJackaroo(r);if(r.rules.game==='werewolf')initWerewolf(r);if(r.rules.game==='blackjack')initBlackjack(r);if(r.rules.game==='darts')initDarts(r);if(r.rules.game==='beerpong')initPong(r);if(r.rules.game==='poker')initPoker(r);
     if(r.rules.game==='trivia')initializeTrivia(r);
     if(r.rules.game==='scribble')initScribble(r);
     if(r.rules.game==='rpg')initRpg(r);
@@ -112,7 +113,7 @@ function tickInternal(r: Room) {
     if (r.phase !== 'playing'){if(r.busyUntil&&r.busyUntil<=Date.now()){r.busyUntil=0;return true;}return false;}
     if(tickRaid(r))return true;
     if(r.raid)return false;
-    if(tickWerewolf(r)||tickBlackjack(r)||tickDarts(r)||tickPong(r))return true;
+    if(tickJackaroo(r)||tickWerewolf(r)||tickBlackjack(r)||tickDarts(r)||tickPong(r))return true;
     if(tickPoker(r))return true;
     if(tickScribble(r))return true;
     if(tickTrivia(r))return true;
@@ -135,7 +136,7 @@ function actInternal(r: Room, id: string, a: Action): {
     const p = r.players.find(p => p.id === id);
     need(p, 'Join this room first.');
     if(handleAftermath(r,id,a)||handleCharades(r,id,a)||handlePeek(r,id,a))return;
-    if(handleWerewolf(r,id,a)||handleBlackjack(r,id,a)||handleDarts(r,id,a)||handlePong(r,id,a)||handlePoker(r,id,a)||handleSolitaire(r,id,a)||handleScribble(r,id,a)||handleRpg(r,id,a))return;
+    if(handleJackaroo(r,id,a)||handleWerewolf(r,id,a)||handleBlackjack(r,id,a)||handleDarts(r,id,a)||handlePong(r,id,a)||handlePoker(r,id,a)||handleSolitaire(r,id,a)||handleScribble(r,id,a)||handleRpg(r,id,a))return;
     if(handleTrivia(r,p,a))return;
     if (a.type === 'endGame') {
         need(r.host === id && r.phase === 'playing', 'Only the host can end an active game.');
@@ -202,7 +203,7 @@ validateClub(r);
         need(r.host === id, 'Only the host can return to the lobby.');
         r.tradeOffers = []; r.clash = undefined; r.duel = undefined; r.busyUntil = 0;r.raid=undefined;
         abortPoker(r);abortBlackjack(r);r.poker=undefined;
-        r.trivia=undefined;r.werewolf=undefined;r.blackjack=undefined;r.darts=undefined;r.pong=undefined;
+        r.jackaroo=undefined;r.trivia=undefined;r.werewolf=undefined;r.blackjack=undefined;r.darts=undefined;r.pong=undefined;
         r.phase = 'lobby';
         r.players.forEach(p => { p.hand = []; p.ready = false; });
         r.deck = [];
@@ -495,7 +496,7 @@ function actPresented(r: Room, id: string, a: Action): { peek?: Card[] } | void 
 
     if(['endGame','restart','lobby'].includes(a.type))invalidateChaos(r);
     if(a.type==='scribbleStroke'||a.type==='soreLoserShot'||a.type.startsWith('charade')||r.rules.game==='charades'&&['guess','award','skip'].includes(a.type)||['peek','catch'].includes(a.type))return result;
-    if(['trivia','poker','wolf','bj','dart','pong'].some(prefix=>a.type.startsWith(prefix)))return result;
+    if(['jackaroo','trivia','poker','wolf','bj','dart','pong'].some(prefix=>a.type.startsWith(prefix)))return result;
     if (['tradeOffer','tradeAccept','tradeReject','tradeCancel','box','allowTrump','punch'].includes(a.type)) return result;
     let kind = a.type === 'bid' && a.value === 0 && !allPassed ? 'bidPass' : a.type;
     const data: Record<string, unknown> = {};
@@ -525,6 +526,7 @@ function forceChaosAction(r:Room,id:string){return withChaosForce(r,()=>forceCha
 function forceChaosActionInternal(r:Room,id:string){
  if(r.phase!=='playing'||r.players[r.turn]?.id!==id)return;
  const p=r.players[r.turn];let action:Action|undefined;
+ if(r.jackaroo){const before=chaosBefore(r);skipJackaroo(r,id,'Hot Potato · card burned');chaosAfter(r,before,'hotSkip');return;}
  if(r.werewolf||r.blackjack||r.darts||r.pong){const before=chaosBefore(r);if(r.werewolf)skipWerewolf(r,id);if(r.blackjack)forfeitBlackjack(r,id);if(r.darts)skipDarts(r,id);if(r.pong)skipPong(r,id);chaosAfter(r,before,'hotSkip');finishEffects(r);return;}
  if(r.rules.game==='poker'&&r.poker&&r.poker.street!=='handEnd'){const seat=r.poker.seats.find(s=>s.id===id);action={type:'pokerAct',move:'fold'};}
  if(r.rules.game==='cards')action={type:r.solitaire?'solitaireDraw':'pass'};

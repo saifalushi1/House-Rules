@@ -6,7 +6,7 @@ import {chaosUnavailable,chaosEffect,availableDieFaces,chaosAimSpeed,chaosCupRad
 import {applyChaosDie,chaosBefore,chaosAfter,chaosPenalty,chaosUnits,tickChaos} from '../server/chaos.js';
 import {chaosFields} from '../src/chaos-ui.js';import {scoringAction} from './aim-fixture.js';
 import {cupPositions} from '../shared/club.js';
-function setup(game:Game,count=game==='werewolf'||game==='tarneeb'||game==='charades'?4:3,rules:Partial<Rules>={}){if(game==='beerpong'&&count%2)count=4;const r=makeRoom('AUDIT','p0');r.rules={...defaults,game,triviaHostMode:'everyone',rooftopAntics:false,soreLoser:false,chaosTableFlip:true,...rules};r.players=Array.from({length:count},(_,i)=>player('p'+i,'Player '+i,i));start(r);r.busyUntil=0;return r;}
+function setup(game:Game,count=game==='werewolf'||game==='tarneeb'||game==='charades'?4:3,rules:Partial<Rules>={}){if(game==='jackaroo')count=4;if(game==='beerpong'&&count%2)count=4;const r=makeRoom('AUDIT','p0');r.rules={...defaults,game,triviaHostMode:'everyone',rooftopAntics:false,soreLoser:false,chaosTableFlip:true,...rules};r.players=Array.from({length:count},(_,i)=>player('p'+i,'Player '+i,i));start(r);r.busyUntil=0;return r;}
 function die(r:Room,n:number){r.rules.chaosDie=true;applyChaosDie(r,n);r.busyUntil=0;}
 function settled(r:Room){if(r.poker){r.poker.street='handEnd';r.poker.pot=0;r.poker.seats.forEach(s=>{s.total=s.bet=0;});}if(r.blackjack)r.blackjack.phase='result';r.busyUntil=0;}
 function cycle(r:Room){r.chaos!.pendingCyclone=true;tickChaos(r);r.busyUntil=0;}

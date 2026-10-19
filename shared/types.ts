@@ -1,10 +1,11 @@
+import type {JackarooState} from './jackaroo.js';
 import type {WerewolfState,WerewolfView,BlackjackState,BlackjackView,DartsState,PongState} from './club.js';
 import type {PokerState,PokerView} from './poker.js';
 import type {SolitaireState,SolitaireView,ScribbleState,ScribbleView,RpgState,Raid,RaidView} from './expansion.js';
 import type {ChaosState} from './chaos.js';
 import type {TriviaState,TriviaView} from "./trivia.js";
 import type {CharadeCategory} from "./charades.js";
-export type Game = 'bluff' | 'tarneeb' | 'cards' | 'charades' | 'trivia' | 'property' | 'life' | 'scribble' | 'rpg' | 'poker' | 'werewolf' | 'blackjack' | 'darts' | 'beerpong';
+export type Game = 'jackaroo' | 'bluff' | 'tarneeb' | 'cards' | 'charades' | 'trivia' | 'property' | 'life' | 'scribble' | 'rpg' | 'poker' | 'werewolf' | 'blackjack' | 'darts' | 'beerpong';
 export type Suit = '♠' | '♥' | '♦' | '♣';
 export interface Card {
     id: string;
@@ -12,6 +13,7 @@ export interface Card {
     suit: Suit;
 }
 export interface Rules {
+ jackarooSeconds:number;jackarooSplitSeven:boolean;jackarooFiveAny:boolean;jackarooRedQueenBurn:boolean;jackarooTenBurn:boolean;jackarooKingSweep:boolean;jackarooProtectedStart:boolean;
 wolfCount:number;wolfNightSeconds:number;wolfDaySeconds:number;wolfVoteSeconds:number;wolfSeer:boolean;wolfDoctor:boolean;wolfReveal:boolean;wolfRepeatSave:boolean;
 blackjackDecks:number;blackjackSeconds:number;blackjackRounds:number;blackjackMin:number;blackjackMax:number;blackjackSideBets:boolean;blackjackHitSoft17:boolean;
 dartsAimSpeed:number;pongAimSpeed:number;aimSeconds:number;aimRounds:number;dartsStart:number;dartsDoubleOut:boolean;pongCups:number;pongRedemption:boolean;pongBallsBack:boolean;
@@ -55,7 +57,7 @@ dartsAimSpeed:number;pongAimSpeed:number;aimSeconds:number;aimRounds:number;dart
     roundLimit: number;
     customNotes: string;
 }
-export const defaults: Rules = {wolfCount:1,wolfNightSeconds:30,wolfDaySeconds:60,wolfVoteSeconds:30,wolfSeer:true,wolfDoctor:true,wolfReveal:true,wolfRepeatSave:false,blackjackDecks:4,blackjackSeconds:30,blackjackRounds:5,blackjackMin:10,blackjackMax:500,blackjackSideBets:true,blackjackHitSoft17:false,dartsAimSpeed:1,pongAimSpeed:1,aimSeconds:20,aimRounds:20,dartsStart:301,dartsDoubleOut:false,pongCups:6,pongRedemption:true,pongBallsBack:true,triviaFormat:'typed',triviaDifficulty:'easy',charadeRounds:1,rooftopAntics:true,soreLoser:true,pokerStack:1000,pokerSmallBlind:5,pokerBigBlind:10,pokerSeconds:45,pokerHands:0,triviaHostMode:'master',triviaCategory:'general',cardLayout:'free',scribbleSeconds:60,scribbleRounds:2,rpgMap:'crypt',chaosRaid:false,"chaosHotOutcome":"random","chaosHotPotato":false,"chaosSeatRoulette":false,"chaosCyclone":false,"chaosDouble":false,"chaosDie":false,"chaosTableFlip":false,"chaosBlackout":false,"chaosRobin":false,"chaosBanned":false,"chaosDare":false,"chaosWarp":false,"chaosHotSeconds":30,"chaosMinSeconds":5,"chaosShrinkSeconds":2,"chaosSeatEvery":3,"chaosRandomPercent":20,chaosDoublePercent:20,"chaosHandsTravel":true,"chaosDirection":"left","chaosCycloneTrigger":"round","chaosFlipMode":"order","chaosWords":"yes\nno\nokay\nliterally\nactually","chaosDares":"Speak like a pirate until your next turn\nDo a dramatic victory pose\nNarrate your next move like a sports commentator", allowTrading: true, tradeSlaps: true, boxingDuels: true, game: 'bluff', background: 'forest', camera: 'third', maxPlayers: 8, allowPeeking: false, catchPeeking: true, penalty: 'Speak like a pirate until your next turn', decks: 1, handSize: 7, followSuit: true, targetScore: 31, challengeSeconds: 12, reverseTurns: false, triviaQuestions: 10, triviaSeconds: 30, triviaMode: "ffa", charadeMatchSeconds: 300, charadeCategory: "animals", charadeSeconds: 120, allowSkipping: true, skipPenalty: 0, charadePrompts: '', startingCash: 1500, salary: 200, rentMultiplier: 1, freeParking: true, roundLimit: 15, customNotes: '' };
+export const defaults: Rules = {jackarooSeconds:40,jackarooSplitSeven:true,jackarooFiveAny:true,jackarooRedQueenBurn:true,jackarooTenBurn:true,jackarooKingSweep:true,jackarooProtectedStart:true,wolfCount:1,wolfNightSeconds:30,wolfDaySeconds:60,wolfVoteSeconds:30,wolfSeer:true,wolfDoctor:true,wolfReveal:true,wolfRepeatSave:false,blackjackDecks:4,blackjackSeconds:30,blackjackRounds:5,blackjackMin:10,blackjackMax:500,blackjackSideBets:true,blackjackHitSoft17:false,dartsAimSpeed:1,pongAimSpeed:1,aimSeconds:20,aimRounds:20,dartsStart:301,dartsDoubleOut:false,pongCups:6,pongRedemption:true,pongBallsBack:true,triviaFormat:'typed',triviaDifficulty:'easy',charadeRounds:1,rooftopAntics:true,soreLoser:true,pokerStack:1000,pokerSmallBlind:5,pokerBigBlind:10,pokerSeconds:45,pokerHands:0,triviaHostMode:'master',triviaCategory:'general',cardLayout:'free',scribbleSeconds:60,scribbleRounds:2,rpgMap:'crypt',chaosRaid:false,"chaosHotOutcome":"random","chaosHotPotato":false,"chaosSeatRoulette":false,"chaosCyclone":false,"chaosDouble":false,"chaosDie":false,"chaosTableFlip":false,"chaosBlackout":false,"chaosRobin":false,"chaosBanned":false,"chaosDare":false,"chaosWarp":false,"chaosHotSeconds":30,"chaosMinSeconds":5,"chaosShrinkSeconds":2,"chaosSeatEvery":3,"chaosRandomPercent":20,chaosDoublePercent:20,"chaosHandsTravel":true,"chaosDirection":"left","chaosCycloneTrigger":"round","chaosFlipMode":"order","chaosWords":"yes\nno\nokay\nliterally\nactually","chaosDares":"Speak like a pirate until your next turn\nDo a dramatic victory pose\nNarrate your next move like a sports commentator", allowTrading: true, tradeSlaps: true, boxingDuels: true, game: 'bluff', background: 'forest', camera: 'third', maxPlayers: 8, allowPeeking: false, catchPeeking: true, penalty: 'Speak like a pirate until your next turn', decks: 1, handSize: 7, followSuit: true, targetScore: 31, challengeSeconds: 12, reverseTurns: false, triviaQuestions: 10, triviaSeconds: 30, triviaMode: "ffa", charadeMatchSeconds: 300, charadeCategory: "animals", charadeSeconds: 120, allowSkipping: true, skipPenalty: 0, charadePrompts: '', startingCash: 1500, salary: 200, rentMultiplier: 1, freeParking: true, roundLimit: 15, customNotes: '' };
 export const games: Record<Game, {
     name: string;
     category: string;
@@ -63,6 +65,7 @@ export const games: Record<Game, {
     icon: string;
     players: string;
 }> = {
+    jackaroo:{name:'Jackaroo',category:'TABLETOP',description:'Play your cards. Race your marbles home. Help your partner win.',icon:'●',players:'4'},
     werewolf:{name:'Werewolf / Mafia',category:'PARTY',description:'Secret roles. Quiet nights. Very loud accusations.',icon:'☾',players:'4–8'},
     blackjack:{name:'Blackjack',category:'CARDS',description:'Beat the house. Play your chips, or try a side bet.',icon:'♣',players:'1–8'},
     darts:{name:'Darts',category:'TABLETOP',description:'Aim. Time your release. Race from 301 or 501 to zero.',icon:'◎',players:'1–8'},
@@ -106,6 +109,7 @@ export interface Tile {
     owner?: string;
 }
 export interface Room {
+ jackaroo?:JackarooState;
  werewolf?:WerewolfState;blackjack?:BlackjackState;darts?:DartsState;pong?:PongState;
     charadeTeams?:string[][];charadeSession?:{order:string[];index:number;turnEnds:number};
     retaliated:string[];finishEffectsDone:boolean;endReason?:'tableFlip';

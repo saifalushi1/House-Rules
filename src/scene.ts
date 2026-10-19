@@ -1,3 +1,4 @@
+import {JackVisuals} from './jackaroo-visuals';
 import {AimVisuals} from './aim-visuals';
 import {ClubVisuals} from './club-visuals';
 import {BoxingVisuals} from './boxing-visuals';
@@ -16,12 +17,12 @@ export class GameScene {
   group = new THREE.Group(); actors = new THREE.Group(); pieces = new THREE.Group(); tokens = new THREE.Group(); dice = new THREE.Group(); fx = new THREE.Group();
   environment = new TableEnvironment(this.scene);
   ownHand = new THREE.Group(); handKey=''; selectedCards=new Set<string>(); hoveredCard?:string;
-  onPick?: (pick:{card?:string;action?:string;tile?:number;rpgTile?:{x:number;y:number};rpgPawn?:string})=>void;
+  onPick?: (pick:{card?:string;action?:string;tile?:number;rpgTile?:{x:number;y:number};rpgPawn?:string;jackMarble?:string})=>void;
   raycaster=new THREE.Raycaster();
   closeBoard = true; mode = 'third'; self = 0; room?: View; game: Game = 'bluff'; resize: ResizeObserver;
   actorMap = new Map<string, THREE.Group>(); tokenMap = new Map<string, THREE.Mesh>(); tweens: Tween[] = [];
   slapShot?:{until:number;actor:string;target:string};
-  aimFX:AimVisuals;onAim?:(action:import('../shared/types').Action)=>void;clubFX:ClubVisuals;boxingFX:BoxingVisuals;partyFX:PartyVisuals;rooftopShotUntil=0;pokerFX:PokerVisuals;expansionFX:ExpansionVisuals;chaosFX:ChaosVisuals; chaosShotUntil=0;
+  aimFX:AimVisuals;onAim?:(action:import('../shared/types').Action)=>void;jackFX:JackVisuals;clubFX:ClubVisuals;boxingFX:BoxingVisuals;partyFX:PartyVisuals;rooftopShotUntil=0;pokerFX:PokerVisuals;expansionFX:ExpansionVisuals;chaosFX:ChaosVisuals; chaosShotUntil=0;
   seatAngle(index:number){const id=this.room?.players[index]?.id,seat=id?this.room?.chaos?.seats.indexOf(id):undefined;return (seat!==undefined&&seat>=0?seat:index)*Math.PI*2/(this.room?.players.length||4);}
   actorKey = ''; pieceKey = ''; shake = 0; moving = new Set<string>();
   constructor(private el: HTMLElement) {
@@ -36,10 +37,10 @@ export class GameScene {
     this.resize = new ResizeObserver(() => { const w=el.clientWidth,h=el.clientHeight; this.renderer.setSize(w,h); this.camera.aspect=w/h; this.camera.updateProjectionMatrix(); this.handKey=''; this.updateOwnHand(); });
     this.renderer.domElement.addEventListener('pointerup',event=>{const pick=this.pick(event);if(pick)this.onPick?.(pick);});
     this.renderer.domElement.addEventListener('pointermove',event=>{const pick=this.pick(event);this.hoveredCard=pick?.card;this.renderer.domElement.style.cursor=pick?'pointer':'default';});
-    this.boxingFX=new BoxingVisuals(this);this.chaosFX=new ChaosVisuals(this);this.expansionFX=new ExpansionVisuals(this);this.pokerFX=new PokerVisuals(this);this.partyFX=new PartyVisuals(this);this.clubFX=new ClubVisuals(this);this.aimFX=new AimVisuals(this,el);
+    this.boxingFX=new BoxingVisuals(this);this.chaosFX=new ChaosVisuals(this);this.expansionFX=new ExpansionVisuals(this);this.pokerFX=new PokerVisuals(this);this.partyFX=new PartyVisuals(this);this.clubFX=new ClubVisuals(this);this.aimFX=new AimVisuals(this,el);this.jackFX=new JackVisuals(this);
     this.resize.observe(el); this.update('bluff'); this.animate();
   }
-  get board() { return this.game === 'property' || this.game === 'life'||this.game==='rpg'||!!this.room?.solitaire; }
+  get board() { return this.game==='jackaroo'||this.game === 'property' || this.game === 'life'||this.game==='rpg'||!!this.room?.solitaire; }
   get radius() { return this.board ? 4.02 : 3.05; }
   mesh(g: THREE.BufferGeometry, color: number|string, x=0,y=0,z=0) { const m=new THREE.Mesh(g,new THREE.MeshStandardMaterial({color,flatShading:true,roughness:.9})); m.position.set(x,y,z); m.castShadow=true; m.receiveShadow=true; return m; }
   clear(group: THREE.Group) { for (const child of [...group.children]) this.remove(child); }
@@ -64,6 +65,7 @@ export class GameScene {
   update(game:Game,room?:View,id?:string,background:Rules['background']=room?.rules.background||'forest') {
     const previous=this.room;if(previous?.gameInstance!==room?.gameInstance||previous?.phase!==room?.phase){for(const group of [this.group,this.pieces,this.dice,this.expansionFX.group,this.pokerFX.group,this.clubFX.group]){group.rotation.set(0,0,0);group.position.set(0,0,0);}this.rooftopShotUntil=0;this.chaosShotUntil=0;this.slapShot=undefined;this.clubFX.reset();this.tweens=[];this.clear(this.fx);this.moving.clear();this.actorKey='';this.pieceKey='';this.handKey='';}this.game=game;this.room=room;this.environment.update(background);this.self=Math.max(0,room?.players.findIndex(p=>p.id===id)??0);this.group.scale.set(this.board?1.3:1,1,this.board?1.3:1);
     if((previous?.gameInstance!==room?.gameInstance||previous?.rules.game!==game)&&this.mode!=='first'&&(game==='rpg'||room?.solitaire))this.camera.position.set(0,game==='rpg'?12.7:7,game==='rpg'?6:1.2);
+    if(game==='jackaroo'&&previous?.rules.game!=='jackaroo'){this.camera.position.set(0,11.8,3.5);this.camera.lookAt(0,1,1.35);}
     this.el.parentElement?.classList.toggle('board-stage',this.board);
     const players=room?.players.length?room.players:[{id:'preview0',color:'#d9a658'},{id:'preview1',color:'#83a3a8'},{id:'preview2',color:'#bc8c83'},{id:'preview3',color:'#8ba177'}];
     const actorKey=game+players.map(p=>p.id+p.color).join('|');
@@ -84,7 +86,7 @@ export class GameScene {
     if(this.board){room?.players.forEach((p,i)=>{let token=this.tokenMap.get(p.id);if(!token){token=this.mesh(new THREE.ConeGeometry(.105,.27,5),p.color);const[x,z]=this.tilePosition(p.position);token.position.set(x+(i%3)*.08-.08,1.19,z);token.userData.logical=p.position;const ring=this.mesh(new THREE.TorusGeometry(.2,.024,4,20),0xe7b770,0,-.11,0);ring.rotation.x=Math.PI/2;token.add(ring);token.userData.ring=ring;this.tokens.add(token);this.tokenMap.set(p.id,token);}else if(token.userData.logical!==p.position){const old=token.userData.logical as number;token.userData.logical=p.position;const event=room.events.at(-1);const steps=event?.kind==='roll'&&event.actor===p.id?Number(event.data.steps):(p.position-old+24)%24;if(event?.kind==='chaosWarp'){const from=token.position.clone(),[x,z]=this.tilePosition(p.position);this.tween(1800,t=>{token!.position.lerpVectors(from,new THREE.Vector3(x+(i%3)*.08-.08,1.19,z),t);token!.position.y+=Math.sin(t*Math.PI)*.3;});}else this.moveToken(token,old,steps,i,event?.kind==='roll'?1000:0);}token.userData.ring.visible=p.id===room.players[this.self]?.id||room.players[room.turn]?.id===p.id;});}
     const diceCount=['property','life'].includes(game)?(game==='property'?2:1):0;
     if(this.dice.children.length!==diceCount||previous?.rules.game!==game||previous?.gameInstance!==room?.gameInstance){this.clear(this.dice);for(let i=0;i<diceCount;i++){const die=this.makeDie();die.userData.action='roll';die.position.set(.3+i*.55,1.19,-.25);this.orientDie(die,room?.rollDice[i]||1);this.dice.add(die);}}
-    this.expansionFX.update(room);this.pokerFX.update(room);this.clubFX.update(room);this.tokens.visible=!(room?.rules.game==='rpg'||room?.solitaire);
+    this.expansionFX.update(room);this.pokerFX.update(room);this.clubFX.update(room);this.jackFX.update(room);this.tokens.visible=!(room?.rules.game==='jackaroo'||room?.rules.game==='rpg'||room?.solitaire);
     this.updateOwnHand();
     if(previous?.duel&&!room?.duel){for(const g of this.actorMap.values()){const a=g.userData.baseAngle;g.position.set(Math.sin(a)*this.radius,-.38,Math.cos(a)*this.radius);g.rotation.set(0,a,0);g.userData.arms.forEach((arm:THREE.Group)=>arm.rotation.set(.5,0,0));}}
   }
@@ -99,11 +101,11 @@ export class GameScene {
   handFace(rank:string,suit:string){
     const canvas=document.createElement('canvas');canvas.width=256;canvas.height=384;const ctx=canvas.getContext('2d')!;ctx.fillStyle='#f1e8cf';ctx.fillRect(0,0,256,384);ctx.fillStyle=suit==='♥'||suit==='♦'?'#a34e3b':'#304937';ctx.textAlign='left';ctx.font='bold 58px sans-serif';ctx.fillText(rank,14,62,82);ctx.font='60px sans-serif';ctx.fillText(suit,14,120);ctx.textAlign='center';ctx.font='110px sans-serif';ctx.fillText(suit,128,257);const map=new THREE.CanvasTexture(canvas);map.colorSpace=THREE.SRGBColorSpace;const face=new THREE.Mesh(new THREE.PlaneGeometry(.29,.42),new THREE.MeshBasicMaterial({map}));face.rotation.x=-Math.PI/2;return face;
   }
-  pick(event:PointerEvent):{card?:string;action?:string;tile?:number;rpgTile?:{x:number;y:number};rpgPawn?:string}|undefined{
+  pick(event:PointerEvent):{card?:string;action?:string;tile?:number;rpgTile?:{x:number;y:number};rpgPawn?:string;jackMarble?:string}|undefined{
     if(this.room?.phase!=='playing')return;
     const rect=this.renderer.domElement.getBoundingClientRect();const mouse=new THREE.Vector2((event.clientX-rect.left)/rect.width*2-1,-(event.clientY-rect.top)/rect.height*2+1);this.raycaster.setFromCamera(mouse,this.camera);
-    const hit=this.raycaster.intersectObjects([this.ownHand,this.pieces,this.dice,this.actors,this.expansionFX.group],true).find(h=>{let p:THREE.Object3D|null=h.object;while(p){if(!p.visible)return false;p=p.parent;}return true;});
-    if(!hit)return;let object:THREE.Object3D|null=hit.object;while(object){if(object.userData.rpgTile)return {rpgTile:object.userData.rpgTile};if(object.userData.rpgPawn)return {rpgPawn:object.userData.rpgPawn};if(object.userData.card)return{card:object.userData.card};if(object.userData.action)return{action:object.userData.action};if(object.userData.tile!==undefined)return{tile:object.userData.tile};object=object.parent;}
+    const hit=this.raycaster.intersectObjects([this.ownHand,this.pieces,this.dice,this.actors,this.expansionFX.group,this.jackFX.group],true).find(h=>{let p:THREE.Object3D|null=h.object;while(p){if(!p.visible)return false;p=p.parent;}return true;});
+    if(!hit)return;let object:THREE.Object3D|null=hit.object;while(object){if(object.userData.jackMarble)return{jackMarble:object.userData.jackMarble};if(object.userData.rpgTile)return {rpgTile:object.userData.rpgTile};if(object.userData.rpgPawn)return {rpgPawn:object.userData.rpgPawn};if(object.userData.card)return{card:object.userData.card};if(object.userData.action)return{action:object.userData.action};if(object.userData.tile!==undefined)return{tile:object.userData.tile};object=object.parent;}
   }
   card(){return this.mesh(new THREE.BoxGeometry(.3,.016,.44),0xeadbb6);}
   orientDie(die:THREE.Object3D,value:number){const rotations:Record<number,[number,number,number]>={1:[0,0,0],2:[-Math.PI/2,0,0],3:[0,0,Math.PI/2],4:[0,0,-Math.PI/2],5:[Math.PI/2,0,0],6:[Math.PI,0,0]};die.rotation.set(...(rotations[value]||rotations[1]));}
@@ -122,6 +124,7 @@ export class GameScene {
   }
   star(actor?:string){const seat=this.actorMap.get(actor||'');if(!seat)return;const vertices:number[]=[];for(let i=0;i<10;i++){const a=i*Math.PI/5+Math.PI/2,b=(i+1)*Math.PI/5+Math.PI/2,r=i%2?.16:.36,next=(i+1)%2?.16:.36;vertices.push(0,0,0,Math.cos(a)*r,Math.sin(a)*r,0,Math.cos(b)*next,Math.sin(b)*next,0);}const geometry=new THREE.BufferGeometry();geometry.setAttribute('position',new THREE.Float32BufferAttribute(vertices,3));geometry.computeVertexNormals();const star=this.mesh(geometry,0xffd05e);const start=seat.position.clone().add(new THREE.Vector3(0,2.1,0));this.fx.add(star);this.tween(1200,t=>{star.position.copy(start);star.position.y+=t*.7;star.scale.setScalar(Math.sin(t*Math.PI));star.quaternion.copy(this.camera.quaternion);star.rotateZ(t*.6);},()=>this.remove(star));this.burst(start,0xffd05e);}
   play(e:GameEvent){
+    if(e.kind.startsWith('jackaroo')){this.jackFX.play(e);return;}
     if(['wolf','bj','dart','pong'].some(prefix=>e.kind.startsWith(prefix))){this.clubFX.play(e);return;}
     if(['rooftopJump','soreLoserShot','charadeTurn'].includes(e.kind)){this.partyFX.play(e);return;}
     if(e.kind.startsWith('poker')){this.pokerFX.play(e);return;}
@@ -149,7 +152,7 @@ export class GameScene {
     for(const object of this.ownHand.children){const c=object as THREE.Mesh<THREE.BoxGeometry,THREE.MeshStandardMaterial>,selected=this.selectedCards.has(c.userData.card),hovered=c.userData.card===this.hoveredCard;c.position.y=THREE.MathUtils.lerp(c.position.y,c.userData.baseY+(selected?.012:hovered?.006:0),.2);c.material.emissive.setHex(selected?0x60431c:hovered?0x263d29:0x000000);}
 
     for(const [i,g] of [...this.actorMap.values()].entries()){g.visible=!(this.mode==='first'&&!(['darts','beerpong'].includes(this.game)&&this.room?.phase==='playing')&&now>=this.chaosShotUntil&&i===this.self&&!(this.slapShot&&now<this.slapShot.until));const inBout=!!this.room?.duel&&[this.room.duel.acePlayer,this.room.duel.trumpPlayer].includes(g.userData.id);g.userData.chairParts?.forEach((part:THREE.Object3D)=>part.visible=!inBout&&!this.moving.has(g.userData.id));if(this.room?.duel&&[this.room.duel.acePlayer,this.room.duel.trumpPlayer].includes(g.userData.id)){const side=g.userData.id===this.room.duel.acePlayer?-1:1;g.position.set(side*.75,.9+Math.sin(now*.006)*.035,0);g.rotation.y=side<0?-Math.PI/2:Math.PI/2;}else if(['charades','scribble'].includes(this.game)&&this.room?.phase==='playing'&&this.room.turn===i){const arms=g.userData.arms as THREE.Group[];arms[0].rotation.x=.7+Math.sin(now*.002)*.4;arms[1].rotation.z=Math.sin(now*.002)*.3;}}
-    for(const [playerId,g] of this.actorMap){const p=this.room?.players.find(p=>p.id===playerId);if(this.moving.has(playerId)||this.room?.duel)continue;let a=g.userData.baseAngle;const victim=this.actorMap.get(p?.peekTarget||'');const leaning=['bluff','tarneeb','cards','poker'].includes(this.game)&&!!p&&p.peekingUntil>Date.now()&&!!victim;const base=new THREE.Vector3(Math.sin(a)*this.radius,-.38,Math.cos(a)*this.radius);
+    for(const [playerId,g] of this.actorMap){const p=this.room?.players.find(p=>p.id===playerId);if(this.moving.has(playerId)||this.room?.duel)continue;let a=g.userData.baseAngle;const victim=this.actorMap.get(p?.peekTarget||'');const leaning=['jackaroo','bluff','tarneeb','cards','poker'].includes(this.game)&&!!p&&p.peekingUntil>Date.now()&&!!victim;const base=new THREE.Vector3(Math.sin(a)*this.radius,-.38,Math.cos(a)*this.radius);
       if(this.room?.phase==='playing'&&this.game==='darts'){const active=this.room.players[this.room.turn]?.id,others=(this.room.chaos?.seats||this.room.players.map(p=>p.id)).filter(id=>id!==active).map(id=>this.room!.players.find(p=>p.id===id)!),index=others.findIndex(p=>p.id===playerId);a=playerId===active?0:(index+1)*Math.PI*2/this.room.players.length;base.set(Math.sin(a)*this.radius,-.38,Math.cos(a)*this.radius);}
       if(this.room?.phase==='playing'&&this.game==='beerpong'&&this.room.pong){const p=this.room.pong,team=p.teams.findIndex(t=>t.includes(playerId)),active=this.room.players[this.room.turn]?.id,members=p.teams[team]||[],index=members.filter(id=>id!==active).indexOf(playerId);a=team===0?0:Math.PI;const x=playerId===active?0:team===p.team?(index%2?-1:1)*(Math.floor(index/2)+1)*.9:(members.indexOf(playerId)-(members.length-1)/2)*.9;base.set(x,-.38,team===0?this.radius:-this.radius);}
       if(leaning){base.lerp(victim!.position,.38);base.y=-.12;g.rotation.y=Math.atan2(base.x-victim!.position.x,base.z-victim!.position.z);}else g.rotation.y=a;g.position.lerp(base,.18);g.rotation.x=THREE.MathUtils.lerp(g.rotation.x,leaning?.42:0,.18);}
@@ -160,6 +163,7 @@ export class GameScene {
     else if(this.mode==='first'&&now<this.chaosShotUntil){target=new THREE.Vector3(6.7,7.4,8.8);look.set(0,1,0);}
     else if(this.slapShot&&now<this.slapShot.until){const a=this.actorMap.get(this.slapShot.actor),b=this.actorMap.get(this.slapShot.target),mid=a&&b?a.position.clone().add(b.position).multiplyScalar(.5):new THREE.Vector3();target=new THREE.Vector3(mid.x+6.7,7.4,mid.z+8.8);look.copy(mid).y=.4;}
     else if(this.room?.duel){target=this.mode==='first'?new THREE.Vector3(this.self===this.room.players.findIndex(p=>p.id===this.room!.duel!.acePlayer)?-.8:.8,2.3,1.2):new THREE.Vector3(0,4.5,6);look.set(0,1.8,0);}
+    else if(this.game==='jackaroo'){target=this.mode==='first'?new THREE.Vector3(Math.sin(angle)*7.6,7.2,Math.cos(angle)*7.6):new THREE.Vector3(0,11.8,3.5);look.set(this.mode==='first'?Math.sin(angle)*1.5:0,1,this.mode==='first'?Math.cos(angle)*1.5:1.35);}
     else if(['darts','beerpong'].includes(this.game)&&this.room?.phase==='playing'&&this.mode==='first'){const shooter=this.actorMap.get(this.room.players[this.room.turn]?.id),base=shooter?.position.clone()||new THREE.Vector3(0,0,3),end=this.game==='darts'?new THREE.Vector3(0,1.5,-.6):new THREE.Vector3(0,1.3,this.room.pong?.team===0?-1.15:1.15),away=base.clone().sub(end).setY(0).normalize(),side=new THREE.Vector3(away.z,0,-away.x);target=base.clone().add(away.multiplyScalar(3)).add(side.multiplyScalar(1.4));target.y=3.4;look.copy(base).lerp(end,.65);look.y=1.2;}
     else target=this.mode==='first'?new THREE.Vector3(Math.sin(angle)*(this.radius+.15),this.board?2.65:1.72,Math.cos(angle)*(this.radius+.15)):this.board?(this.closeBoard&&!this.moving.size?new THREE.Vector3(0,this.game==='rpg'?12.7:7,this.game==='rpg'?6:1.2):new THREE.Vector3(.5,8.4,5.7)):new THREE.Vector3(6.7,7.4,8.8);
     if(this.board && this.mode!=='first'&&!this.room?.duel)look.y=.9;if(this.game==='rpg'&&this.mode!=='first')look.z=1.5;for(const token of this.tokenMap.values())if(token.userData.ring)token.userData.ring.scale.setScalar(1+Math.sin(now*.004)*.13);this.camera.position.lerp(target,this.slapShot&&now<this.slapShot.until?.3:.06);if(this.shake>.002){this.camera.position.x+=Math.sin(now*.13)*this.shake;this.shake*=.91;}this.camera.lookAt(look);this.camera.updateMatrixWorld();this.aimFX.frame();this.renderer.render(this.scene,this.camera);

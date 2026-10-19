@@ -7,7 +7,7 @@ Your table. Your rules. A browser-based game night for friends.
 1. [About House Rules](#about-house-rules) — what the game-night website does.
 2. [How to run](#how-to-run) — Windows launcher and terminal setup.
 3. [Play with friends](#play-with-friends) — local Wi-Fi and internet access.
-4. [Available games](#available-games) — all 14 presets and player counts.
+4. [Available games](#available-games) — all 15 presets and player counts.
 5. [Game guides](#game-guides) — setup, controls and scoring.
 6. [Rules](#rules) — [house settings](#house-settings), [chaos overview](#chaos-rule-overview), [compatibility](#compatibility-at-a-glance), [per-game effects and die faces](#full-rule-effects-and-die-faces-by-preset), and [timing safeguards](#timing-penalties-and-limits).
 7. [Development](#development) — editing, building and testing.
@@ -19,7 +19,7 @@ Your table. Your rules. A browser-based game night for friends.
 
 **House Rules** is a self-hosted, browser-based TypeScript game-night sandbox for friends. One person runs the server, hosts a room and chooses a game; everyone else joins through a browser with an invite or room code. The host can customize supported rules and add optional chaos modifiers that change real cards, scores, chips, turns and other game resources.
 
-The website includes **14 game presets**, a low-poly 3D table, animated avatars, first- and third-person cameras, private hands, shared chat, action sounds and seven backgrounds. Trivia contains 1,000 questions across ten categories; pair Charades contains 1,900 prompts across 19 categories. Restart, early ending and lobby controls keep the group in control of the session.
+The website includes **15 game presets**, a low-poly 3D table, animated avatars, first- and third-person cameras, private hands, shared chat, action sounds and seven backgrounds. Trivia contains 1,000 questions across ten categories; pair Charades contains 1,900 prompts across 19 categories. Restart, early ending and lobby controls keep the group in control of the session.
 
 It runs from your machine and uses a persistent Node.js/WebSocket server for live rooms. Rooms exist in memory and disappear when the server stops. Use your existing group call for voice or video. Written house agreements are notes for the group; supported toggles and parameters drive the automated behavior.
 
@@ -69,6 +69,7 @@ Use it with trusted friends. Room codes are lightweight invite gates, not accoun
 
 | Preset | Playable behavior |
 | --- | --- |
+| Jackaroo | Exactly four players; opposite-seat partnerships, private 4–4–5 card deals, four marbles each, captures, swaps, split sevens, safe lanes and partner assistance on a shared polygon board. |
 | Werewolf / Mafia | 4–8 players; hidden roles, night/day phases, seer/doctor abilities, discussion, voting and faction victory. |
 | Blackjack | 1–8 players; automatic dealer, hit/stand/double, play chips, Perfect Pairs and 21+3 side bets. |
 | Darts | 1–8 players; 301/501, optional double-out, timed two-stage dotted aiming and configurable trajectory speed. |
@@ -91,6 +92,32 @@ Tarneeb uses the common scoring variation: a made bid scores tricks won, an unbi
 ## Game guides
 
 Choose a preset on the game shelf, configure its rules in the lobby and apply the draft before starting. The host can restart, end early or return everyone to the lobby. The [Rules section](#rules) documents optional modifiers and overrides.
+
+### Jackaroo
+
+Choose **Jackaroo** from the game shelf and invite exactly **four players**. Opposite seats form fixed teams: seats 1 + 3 versus 2 + 4. Each player has four marbles in reserve. Play cards to move around a 64-hole shared track and into four personal safety slots. When your own four are safe, your cards control your partner’s marbles. The first team to finish all eight wins.
+
+Select a private card, choose a legal move and click **Play selected move**. Clicking a marble in the 3D board filters the move list; **All marbles** clears that filter. Hands and controls stay beneath the board in both camera modes. Movement hops along the track, captures return marbles to reserve, swaps arc between positions, safe arrivals pop stars, and deals visibly shuffle and send cards to each seat, with original action sounds.
+
+| Card | Default effect |
+| --- | --- |
+| Ace | Enter a reserve marble, or move 1 or 11 forward. |
+| 2, 3, 6, 8, 9 | Move that number forward. |
+| 4 | Move four backwards on the track, including a shortcut from your start. Never move backwards out of safety. |
+| 5 | Move a controlled marble five, or another player’s unprotected track marble. |
+| 7 | Move seven on one marble or divide all seven steps between two. If the first segment finishes your fourth marble, the remainder may help your partner. |
+| 10 | Move ten, or make the next player holding cards burn one. |
+| Jack | Swap a controlled track marble with another color; protected starts and safe lanes are excluded. |
+| Queen | Black moves twelve; red forces a card burn. |
+| King | Enter a reserve marble, or move thirteen and capture unprotected marbles along the path, including your own. |
+
+Land on an opposing track marble to send it to reserve. Your own marbles block ordinary movement. With start protection enabled, a marble on its own entrance cannot be passed, captured or swapped until it moves. Safety moves cannot overshoot or jump a marble already in that lane. Captures do not remove a player from the game.
+
+One 52-card deck is dealt **4, 4, then 5 cards per player**; the dealer advances after the stock is exhausted and the discard pile is shuffled. Play a legal card if any exists. When stuck, **Discard · no legal move** burns your selected card. Forced burns and stuck-hand timeouts choose a random card. Empty hands sit out until the next deal. The turn timer auto-plays a legal move or burns if stuck, so disconnected seats cannot stall the game. The host may restart, end early or return to the lobby.
+
+In **Game rules**, set **10–120 seconds per turn** (default 40), split sevens, moving other track marbles with fives, red-Queen burns, optional ten burns, King sweeps and start protection. With the Queen toggle off, every Queen moves twelve. Turning off the other special effects restores single-marble sevens, controlled-only fives, movement-only tens or non-sweeping Kings respectively. There are no jokers or mandatory partner-card exchanges in this preset. Peeking uses the existing one-second slap/four-second reveal/eight-play cooldown and excludes teammates.
+
+This is a configurable house variant; regional card effects differ. References: [Jackaroo World manual](https://www.jackarooworld.com/pdfs/Jackaroo-World-Manual.pdf) and [House Jackaroo’s variant reference](https://playjackaroo.com/rules). The board, code, graphics and sounds are original to this project.
 
 ### Werewolf / Mafia
 
@@ -203,7 +230,7 @@ External voice comes from the group’s call; Banned Word does not record or tra
 
 ### How modifiers work
 
-This is the current **v0.17 chaos rule reference**. It covers all twelve rules, their effects on every game, all game-specific Chaos Die faces, compatibility restrictions, animations, sounds and timing safeguards.
+This is the current **v0.18 chaos rule reference**. It covers all twelve rules, their effects on every game, all game-specific Chaos Die faces, compatibility restrictions, animations, sounds and timing safeguards.
 
 All twelve chaos rules now have a game-specific adapter or are hidden for an incompatible preset. They change **actual cards, points, cash, chips, XP, darts remainders or cup racks**; there is no separate bonus scoreboard. The lobby and **Info → Modifiers & custom rules** explain effects for the selected game. Imported rules are normalized by the server, so a hidden rule cannot be enabled by editing JSON.
 
@@ -234,6 +261,7 @@ Open **House rules → Chaos** before starting, enable compatible rules, adjust 
 
 | Preset | Hidden rules | Reason |
 | --- | --- | --- |
+| Jackaroo | Seat Roulette, Double or Nothing, Chaos Die, Robin Hood, Blackout | Keep fixed entrances, exact marble movement, visible legal choices and the eight-marble team objective intact. |
 | Werewolf / Mafia | Winner Takes It, Seat Roulette, Cyclone, Double or Nothing, Chaos Die, Robin Hood, Time Warp | Preserve hidden roles, simultaneous phases and faction victory. |
 | Blackjack | Time Warp | Preserve the mode’s turn, wager, scoring or team structure. |
 | Darts | Robin Hood | Preserve the mode’s turn, wager, scoring or team structure. |
@@ -256,6 +284,28 @@ Additionally, effects requiring opponents are hidden when there are fewer than t
 ### Full rule effects and die faces by preset
 
 Expand a game below for all twelve rules and its exact die faces. Trivia's everyone/master choice does not change score adapters; FFA hides Seat Roulette and replaces the reverse die face with a shorter question. Turn-based Trivia supports Seat Roulette. Solitaire is listed separately from free card sandbox.
+
+<details>
+<summary><strong>Jackaroo</strong></summary>
+
+| Rule | Direct effect |
+| --- | --- |
+| Winner Takes It | Challenge an opponent to swap actual remaining hands. Partners cannot challenge each other. |
+| Hot Potato | Burn one random card and forfeit the turn; keep all marbles in place. |
+| Seat Roulette | Hidden: Fixed board entrances and marble-based victory must remain intact; the board must stay visible for legal choices. |
+| Cyclone | Pass actual remaining hands at a clear turn boundary. Marble ownership and partners stay fixed. |
+| Double or Nothing | Hidden: Fixed board entrances and marble-based victory must remain intact; the board must stay visible for legal choices. |
+| Chaos Die | Hidden: Fixed board entrances and marble-based victory must remain intact; the board must stay visible for legal choices. |
+| Table Flip | A member of a team with the fewest safe marbles may roll a d6 and end the game with no winner. |
+| Blackout | Hidden: Fixed board entrances and marble-based victory must remain intact; the board must stay visible for legal choices. |
+| Robin Hood | Hidden: Fixed board entrances and marble-based victory must remain intact; the board must stay visible for legal choices. |
+| Banned Word | Queue one forced card burn at the offender’s next turn. |
+| Dare Wheel | Penalties and misses spin a task from the host’s list. The offender must acknowledge completion in Chaos controls before their next manual play; automatic timeouts still work. Physical completion is on the group’s honor system. |
+| Time Warp | Majority vote restores the last eligible gameplay state and timers. Revealed information cannot be forgotten; secret role actions are excluded. |
+
+Marble ownership, fixed entrances and partners remain unchanged by hand swaps. A Banned Word burn waits until the offender next has an active turn with cards; Hot Potato burns one card immediately. Dare Wheel triggers on captures, forced burns and stuck-hand discards. Table Flip compares team safety totals.
+
+</details>
 
 <details>
 <summary><strong>Werewolf / Mafia</strong></summary>
@@ -798,7 +848,7 @@ Expand a game below for all twelve rules and its exact die faces. Trivia's every
 - **Shield die face:** blocks chaos penalties, chance coin gambles, Robin Hood and dare penalties for that modifier round; ordinary gameplay rules and losses still apply.
 - **Fixed-size games:** no random extra cards are created in Tarneeb, Hold’em, Blackjack or Solitaire. Double card pickups apply only to Bluff/free sandbox and are capped to prevent uncontrolled deck growth. Final party and cash-game winners are recalculated from chaos-adjusted actual standings.
 
-Validated with the production client/server build and **286 automated tests**, including all preset/rule compatibility combinations, supported die profiles, real resource transfers, exact checkout, redemption, fixed deck integrity, role privacy, wagering escrow and final-hand penalties. Restart the server and refresh clients to load the new rule policy together. Existing in-memory rooms disappear when their server stops.
+Validated with the production client/server build and **316 automated tests**, including all preset/rule compatibility combinations, supported die profiles, real resource transfers, exact checkout, redemption, fixed deck integrity, role privacy, wagering escrow and final-hand penalties. Restart the server and refresh clients to load the new rule policy together. Existing in-memory rooms disappear when their server stops.
 
 ## Development
 
@@ -832,6 +882,7 @@ npm start
 - `src/social.ts`: negotiation offers and boxing controls.
 - `server/interactions.ts`: atomic trades, offer expiry, private boxing moves and duel outcomes.
 - `server/index.ts`: HTTP/static server, rooms, session resume, WebSocket connections, payload limits, heartbeat and rate limiting.
+- `shared/jackaroo.ts`, `server/jackaroo.ts`, `src/jackaroo-ui.ts` and `src/jackaroo-visuals.ts`: legal marble moves, authoritative turns/deals, private hand controls and the shared Jackaroo board.
 - `server/engine.ts`: authoritative game rules, actions, private per-player views and timers.
 - `server/chaos.ts`: shared chaos triggers, score adapters, private undo snapshots and voting.
 - `src/chaos-ui.ts`, `src/chaos-visuals.ts`, `src/chaos-audio.ts`: chaos controls, 3D effects and synthesized audio.
@@ -846,13 +897,17 @@ Rooms are in memory. Restarting the server clears games. Disconnected rooms expi
 
 ## Verification
 
-The v0.17 gameplay update passed the production client/server build and **286 automated tests**. Coverage includes all preset/rule compatibility combinations, supported die profiles, real resource transfers, fixed deck integrity, exact darts checkout, Pong redemption, wagering escrow, secret-role privacy, reconnects and final-hand penalties. Run `npm run build` before `npm test`, since integration tests use the production build.
+The v0.18 gameplay update passed the production client/server build and **316 automated tests**. Coverage includes all preset/rule compatibility combinations, supported die profiles, real resource transfers, fixed deck integrity, exact darts checkout, Pong redemption, wagering escrow, secret-role privacy, reconnects and final-hand penalties. Run `npm run build` before `npm test`, since integration tests use the production build.
 
 Browser checks cover room creation, joining, private hands, card play and bluff calls, camera switching, negotiations, host editing, direct aiming, actual standings, compatible-only chaos controls and the per-game Info reference.
 
 ## Release history
 
 These notes record behavior at the time of each release. Use the current [game guides](#game-guides) and [Rules](#rules) for today’s timers, scoring and supported modifiers.
+
+### Version 0.18 · Jackaroo
+
+Added a four-player card-and-marble partnership game, private hands, a shared 64-hole polygon board, card-driven legal moves, configurable regional effects, captures, safe-lane finishes, partner assistance, timed turns, card shuffling/dealing, movement animations and synthesized sounds. Compatible chaos rules act on real hands and card opportunities; incompatible score/order/darkness modifiers are hidden.
 
 ### Version 0.17 · game-specific chaos
 
