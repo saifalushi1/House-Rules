@@ -109,6 +109,7 @@ export interface Tile {
     owner?: string;
 }
 export interface Room {
+ spectators?:import('./spectators.js').Spectator[];spectatorGhost?:import('./spectators.js').SpectatorGhost;
  jackaroo?:JackarooState;
  werewolf?:WerewolfState;blackjack?:BlackjackState;darts?:DartsState;pong?:PongState;
     charadeTeams?:string[][];charadeSession?:{order:string[];index:number;turnEnds:number};
@@ -196,7 +197,7 @@ export type PublicPlayer = Omit<Player, 'hand'> & {
     handCount: number;
 };
 export type View = Omit<Room, 'players' | 'deck' | 'charadeBag' | 'lastPlay' | 'charade' | 'duel' | 'tradeOffers' | 'trivia' | 'solitaire' | 'scribble' | 'raid' | 'poker' | 'werewolf' | 'blackjack'> & {
-    serverNow?:number;blackoutHidden?:boolean;werewolf?:WerewolfView;blackjack?:BlackjackView;
+    spectating?:boolean;serverNow?:number;blackoutHidden?:boolean;werewolf?:WerewolfView;blackjack?:BlackjackView;
     poker?:PokerView;
     solitaire?:SolitaireView; scribble?:ScribbleView; raid?:RaidView;
     trivia?: TriviaView;

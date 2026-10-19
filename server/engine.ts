@@ -1,3 +1,4 @@
+import {handleSpectator,removeSpectator} from './spectators.js';
 import {initJackaroo,handleJackaroo,tickJackaroo,skipJackaroo} from './jackaroo.js';
 import {normalizeChaos} from '../shared/chaos-policy.js';
 import {initWerewolf,handleWerewolf,tickWerewolf,werewolfView,skipWerewolf} from './werewolf.js';
@@ -30,7 +31,7 @@ export function shuffle<T>(list: T[]): T[] { for (let i = list.length - 1; i > 0
 } return list; }
 export function makeDeck(count = 1): Card[] { return shuffle(Array.from({ length: count }, (_, d) => suits.flatMap(suit => Array.from({ length: 13 }, (_, i) => ({ id: `${d}-${suit}-${i + 1}`, rank: i + 1, suit })))).flat()); }
 export function player(id: string, name: string, index: number): Player { return { id, name: name.trim().slice(0, 24) || 'Guest', color: colors[index % 8], connected: true, ready: false, hand: [], cash: 0, position: 0, score: 0, peekRevealed: false, peekRevealsAt: 0, correctAnswers: 0, peekingUntil: 0, catchUntil: 0, peekBlockedUntil: 0, bankrupt: false, career: '' }; }
-export function makeRoom(code: string, host: string): Room { return { retaliated:[],finishEffectsDone:false,charadeMatchEnds:0, charadeCorrect:[], charadeScores:[], trickCollectUntil:0, lastTrickTeam:0, bluffPlays: 0, gameInstance: 0, endedEarly: false, messageSequence: 1, messages: [{id:1, at:Date.now(), text:'A new table. A fresh set of rules.'}], events: [], eventSequence: 0, busyUntil: 0, rollDice: [], tradeOffers: [], deniedTrumps: [], code, host, players: [], rules: { ...defaults }, phase: 'lobby', turn: 0, deck: [], pile: [], log: ['A new table. A fresh set of rules.'], round: 1, claim: 1, trick: [], tricks: [0, 0], teamScores: [0, 0], bid: 6, passes: 0, bidPassed: [], tarneebPhase: 'bid', trump: '♠', tiles: [], rolled: false, lastRoll: 0, charadeBag: [], boardPot: 0 }; }
+export function makeRoom(code: string, host: string): Room { return { spectators:[],retaliated:[],finishEffectsDone:false,charadeMatchEnds:0, charadeCorrect:[], charadeScores:[], trickCollectUntil:0, lastTrickTeam:0, bluffPlays: 0, gameInstance: 0, endedEarly: false, messageSequence: 1, messages: [{id:1, at:Date.now(), text:'A new table. A fresh set of rules.'}], events: [], eventSequence: 0, busyUntil: 0, rollDice: [], tradeOffers: [], deniedTrumps: [], code, host, players: [], rules: { ...defaults }, phase: 'lobby', turn: 0, deck: [], pile: [], log: ['A new table. A fresh set of rules.'], round: 1, claim: 1, trick: [], tricks: [0, 0], teamScores: [0, 0], bid: 6, passes: 0, bidPassed: [], tarneebPhase: 'bid', trump: '♠', tiles: [], rolled: false, lastRoll: 0, charadeBag: [], boardPot: 0 }; }
 export function note(r: Room, msg: string) { recordMessage(r, msg); }
 export function next(r: Room) {
  const dir=r.rules.reverseTurns!==!!r.chaos?.reversed?-1:1,order=r.chaos?.order||r.players.map(p=>p.id);
@@ -59,6 +60,7 @@ validateClub(r);
     r.jackaroo=undefined;r.werewolf=undefined;r.blackjack=undefined;r.darts=undefined;r.pong=undefined;r.chaos=undefined;r.poker=undefined;r.trivia=undefined;r.solitaire=undefined;r.scribble=undefined;r.raid=undefined;
     r.charadeMatchEnds=r.rules.game==='charades'?Date.now()+r.rules.charadeMatchSeconds*1000:0;r.charadeCorrect=Array(r.players.length/2|0).fill(0);r.charadeScores=Array(r.players.length/2|0).fill(0);
     r.bluffPlays = 0; r.tradeOffers = []; r.clash = undefined; r.duel = undefined; r.deniedTrumps = []; r.busyUntil = 0; r.rollDice = [];
+    r.spectatorGhost=undefined;
     r.gameInstance++;
     r.endedEarly = false;
     r.phase = 'playing';
@@ -108,7 +110,7 @@ else if (r.round > r.rules.roundLimit) {
     finish(r, winner.name);
 } }
 export function worth(r: Room, p: Player) { return p.cash + r.tiles.filter(t => t.owner === p.id).reduce((n, t) => n + t.price, 0); }
-function rawView(r: Room, id: string): View { const { deck, players, lastPlay, charadeBag: _, charade, duel, tradeOffers, trivia: privateTrivia, solitaire:privateSolitaire,scribble:privateScribble,raid:privateRaid,poker:privatePoker,werewolf:privateWolf,blackjack:privateBj, ...publicRoom } = r; const me=players.find(p=>p.id===id);const visiblePeek=r.phase==='playing'&&me&&me.peekTarget&&me.peekRevealed&&me.peekRevealsAt<=Date.now()&&me.peekingUntil>Date.now()?players.find(p=>p.id===me.peekTarget)?.hand.slice(0,3):undefined;return { ...publicRoom,serverNow:Date.now(),werewolf:werewolfView(r,id),blackjack:blackjackView(r),poker:pokerView(r),rpg:r.rules.game==='rpg'?r.rpg:undefined,solitaire:solitaireView(r),scribble:scribbleView(r,id),raid:r.raid?{from:r.raid.from,to:r.raid.to,stake:r.raid.stake,phase:r.raid.phase,lastBeat:r.raid.lastBeat,pausedAt:r.raid.pausedAt,ends:r.raid.ends,round:r.raid.round,wins:r.raid.wins,ready:Object.keys(r.raid.choices)}:undefined, chaos:r.chaos?{...r.chaos,word:chaosWord(r,id)}:undefined, trivia:triviaView(r,id), peek:visiblePeek, tradeOffers: tradeOffers.filter(t => t.from === id || t.to === id), duel: duel ? { acePlayer: duel.acePlayer, trumpPlayer: duel.trumpPlayer, card: duel.card, round: duel.round, score: duel.score, ends: duel.ends, ready: Object.keys(duel.choices) } : undefined, players: players.map(({ hand, ...p }) => ({ ...p, handCount: hand.length })), hand: players.find(p => p.id === id)?.hand || [], deckCount: deck.length, pileCount: r.pile.length, lastPlay: lastPlay ? { player: lastPlay.player, count: lastPlay.cards.length, claim: lastPlay.claim, expires: lastPlay.expires } : undefined, charade: charade ? { actor: charade.actor,guesser:charade.guesser, ends: charade.ends, ...(id === charade.actor ? { prompt: charade.prompt } : {}) } : undefined, pile: r.rules.game === 'bluff' ? [] : r.pile }; }
+function rawView(r: Room, id: string): View { const { deck, players, lastPlay, charadeBag: _, charade, duel, tradeOffers, trivia: privateTrivia, solitaire:privateSolitaire,scribble:privateScribble,raid:privateRaid,poker:privatePoker,werewolf:privateWolf,blackjack:privateBj, ...publicRoom } = r; const me=players.find(p=>p.id===id);const visiblePeek=r.phase==='playing'&&me&&me.peekTarget&&me.peekRevealed&&me.peekRevealsAt<=Date.now()&&me.peekingUntil>Date.now()?players.find(p=>p.id===me.peekTarget)?.hand.slice(0,3):undefined;return { ...publicRoom,spectating:!!r.spectators?.some(s=>s.id===id),serverNow:Date.now(),werewolf:werewolfView(r,id),blackjack:blackjackView(r),poker:pokerView(r),rpg:r.rules.game==='rpg'?r.rpg:undefined,solitaire:solitaireView(r),scribble:scribbleView(r,id),raid:r.raid?{from:r.raid.from,to:r.raid.to,stake:r.raid.stake,phase:r.raid.phase,lastBeat:r.raid.lastBeat,pausedAt:r.raid.pausedAt,ends:r.raid.ends,round:r.raid.round,wins:r.raid.wins,ready:Object.keys(r.raid.choices)}:undefined, chaos:r.chaos?{...r.chaos,word:chaosWord(r,id)}:undefined, trivia:triviaView(r,id), peek:visiblePeek, tradeOffers: tradeOffers.filter(t => t.from === id || t.to === id), duel: duel ? { acePlayer: duel.acePlayer, trumpPlayer: duel.trumpPlayer, card: duel.card, round: duel.round, score: duel.score, ends: duel.ends, ready: Object.keys(duel.choices) } : undefined, players: players.map(({ hand, ...p }) => ({ ...p, handCount: hand.length })), hand: players.find(p => p.id === id)?.hand || [], deckCount: deck.length, pileCount: r.pile.length, lastPlay: lastPlay ? { player: lastPlay.player, count: lastPlay.cards.length, claim: lastPlay.claim, expires: lastPlay.expires } : undefined, charade: charade ? { actor: charade.actor,guesser:charade.guesser, ends: charade.ends, ...(id === charade.actor ? { prompt: charade.prompt } : {}) } : undefined, pile: r.rules.game === 'bluff' ? [] : r.pile }; }
 function tickInternal(r: Room) {
     if (r.phase !== 'playing'){if(r.busyUntil&&r.busyUntil<=Date.now()){r.busyUntil=0;return true;}return false;}
     if(tickRaid(r))return true;
@@ -479,6 +481,7 @@ function commitTarneeb(r: Room, id: string, card: Card) {
 function actPresented(r: Room, id: string, a: Action): { peek?: Card[] } | void {
     const p = r.players.find(p => p.id === id);
     need(p&&p.connected,'Join this room first.');
+    if(a.type==='kickSpectator'){need(r.host===id,'Only the host can remove spectators.');need(typeof a.target==='string'&&r.spectators?.some(s=>s.id===a.target),'Choose a spectator.');removeSpectator(r,String(a.target));return;}
     if(handleRaid(r,id,a))return;
     need(!r.raid||!a.type.startsWith('chaos'),'Finish the challenge before using other chaos controls.');
     if(handleChaos(r,id,a)){finishEffects(r);return;}
@@ -546,5 +549,5 @@ function forceChaosActionInternal(r:Room,id:string){
 }
 
 export function view(r:Room,id:string):View{return blackoutView(r,id,rawView(r,id),rawView);}
-export function act(r:Room,id:string,a:Action){const before=traceBlackout(r);try{return actPresented(r,id,a);}finally{recordBlackout(r,before,id,a.type==='chat');}}
+export function act(r:Room,id:string,a:Action){const before=traceBlackout(r);try{if(r.spectators?.some(s=>s.id===id)||a.type.startsWith('spectator'))return handleSpectator(r,id,a);return actPresented(r,id,a);}finally{recordBlackout(r,before,id,a.type==='chat');}}
 export function tick(r:Room){const before=traceBlackout(r);try{return tickInternalChaos(r);}finally{recordBlackout(r,before);}}

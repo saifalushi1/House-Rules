@@ -6,7 +6,7 @@ Your table. Your rules. A browser-based game night for friends.
 
 1. [About House Rules](#about-house-rules) — what the game-night website does.
 2. [How to run](#how-to-run) — Windows launcher and terminal setup.
-3. [Play with friends](#play-with-friends) — local Wi-Fi and internet access.
+3. [Play with friends](#play-with-friends) — local Wi-Fi, internet access and [spectators](#spectators).
 4. [Available games](#available-games) — all 15 presets and player counts.
 5. [Game guides](#game-guides) — setup, controls and scoring.
 6. [Rules](#rules) — [house settings](#house-settings), [chaos overview](#chaos-rule-overview), [compatibility](#compatibility-at-a-glance), [per-game effects and die faces](#full-rule-effects-and-die-faces-by-preset), and [timing safeguards](#timing-penalties-and-limits).
@@ -64,6 +64,21 @@ cloudflared tunnel --url http://localhost:3000
 Share the public HTTPS URL printed by `cloudflared` with your friends. Open the game through that URL before copying room invites so they use the public address. Keep both the game server and tunnel terminals running while playing.
 
 Use it with trusted friends. Room codes are lightweight invite gates, not account authentication. No router or firewall changes have been made automatically. For an internet deployment, put the server behind HTTPS and authentication rather than exposing HTTP directly.
+
+### Spectators
+
+Enter a name and room code (or open an invite), then choose **Watch as spectator**. Up to **32 spectators** can join a lobby, full table or game already in progress without consuming player seats or changing teams, deals, votes or scoring. They see the public table and shared drawing canvas/questions, with no private hands, hidden roles, unrevealed answers or acting prompts.
+
+During a game, spectators can use two reactions:
+
+| Reaction | Behavior | Cooldown |
+| --- | --- | --- |
+| 🍅 Throw tomato | Choose a seated player; a polygon tomato arcs toward them and splats with a sound. | 8 seconds per spectator |
+| 👻 Ghost dance | Become a translucent ghost in the center of the table for 6 seconds. Shuffle or disco, with a 20% chance of a surprise twerk. Includes dance sounds. | 45 seconds per spectator |
+
+One ghost can occupy the dance floor at a time. Both cooldowns are enforced by the server and survive reconnecting, leaving/rejoining with the same session, restarts and Time Warp. Reactions affect only presentation. Spectators cannot play cards, guess for points, vote, change rules or trigger chaos modifiers. They can chat, except during an active Werewolf game, when the audience stays silent.
+
+Non-host players can choose **Watch instead** in the lobby; spectators can **Join as player** when a seat opens. Roles stay fixed during a match, and the host keeps a player seat. Spectators may leave at any time. The host can expand **Audience** to remove a spectator during a game or in the lobby.
 
 ## Available games
 
@@ -850,7 +865,7 @@ Marble ownership, fixed entrances and partners remain unchanged by hand swaps. A
 - **Shield die face:** blocks chaos penalties, chance coin gambles, Robin Hood and dare penalties for that modifier round; ordinary gameplay rules and losses still apply.
 - **Fixed-size games:** no random extra cards are created in Tarneeb, Hold’em, Blackjack or Solitaire. Double card pickups apply only to Bluff/free sandbox and are capped to prevent uncontrolled deck growth. Final party and cash-game winners are recalculated from chaos-adjusted actual standings.
 
-Validated with the production client/server build and **317 automated tests**, including all preset/rule compatibility combinations, supported die profiles, real resource transfers, exact checkout, redemption, fixed deck integrity, role privacy, wagering escrow and final-hand penalties. Restart the server and refresh clients to load the new rule policy together. Existing in-memory rooms disappear when their server stops.
+Validated with the production client/server build and **340 automated tests**, including all preset/rule compatibility combinations, supported die profiles, real resource transfers, exact checkout, redemption, fixed deck integrity, role privacy, wagering escrow and final-hand penalties. Restart the server and refresh clients to load the new rule policy together. Existing in-memory rooms disappear when their server stops.
 
 ## Development
 
@@ -899,11 +914,16 @@ Rooms are in memory. Restarting the server clears games. Disconnected rooms expi
 
 ## Verification
 
-The v0.18 gameplay update passed the production client/server build and **317 automated tests**. Coverage includes all preset/rule compatibility combinations, supported die profiles, real resource transfers, fixed deck integrity, exact darts checkout, Pong redemption, wagering escrow, secret-role privacy, reconnects and final-hand penalties. Run `npm run build` before `npm test`, since integration tests use the production build.
+The current gameplay update passed the production client/server build and **340 automated tests**. Coverage includes all preset/rule compatibility combinations, supported die profiles, real resource transfers, fixed deck integrity, exact darts checkout, Pong redemption, wagering escrow, secret-role privacy, reconnects and final-hand penalties. Run `npm run build` before `npm test`, since integration tests use the production build.
 
 Browser checks cover room creation, joining, private hands, card play and bluff calls, camera switching, negotiations, host editing, direct aiming, actual standings, compatible-only chaos controls and the per-game Info reference.
 
 ## Release history
+
+### v0.19 · Spectator audience
+
+Added spectator membership, public game views, lobby role changes, audience removal, tomato throws and dancing ghosts with server cooldowns. New tests cover private information and rejected actions across all 15 games, real WebSocket join/reconnect/role changes, reaction timing, Time Warp and animation cleanup. Build and all 340 tests pass; browser checks verify joining a full running table, ghost presentation and visible reaction countdowns.
+
 
 These notes record behavior at the time of each release. Use the current [game guides](#game-guides) and [Rules](#rules) for today’s timers, scoring and supported modifiers.
 

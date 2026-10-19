@@ -28,6 +28,8 @@ export class GameAudio {
     source.connect(filter).connect(gain).connect(this.master || ctx.destination); source.start(ctx.currentTime + delay);
   }
   play(e: GameEvent) {
+    if(e.kind==='spectatorTomato'){this.noise(.12,0,.3,1600);this.tone(300,.08);this.noise(.2,.85,.5,450);return;}
+    if(e.kind==='spectatorGhost'){[440,554,659,880,659,554,440,330].forEach((f,i)=>this.tone(f,.2,i*.65,'triangle',.2));for(let i=0;i<12;i++)this.noise(.06,i*.45,.15,500);return;}
     if(e.kind.startsWith('jackaroo')){if(e.kind==='jackarooDeal'){for(let i=0;i<12;i++)this.noise(.06,i*.1,.2,2100);}else if(e.kind==='jackarooCapture'){this.tone(210,.16);this.noise(.12,.1,.3,550);}else if(e.kind==='jackarooMove'){this.noise(.06,0,.2,2400);for(let i=0;i<5;i++)this.tone(440+i*80,.06,i*.14,'triangle',.14);}else{this.noise(.15,0,.2,1200);}return;}
     if(chaosSound(this,e))return;if(e.kind==='dartLockHeight'||e.kind==='pongLockHeight'){this.tone(660,.07);this.tone(990,.09,.07);return;}
     if(e.kind.startsWith('wolf')){if(e.kind==='wolfPhase'){const night=e.data.phase==='night';[night?220:523,night?330:659,night?440:784].forEach((f,i)=>this.tone(f,.4,i*.2,'triangle',.2));}else if(e.kind==='wolfVote'){this.noise(.08,0,.3,500);this.tone(160,.1);}else {this.tone(330,.4);this.tone(220,.5,.2);}return;}

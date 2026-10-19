@@ -1,3 +1,4 @@
+import {addSpectator,removeSpectator} from './spectators.js';
 import { createServer } from 'node:http';
 import { readFile, stat } from 'node:fs/promises';
 import { resolve, extname, sep } from 'node:path';
@@ -89,7 +90,7 @@ wss.on('connection', (ws, req) => {
                 send(ws, { type: 'session', token, id: s.id });
                 if (s.room) {
                     const r = rooms.get(s.room);
-                    const p = r?.players.find(p => p.id === s.id);
+                    const p = r?.players.find(p => p.id === s.id)||r?.spectators?.find(p=>p.id===s.id);
                     if (r && p) {
                         p.connected = true;
                         broadcast(r);
@@ -103,7 +104,7 @@ wss.on('connection', (ws, req) => {
             if (!s || s.socket !== ws)
                 throw new Error('Connect before joining.');
             s.lastSeen = Date.now();
-            if (msg.type === 'create' || msg.type === 'join') {
+            if (msg.type === 'create' || msg.type === 'join' || msg.type === 'watch') {
                 if (s.room)
                     throw new Error('Leave your current room first.');
                 if (typeof msg.name !== 'string' || !msg.name.trim())
@@ -119,31 +120,39 @@ wss.on('connection', (ws, req) => {
                     r = rooms.get(String(msg.code).toUpperCase())!;
                     if (!r)
                         throw new Error('Room not found. Check the invite code.');
-                    if (r.phase !== 'lobby')
+                    if (msg.type!=='watch'&&r.phase !== 'lobby')
                         throw new Error('This game has started. Ask the host to return to the lobby.');
-                    if (r.players.length >= r.rules.maxPlayers)
+                    if (msg.type!=='watch'&&r.players.length >= r.rules.maxPlayers)
                         throw new Error('That table is full.');
                 }
-                r.players.push(player(s.id, msg.name, r.players.length));
+                if(msg.type==='watch')addSpectator(r,s.id,msg.name);else r.players.push(player(s.id, msg.name, r.players.length));
                 s.room = r.code;
-                note(r, `${r.players.at(-1)!.name} joined the table.`);
+                note(r, msg.type==='watch'?r.spectators!.at(-1)!.name+' joined the audience.':r.players.at(-1)!.name+' joined the table.');
                 broadcast(r);
                 return;
             }
             const r = rooms.get(s.room || '');
             if (!r)
                 throw new Error('Join a room first.');
+            if(msg.type==='takeSeat'||msg.type==='spectate'){
+                if(r.phase!=='lobby')throw Error('Change roles in the lobby after this game.');
+                if(msg.type==='takeSeat'){const spectator=r.spectators?.find(p=>p.id===s.id);if(!spectator)throw Error('Join the audience first.');if(r.players.length>=r.rules.maxPlayers)throw Error('That table is full.');r.players.push(player(s.id,spectator.name,r.players.length));removeSpectator(r,s.id);}
+                else{const member=r.players.find(p=>p.id===s.id);if(!member)throw Error('You are already watching.');if(r.host===s.id)throw Error('The host must keep their seat.');const original=r.players;r.players=r.players.filter(p=>p.id!==s.id);try{addSpectator(r,s.id,member.name);}catch(error){r.players=original;throw error;}if(r.triviaMaster===s.id)r.triviaMaster=undefined;if(r.rpgDm===s.id)r.rpgDm=undefined;r.charadeTeams=undefined;}
+                note(r,'A guest changed between player and spectator.');broadcast(r);return;
+            }
             if (msg.type === 'leave') {
-                if (r.phase === 'playing')
+                if (r.phase === 'playing'&&!r.spectators?.some(p=>p.id===s.id))
                     throw new Error('Return to the lobby before leaving. Closing the tab saves your seat.');
+                removeSpectator(r,s.id);
                 r.players = r.players.filter(p => p.id !== s.id);
                 s.room = undefined;
                 send(ws, { type: 'left' });
                 if (r.host === s.id) {
                     r.host = r.players.find(p => p.connected)?.id || r.players[0]?.id || '';
                 }
-                if (!r.players.length)
-                    rooms.delete(r.code);
+                if (!r.players.length){
+                    rooms.delete(r.code);for(const guest of sessions.values())if(guest.room===r.code){guest.room=undefined;if(guest.socket)send(guest.socket,{type:'left'});}
+                }
                 else
                     broadcast(r);
                 return;
@@ -151,9 +160,9 @@ wss.on('connection', (ws, req) => {
             const result = act(r, s.id, msg);
             if (result?.peek)
                 send(ws, { type: 'peek', cards: result.peek, expires: Date.now() + 4000 });
-            if (msg.type === 'kick') {
+            if (msg.type === 'kick'||msg.type==='kickSpectator') {
                 for (const kicked of sessions.values())
-                    if (kicked.room === r.code && !r.players.some(p => p.id === kicked.id)) {
+                    if (kicked.room === r.code && !r.players.some(p => p.id === kicked.id)&&!r.spectators?.some(p=>p.id===kicked.id)) {
                         kicked.room = undefined;
                         if (kicked.socket)
                             send(kicked.socket, { type: 'left' });
@@ -166,9 +175,9 @@ wss.on('connection', (ws, req) => {
         }
     });
     ws.on('close', () => { clearInterval(heartbeat); const s = sessions.get(token); if (s?.socket !== ws)
-        return; s.socket = undefined; s.lastSeen = Date.now(); const r = rooms.get(s.room || ''); const p = r?.players.find(p => p.id === s.id); if (r && p) {
+        return; s.socket = undefined; s.lastSeen = Date.now(); const r = rooms.get(s.room || ''); const p = r?.players.find(p => p.id === s.id)||r?.spectators?.find(p=>p.id===s.id); if (r && p) {
         p.connected = false;
-        note(r, `${p.name} disconnected. Their seat is saved.`);
+        note(r, p.name+(r.spectators?.some(g=>g.id===p.id)?' disconnected from the audience.':' disconnected. Their seat is saved.'));
         if (r.phase === 'lobby' && r.host === p.id)
             r.host = r.players.find(p => p.connected)?.id || p.id;
         broadcast(r);

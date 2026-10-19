@@ -1,3 +1,4 @@
+import {spectatorPanel,audiencePanel} from './spectator-ui';
 import {followChat} from './chat-scroll';
 import {spinGameWheel} from './game-wheel';
 import {jackPlay,jackSettings,bindJack,pickJackMarble} from './jackaroo-ui';
@@ -35,7 +36,7 @@ let seenEvent = 0, eventRoom = '', effectTimer: ReturnType<typeof setTimeout>;
 document.addEventListener('pointerdown', () => void audio.unlock(), {capture:true});
 document.addEventListener('keydown', () => void audio.unlock(), {capture:true});
 const app = document.querySelector<HTMLDivElement>('#app')!;
-app.innerHTML = `<div class="shell"><aside class="sidebar" id="sidebar"></aside><main><header id="header"></header><div class="workspace"><section class="table-area"><div id="intro"></div><div class="stage"><div class="stage-top" id="stage-top"></div><div id="scene" aria-label="Low polygon multiplayer game table"></div><div id="stage-bottom"></div><div id="effects-layer" aria-live="polite"></div></div><div id="play-panel"></div></section><aside class="right-rail"><button id="rules-toggle" data-action="toggleRules"></button><section class="rules-panel" id="rules-panel"></section><div id="activity"></div></aside></div><footer><span>MADE FOR GAME NIGHT. BUILT FOR YOUR RULES.</span><span>SELF-HOSTED <i></i> VERSION 0.18</span></footer></main></div><div id="toast" role="status" aria-live="polite"></div><div id="modal-root"></div>`;
+app.innerHTML = `<div class="shell"><aside class="sidebar" id="sidebar"></aside><main><header id="header"></header><div class="workspace"><section class="table-area"><div id="intro"></div><div class="stage"><div class="stage-top" id="stage-top"></div><div id="scene" aria-label="Low polygon multiplayer game table"></div><div id="stage-bottom"></div><div id="effects-layer" aria-live="polite"></div></div><div id="play-panel"></div></section><aside class="right-rail"><button id="rules-toggle" data-action="toggleRules"></button><section class="rules-panel" id="rules-panel"></section><section id="audience-panel"></section><div id="activity"></div></aside></div><footer><span>MADE FOR GAME NIGHT. BUILT FOR YOUR RULES.</span><span>SELF-HOSTED <i></i> VERSION 0.19</span></footer></main></div><div id="toast" role="status" aria-live="polite"></div><div id="modal-root"></div>`;
 try {
     scene = new GameScene(document.querySelector('#scene')!);scene.onAim=send;
 }
@@ -68,7 +69,7 @@ function connect() { clearTimeout(reconnectTimer); socket = new WebSocket(`${loc
         pendingCreate = undefined;
         send({ type: 'rules', rules: draft });
     }
-    camera = first ? draft.camera : camera;
+    camera = room!.spectating?'third':first ? draft.camera : camera;
     selected = new Set([...selected].filter(c => room!.hand.some(h => h.id === c)));
     render();
     if (first)
@@ -90,10 +91,10 @@ function render() {
     const focus = document.activeElement as HTMLInputElement | HTMLTextAreaElement | null;
     const focusId = focus?.id;
     const position = focus && 'selectionStart' in focus ? focus.selectionStart : null;
-    const drafts = new Map(['bj-bet','bj-pair','bj-trio','scribble-award-target','sore-loser-target','poker-raise','chat','guess','trivia-answer','player-name','room-code','scribble-guess','rpg-name','rpg-inventory','rpg-notes','rpg-narrative','rpg-enemy-name','rpg-enemy-x','rpg-enemy-y','rpg-enemy-hp','rpg-enemy-ac','rpg-target','rpg-die','rpg-ability'].map(key => [key, (document.getElementById(key) as HTMLInputElement | null)?.value]));
+    const drafts = new Map(['spectator-target','bj-bet','bj-pair','bj-trio','scribble-award-target','sore-loser-target','poker-raise','chat','guess','trivia-answer','player-name','room-code','scribble-guess','rpg-name','rpg-inventory','rpg-notes','rpg-narrative','rpg-enemy-name','rpg-enemy-x','rpg-enemy-y','rpg-enemy-hp','rpg-enemy-ac','rpg-target','rpg-die','rpg-ability'].map(key => [key, (document.getElementById(key) as HTMLInputElement | null)?.value]));
     if(room?.phase==='lobby') resetTradeDraft();
     applyLayout();
-    renderSidebar(); renderHeader(); renderIntro(); renderStage(); renderRules(); renderPlay(); renderActivity();
+    renderSidebar(); renderHeader(); renderIntro(); renderStage(); renderRules(); renderPlay(); renderActivity();document.querySelector('#audience-panel')!.innerHTML=audiencePanel(room,id);
     for (const [key, value] of drafts) {
         const field = document.getElementById(key) as HTMLInputElement | null;
         if (field && value !== undefined) if(field instanceof HTMLSelectElement){if(Array.from(field.options).some(o=>o.value===value))field.value=value;}else field.value = value;
@@ -107,8 +108,8 @@ function render() {
     if (scene) {scene.mode = camera;scene.setSelected(selected);}
     applyLayout();
     mountExpansion(room,id,send);
-    document.querySelector('#raid-hud')?.remove();if(room&&room.phase==='playing'&&room.rules.chaosRaid&&room.players.length>1){const hud=document.createElement('div');hud.id='raid-hud';hud.innerHTML=raidHtml(room,id);document.querySelector('.stage')!.append(hud);}
-    chaosHud(room,id);
+    document.querySelector('#raid-hud')?.remove();if(room&&room.phase==='playing'&&room.rules.chaosRaid&&room.players.length>1&&!room.spectating){const hud=document.createElement('div');hud.id='raid-hud';hud.innerHTML=raidHtml(room,id);document.querySelector('.stage')!.append(hud);}
+    chaosHud(room?.spectating?undefined:room,id);
     presentEvents();
 }
 function renderSidebar() { document.querySelector('#sidebar')!.innerHTML = `<a class="brand" href="/" aria-label="House Rules home"><span class="brand-mark">H<span>R</span></span><span>HOUSE<br>RULES<span class="brand-dot">.</span></span></a><button class="spin-game-button" data-action="spinGame" ${locked()?'disabled':''}><span>◉</span> Spin the wheel<small>Pick a random game</small></button><div class="side-label">YOUR GAME SHELF <span>${Object.keys(games).length}</span></div><div class="filters">${['all', 'cards', 'party', 'tabletop'].map(f => `<button data-filter="${f}" class="${filter === f ? 'active' : ''}">${f === 'all' ? 'All games' : f[0].toUpperCase() + f.slice(1)}</button>`).join('')}</div><nav aria-label="Game presets">${Object.entries(games).filter(([, g]) => filter === 'all' || g.category.toLowerCase() === filter).map(([key, g]) => `<button class="game-item ${draft.game === key ? 'active' : ''}" data-game="${key}" ${room && (room.host !== id || room.phase !== 'lobby') ? 'disabled' : ''}><span class="game-icon ${key}">${g.icon}</span><span><strong>${g.name}</strong><small>${g.category} <b>·</b> ${g.players} PLAYERS</small></span><span class="game-arrow">↗</span></button>`).join('')}</nav><div class="side-bottom"><div class="tiny-dice">⚄</div><strong>The best rule?<br>Make it your own.</strong><p>Familiar games. Unfamiliar twists.<br>Entirely your table.</p><button class="text-btn" data-action="help">Info <span>↗</span></button></div>`; }
@@ -119,7 +120,7 @@ function renderHeader() {
 function renderIntro() { const g = games[draft.game]; document.querySelector('#intro')!.innerHTML = `<div class="eyebrow"><span></span> YOUR TABLE. YOUR RULES.</div><div class="intro-title"><h1>${room ? esc(g.name) : 'Good friends.<br><em>Questionable rules.</em>'}</h1><span class="edition">THE GAME NIGHT<br>SANDBOX</span></div><p>${room ? esc(g.description) : 'Pick a classic. Bend the rules. Make a night of it.'}</p>`; }
 function renderStage() {
     const g = games[draft.game];
-    document.querySelector('#stage-top')!.innerHTML = `<div class="table-name"><span class="live-dot"></span><strong>${room ? room.phase === 'lobby' ? 'WAITING ROOM' : room.phase === 'finished' ? 'GAME COMPLETE' : 'AT THE TABLE' : 'YOUR NEXT GAME NIGHT'}</strong><span>${room ? `${room.players.length}/${room.rules.maxPlayers} seated` : 'Low-poly living room'}</span></div><div class="camera-switch" aria-label="Camera view">${['property','life','rpg'].includes(draft.game) ? `<button data-action="boardZoom" class="${scene?.closeBoard ? 'active' : ''}">⌕ Board zoom</button>` : ''}<button data-camera="third" class="${camera === 'third' ? 'active' : ''}" title="Third-person view">◈ Overview</button><button data-camera="first" class="${camera === 'first' ? 'active' : ''}" title="First-person view">◉ My seat</button></div>`;
+    document.querySelector('#stage-top')!.innerHTML = `<div class="table-name"><span class="live-dot"></span><strong>${room ? room.phase === 'lobby' ? 'WAITING ROOM' : room.phase === 'finished' ? 'GAME COMPLETE' : 'AT THE TABLE' : 'YOUR NEXT GAME NIGHT'}</strong><span>${room ? `${room.players.length}/${room.rules.maxPlayers} seated` : 'Low-poly living room'}</span></div><div class="camera-switch" aria-label="Camera view">${['property','life','rpg'].includes(draft.game) ? `<button data-action="boardZoom" class="${scene?.closeBoard ? 'active' : ''}">⌕ Board zoom</button>` : ''}<button data-camera="third" class="${camera === 'third' ? 'active' : ''}" title="Third-person view">◈ Overview</button><button ${room?.spectating?'disabled':''} data-camera="first" class="${camera === 'first' ? 'active' : ''}" title="First-person view">◉ My seat</button></div>`;
     const deadline=room?.clash?.expires||room?.lastPlay?.expires;if(deadline)document.querySelector('.table-name')!.insertAdjacentHTML('beforeend',`<span class="challenge-clock">Call window <b data-countdown="${deadline}"></b></span>`);
     document.querySelector('#tarneeb-status')?.remove();
     if(room && draft.game==='tarneeb' && room.phase!=='lobby'){
@@ -172,13 +173,14 @@ function renderPlay() {
     const g = games[draft.game];
     if (!room) {
         const invite = new URLSearchParams(location.search).get('room') || '';
-        el.innerHTML = `<div class="host-panel"><div><span class="eyebrow">LET’S GET THE GROUP TOGETHER</span><h2>Every great night starts <br>with an open table.</h2></div><form id="room-form"><label>Your name<input id="player-name" maxlength="24" placeholder="What should we call you?" value="${esc(localStorage.getItem('house-name') || '')}" required></label><div class="host-actions"><button class="primary" type="submit" name="intent" value="create" ${connected ? '' : 'disabled'}>Host a table <span>↗</span></button><button class="secondary" type="submit" name="intent" value="join" ${connected ? '' : 'disabled'}>Join friends</button></div><input id="room-code" maxlength="6" placeholder="ROOM CODE TO JOIN" aria-label="Room code to join" value="${esc(invite)}"></form></div>`;
+        el.innerHTML = `<div class="host-panel"><div><span class="eyebrow">LET’S GET THE GROUP TOGETHER</span><h2>Every great night starts <br>with an open table.</h2></div><form id="room-form"><label>Your name<input id="player-name" maxlength="24" placeholder="What should we call you?" value="${esc(localStorage.getItem('house-name') || '')}" required></label><div class="host-actions"><button class="primary" type="submit" name="intent" value="create" ${connected ? '' : 'disabled'}>Host a table <span>↗</span></button><button class="secondary" type="submit" name="intent" value="join" ${connected ? '' : 'disabled'}>Join friends</button><button class="secondary" type="submit" name="intent" value="watch" ${connected?'':'disabled'}>Watch as spectator</button></div><input id="room-code" maxlength="6" placeholder="ROOM CODE TO JOIN" aria-label="Room code to join" value="${esc(invite)}"></form></div>`;
         return;
     }
+    if(room.spectating){el.innerHTML=spectatorPanel(room,id);updateTimers();return;}
     if(room.raid&&room.raid.phase!=='offer'){const d=room.raid;el.innerHTML=`<div class="gameplay boxing-status"><strong>Winner Takes It · Boxing Club</strong><p>${d.phase==='ready'?'Get ready… moves unlock after the countdown.':d.phase==='fight'?'Choose secretly: jab beats hook, hook beats block, block beats jab.':`${esc(room.players.find(p=>p.id===d.from)?.name)}: ${esc(d.lastBeat?.a)} · ${esc(room.players.find(p=>p.id===d.to)?.name)}: ${esc(d.lastBeat?.b)}`}</p><span>Beat ${d.round}/3 · ${d.wins.join(' : ')} · <b data-countdown="${d.ends}"></b></span></div>`;return;}
     const me = room.players.find(p => p.id === id), myTurn = room.players[room.turn]?.id === id, host = room.host === id;
     if (room.phase === 'lobby') {
-        el.innerHTML = `<div class="lobby-panel"><div><small class="eyebrow">INVITE YOUR PEOPLE</small><div class="invite-code">${room.code} ${button('⧉ Copy invite', 'invite', false, 'text-btn')}</div><p>${g.name} · ${room.players.length} at the table · ${['jackaroo','tarneeb'].includes(draft.game) ? '4 needed · opposite seats are partners' : ['cards','rpg','blackjack','darts'].includes(draft.game) ? '1–8 players' :draft.game==='werewolf'?'4–8 players':draft.game==='beerpong'?'2, 4, 6 or 8 · alternating seats form teams' : draft.game==='charades'?'2, 4, 6 or 8 · choose your pair below':'2–8 players'}</p></div><div class="lobby-actions">${button(host ? 'Start game →' : me?.ready ? 'Ready ✓' : 'I’m ready', '' + (host ? 'start' : 'ready'), !connected || (host&&draft.game==='jackaroo'&&room.players.length!==4) || (host&&draft.game==='werewolf'&&(room.players.length<4||draft.wolfCount*2>=room.players.length)) ||(host&&draft.game==='beerpong'&&![2,4,6,8].includes(room.players.length)) || (host && draft.game==='trivia' && (room.players.length<2||draft.triviaHostMode==='master'&&!room.triviaMaster)) || (host&&draft.game==='cards'&&draft.cardLayout==='solitaire'&&room.players.length!==1)||(host && draft.game==='charades' && ![2,4,6,8].includes(room.players.length)), 'primary')}${button('Leave table', 'leave', false, 'text-btn')}</div></div>${draft.game==='trivia'&&draft.triviaHostMode==='master'?`<div class="trivia-lobby"><h3>Trivia master</h3><p>${room.triviaMaster?esc(room.players.find(p=>p.id===room!.triviaMaster)?.name)+' will ask the questions.':'One person volunteers to ask questions; everyone else competes.'}</p>${room.rules.game!=='trivia'?host?button('Apply Trivia rules','apply',false,'primary'):'Waiting for the host to apply Trivia rules.':button(room.triviaMaster===id?'Release master seat':'Volunteer as trivia master','triviaVolunteer',!!room.triviaMaster&&room.players.some(p=>p.id===room!.triviaMaster)&&room.triviaMaster!==id,'secondary')}</div>`:''}${charadeLobby(room,id)}${expansionLobby(room,id)}${draft.customNotes ? `<div class="house-contract"><strong>Tonight’s house contract</strong><p>${esc(draft.customNotes)}</p></div>` : ''}`;
+        el.innerHTML = `<div class="lobby-panel"><div><small class="eyebrow">INVITE YOUR PEOPLE</small><div class="invite-code">${room.code} ${button('⧉ Copy invite', 'invite', false, 'text-btn')}</div><p>${g.name} · ${room.players.length} at the table · ${['jackaroo','tarneeb'].includes(draft.game) ? '4 needed · opposite seats are partners' : ['cards','rpg','blackjack','darts'].includes(draft.game) ? '1–8 players' :draft.game==='werewolf'?'4–8 players':draft.game==='beerpong'?'2, 4, 6 or 8 · alternating seats form teams' : draft.game==='charades'?'2, 4, 6 or 8 · choose your pair below':'2–8 players'}</p></div><div class="lobby-actions">${button(host ? 'Start game →' : me?.ready ? 'Ready ✓' : 'I’m ready', '' + (host ? 'start' : 'ready'), !connected || (host&&draft.game==='jackaroo'&&room.players.length!==4) || (host&&draft.game==='werewolf'&&(room.players.length<4||draft.wolfCount*2>=room.players.length)) ||(host&&draft.game==='beerpong'&&![2,4,6,8].includes(room.players.length)) || (host && draft.game==='trivia' && (room.players.length<2||draft.triviaHostMode==='master'&&!room.triviaMaster)) || (host&&draft.game==='cards'&&draft.cardLayout==='solitaire'&&room.players.length!==1)||(host && draft.game==='charades' && ![2,4,6,8].includes(room.players.length)), 'primary')}${!host?button('Watch instead','spectate',false,'text-btn'):''}${button('Leave table', 'leave', false, 'text-btn')}</div></div>${draft.game==='trivia'&&draft.triviaHostMode==='master'?`<div class="trivia-lobby"><h3>Trivia master</h3><p>${room.triviaMaster?esc(room.players.find(p=>p.id===room!.triviaMaster)?.name)+' will ask the questions.':'One person volunteers to ask questions; everyone else competes.'}</p>${room.rules.game!=='trivia'?host?button('Apply Trivia rules','apply',false,'primary'):'Waiting for the host to apply Trivia rules.':button(room.triviaMaster===id?'Release master seat':'Volunteer as trivia master','triviaVolunteer',!!room.triviaMaster&&room.players.some(p=>p.id===room!.triviaMaster)&&room.triviaMaster!==id,'secondary')}</div>`:''}${charadeLobby(room,id)}${expansionLobby(room,id)}${draft.customNotes ? `<div class="house-contract"><strong>Tonight’s house contract</strong><p>${esc(draft.customNotes)}</p></div>` : ''}`;
         return;
     }
     if (room.phase === 'finished') {
@@ -264,7 +266,7 @@ function renderActivity() {
   activity.innerHTML='<section class="activity"><div class="activity-heading"><h3>Table talk <span>ROOM '+esc(room.code)+'</span></h3></div><div class="activity-log" role="log" aria-live="polite" aria-label="Table conversation"></div><form id="chat-form"><input id="chat" maxlength="240" aria-label="Table message"><button aria-label="Send table message">↗</button></form></section>';
   chatFollower=followChat(activity.querySelector<HTMLElement>('.activity-log')!);
  }
- const quiet=!!room.werewolf&&room.phase==='playing'&&(!room.werewolf.alive.includes(id)||room.werewolf.phase==='night');
+ const quiet=!!room.werewolf&&room.phase==='playing'&&(room.spectating||!room.werewolf.alive.includes(id)||room.werewolf.phase==='night');
  const input=activity.querySelector<HTMLInputElement>('#chat')!;input.disabled=quiet;input.placeholder=quiet?'Quiet until daylight / observe if eliminated':'A little table talk…';activity.querySelector<HTMLButtonElement>('form button')!.disabled=quiet;
  const format=new Intl.DateTimeFormat(undefined,{hour:'2-digit',minute:'2-digit'});
  chatFollower.update(room.messages.map((message,i)=>`<p data-message-id="${message.id}" class="${i===room!.messages.length-1?'latest':''}"><time>${esc(format.format(message.at))}</time><span>${esc(message.text)}</span></p>`).join(''));
@@ -281,13 +283,15 @@ function renderPeekQuickEvent(){
     const peeker=room?.phase==="playing" && ["jackaroo","bluff","tarneeb","cards","poker"].includes(room.rules.game) && room.rules.catchPeeking ? room.players.find(p=>p.peekTarget===id && p.catchUntil>Date.now() && p.peekingUntil>Date.now()) : undefined;
     layer.innerHTML=peeker?`<div class="peek-qte" data-expires="${peeker.catchUntil}" role="alert"><strong>${esc(peeker.name)} is peeking at YOUR cards!</strong><button class="danger" data-kind="catch" data-target="${peeker.id}">Slap the peeker ✋ <b data-countdown="${peeker.catchUntil}"></b></button><small>Catch them now · 8-hand peek cooldown</small></div>`:"";
 }
-function updateTimers() { document.querySelectorAll<HTMLElement>(".peek-qte").forEach(el=>{if(Number(el.dataset.expires)<=Date.now())el.remove();}); document.querySelectorAll<HTMLElement>('[data-countdown]').forEach(el => { el.textContent = Math.max(0, Math.ceil((Number(el.dataset.countdown) - Date.now()) / 1000)) + 's'; }); }
+function updateTimers() {document.querySelectorAll<HTMLButtonElement>('[data-ready-at]').forEach(b=>{const remaining=Math.max(0,Math.ceil((Number(b.dataset.readyAt)-Date.now())/1000));b.disabled=room?.phase!=='playing'||remaining>0;b.textContent=b.dataset.readyTitle+(remaining?' · '+remaining+'s':'');}); document.querySelectorAll<HTMLElement>(".peek-qte").forEach(el=>{if(Number(el.dataset.expires)<=Date.now())el.remove();}); document.querySelectorAll<HTMLElement>('[data-countdown]').forEach(el => { el.textContent = Math.max(0, Math.ceil((Number(el.dataset.countdown) - Date.now()) / 1000)) + 's'; }); }
 setInterval(updateTimers, 250);
 setInterval(()=>{tickChaosAudio(audio,room);rooftopAudio(audio,room);},100);
 app.addEventListener('click', async (e) => {
     const el = (e.target as HTMLElement).closest<HTMLElement>('button');
     if (!el || el.hasAttribute('disabled'))
         return;
+    if(el.dataset.spectatorAction){send({type:el.dataset.spectatorAction,target:(document.querySelector('#spectator-target') as HTMLSelectElement)?.value});return;}
+    if(el.dataset.kickSpectator){send({type:'kickSpectator',target:el.dataset.kickSpectator});return;}
     if(el.dataset.infoTab){infoTab=el.dataset.infoTab;showHelp();return;}
     if(el.dataset.triviaChoice!==undefined){send({type:'triviaAnswer',text:el.dataset.triviaChoice,question:el.dataset.question});return;}
     if (el.dataset.filter) {
@@ -300,7 +304,7 @@ app.addEventListener('click', async (e) => {
         renderRules();
     }
     if (el.dataset.camera) {
-        camera = el.dataset.camera;
+        camera = room?.spectating?'third':el.dataset.camera;
         if (scene)
             scene.mode = camera;
         applyLayout(); renderStage(); renderPlay(); scene?.update(draft.game,room,id,draft.background); scene?.setSelected(selected);
@@ -326,6 +330,7 @@ app.addEventListener('click', async (e) => {
         return;
     if(action==='spinGame'){spinGameWheel(document.querySelector<HTMLElement>('#modal-root')!,chooseGame,()=>!locked());return;}
     if(action.startsWith('chaos')){if(action==='chaosYes'||action==='chaosNo')send({type:'chaosVote',yes:action==='chaosYes'});else if(action==='chaosReportWord')send({type:action,target:(document.querySelector('#chaos-offender') as HTMLSelectElement)?.value});else send({type:action});return;}
+    if(action==='takeSeat'||action==='spectate'){send({type:action});return;}
     if (action === 'toggleShelf'){shelfOpen=!shelfOpen;applyLayout();renderHeader();return;}
     if (action === 'toggleRules'){rulesOpen=!rulesOpen;applyLayout();return;}
     if (action === 'toggleChat'){chatOpen=!chatOpen;applyLayout();return;}
@@ -528,7 +533,7 @@ function showBoard(tileIndex?:number) {
 }
 app.addEventListener('click',e=>{const button=(e.target as HTMLElement).closest<HTMLButtonElement>('button');if(!button)return;if(button.dataset.inspect)showBoard(Number(button.dataset.inspect));if(button.dataset.negotiate){tradeDraft.to=button.dataset.negotiate;tradeDraft.open=true;document.querySelector('#modal-root')!.innerHTML='';renderPlay();}if(button.dataset.action==='buyFromTable'){send({type:'buy'});document.querySelector('#modal-root')!.innerHTML='';}});
 if(scene)scene.onPick=(pick)=>{
-  if(!room||room.phase!=='playing')return;
+  if(!room||room.phase!=='playing'||room.spectating)return;
   if(pick.jackMarble){pickJackMarble(pick.jackMarble);renderPlay();return;}
   if(pick.rpgTile){rpgPick(pick.rpgTile.x,pick.rpgTile.y,send);return;}
   if(pick.rpgPawn){const target=document.querySelector<HTMLSelectElement>('#rpg-target');if(target)target.value=pick.rpgPawn;return;}

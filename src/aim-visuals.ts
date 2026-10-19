@@ -34,7 +34,7 @@ export class AimVisuals {
  private key(){const r=this.s.room,g=this.state();return r&&g?`${r.gameInstance}:${g.aimAt}:${g.aimLock?.at||0}`:'';}
  private lock(){
   const r=this.s.room,g=this.state(),now=Date.now()+this.offset;
-  if(!r||!g||this.button.disabled||r.players[r.turn]?.id!==r.players[this.s.self]?.id)return;
+  if(!r||r.spectating||!g||this.button.disabled||r.players[r.turn]?.id!==r.players[this.s.self]?.id)return;
   this.pending=this.key();this.pendingUntil=Date.now()+1200;
   const type=r.rules.game==='darts'?(g.aimLock?'dartThrow':'dartLockHeight'):(g.aimLock?'pongThrow':'pongLockHeight');
   this.s.onAim?.({type,aimAt:g.aimAt,gameInstance:r.gameInstance,at:now} as Action);
@@ -44,7 +44,7 @@ export class AimVisuals {
  frame(){
   const s=this.s,r=s.room,g=this.state(),time=Date.now();
   if(r?.serverNow&&r.serverNow!==this.lastServerTime){this.offset=r.serverNow-time;this.lastServerTime=r.serverNow;}
-  const now=time+this.offset,actorId=r?.players[r.turn]?.id,actor=s.actorMap.get(actorId||''),mine=actorId===r?.players[s.self]?.id;
+  const now=time+this.offset,actorId=r?.players[r.turn]?.id,actor=s.actorMap.get(actorId||''),mine=!r?.spectating&&actorId===r?.players[s.self]?.id;
   const visible=!!r&&!!g&&!!actor&&r.phase==='playing'&&!r.raid&&!r.chaos?.vote&&r.busyUntil<=now&&g.ends>now;
   const concealed=r?.blackoutHidden&&!mine&&actorId!==r.chaos?.blackoutPlayer;
   this.dots.visible=this.reticle.visible=visible&&!concealed;

@@ -1,3 +1,4 @@
+import {SpectatorVisuals} from './spectator-visuals';
 import {JackVisuals} from './jackaroo-visuals';
 import {AimVisuals} from './aim-visuals';
 import {ClubVisuals} from './club-visuals';
@@ -22,7 +23,7 @@ export class GameScene {
   closeBoard = true; mode = 'third'; self = 0; room?: View; game: Game = 'bluff'; resize: ResizeObserver;
   actorMap = new Map<string, THREE.Group>(); tokenMap = new Map<string, THREE.Mesh>(); tweens: Tween[] = [];
   slapShot?:{until:number;actor:string;target:string};
-  aimFX:AimVisuals;onAim?:(action:import('../shared/types').Action)=>void;jackFX:JackVisuals;clubFX:ClubVisuals;boxingFX:BoxingVisuals;partyFX:PartyVisuals;rooftopShotUntil=0;pokerFX:PokerVisuals;expansionFX:ExpansionVisuals;chaosFX:ChaosVisuals; chaosShotUntil=0;
+  spectatorFX:SpectatorVisuals;aimFX:AimVisuals;onAim?:(action:import('../shared/types').Action)=>void;jackFX:JackVisuals;clubFX:ClubVisuals;boxingFX:BoxingVisuals;partyFX:PartyVisuals;rooftopShotUntil=0;pokerFX:PokerVisuals;expansionFX:ExpansionVisuals;chaosFX:ChaosVisuals; chaosShotUntil=0;
   seatAngle(index:number){const id=this.room?.players[index]?.id,seat=id?this.room?.chaos?.seats.indexOf(id):undefined;return (seat!==undefined&&seat>=0?seat:index)*Math.PI*2/(this.room?.players.length||4);}
   actorKey = ''; pieceKey = ''; shake = 0; moving = new Set<string>();
   constructor(private el: HTMLElement) {
@@ -37,7 +38,7 @@ export class GameScene {
     this.resize = new ResizeObserver(() => { const w=el.clientWidth,h=el.clientHeight; this.renderer.setSize(w,h); this.camera.aspect=w/h; this.camera.updateProjectionMatrix(); this.handKey=''; this.updateOwnHand(); });
     this.renderer.domElement.addEventListener('pointerup',event=>{const pick=this.pick(event);if(pick)this.onPick?.(pick);});
     this.renderer.domElement.addEventListener('pointermove',event=>{const pick=this.pick(event);this.hoveredCard=pick?.card;this.renderer.domElement.style.cursor=pick?'pointer':'default';});
-    this.boxingFX=new BoxingVisuals(this);this.chaosFX=new ChaosVisuals(this);this.expansionFX=new ExpansionVisuals(this);this.pokerFX=new PokerVisuals(this);this.partyFX=new PartyVisuals(this);this.clubFX=new ClubVisuals(this);this.aimFX=new AimVisuals(this,el);this.jackFX=new JackVisuals(this);
+    this.boxingFX=new BoxingVisuals(this);this.chaosFX=new ChaosVisuals(this);this.expansionFX=new ExpansionVisuals(this);this.pokerFX=new PokerVisuals(this);this.partyFX=new PartyVisuals(this);this.clubFX=new ClubVisuals(this);this.aimFX=new AimVisuals(this,el);this.jackFX=new JackVisuals(this);this.spectatorFX=new SpectatorVisuals(this);
     this.resize.observe(el); this.update('bluff'); this.animate();
   }
   get board() { return this.game==='jackaroo'||this.game === 'property' || this.game === 'life'||this.game==='rpg'||!!this.room?.solitaire; }
@@ -63,7 +64,7 @@ export class GameScene {
   }
   tilePosition(i:number):[number,number] {const s=Math.floor(i/6),t=(i%6)/6*3.28;return s===0?[-1.64+t,1.64]:s===1?[1.64,1.64-t]:s===2?[1.64-t,-1.64]:[-1.64,-1.64+t];}
   update(game:Game,room?:View,id?:string,background:Rules['background']=room?.rules.background||'forest') {
-    const previous=this.room;if(previous?.gameInstance!==room?.gameInstance||previous?.phase!==room?.phase){for(const group of [this.group,this.pieces,this.dice,this.expansionFX.group,this.pokerFX.group,this.clubFX.group]){group.rotation.set(0,0,0);group.position.set(0,0,0);}this.rooftopShotUntil=0;this.chaosShotUntil=0;this.slapShot=undefined;this.clubFX.reset();this.tweens=[];this.clear(this.fx);this.moving.clear();this.actorKey='';this.pieceKey='';this.handKey='';}this.game=game;this.room=room;this.environment.update(background);this.self=Math.max(0,room?.players.findIndex(p=>p.id===id)??0);this.group.scale.set(this.board?1.3:1,1,this.board?1.3:1);
+    const previous=this.room;if(previous?.gameInstance!==room?.gameInstance||previous?.phase!==room?.phase){for(const group of [this.group,this.pieces,this.dice,this.expansionFX.group,this.pokerFX.group,this.clubFX.group]){group.rotation.set(0,0,0);group.position.set(0,0,0);}this.rooftopShotUntil=0;this.chaosShotUntil=0;this.slapShot=undefined;this.clubFX.reset();this.tweens=[];this.clear(this.fx);this.moving.clear();this.actorKey='';this.pieceKey='';this.handKey='';}this.game=game;this.room=room;this.spectatorFX.update(room);this.environment.update(background);this.self=Math.max(0,room?.players.findIndex(p=>p.id===id)??0);this.group.scale.set(this.board?1.3:1,1,this.board?1.3:1);
     if((previous?.gameInstance!==room?.gameInstance||previous?.rules.game!==game)&&this.mode!=='first'&&(game==='rpg'||room?.solitaire))this.camera.position.set(0,game==='rpg'?12.7:7,game==='rpg'?6:1.2);
     if(game==='jackaroo'&&previous?.rules.game!=='jackaroo'){this.camera.position.set(0,11.8,3.5);this.camera.lookAt(0,1,1.35);}
     this.el.parentElement?.classList.toggle('board-stage',this.board);
@@ -124,6 +125,7 @@ export class GameScene {
   }
   star(actor?:string){const seat=this.actorMap.get(actor||'');if(!seat)return;const vertices:number[]=[];for(let i=0;i<10;i++){const a=i*Math.PI/5+Math.PI/2,b=(i+1)*Math.PI/5+Math.PI/2,r=i%2?.16:.36,next=(i+1)%2?.16:.36;vertices.push(0,0,0,Math.cos(a)*r,Math.sin(a)*r,0,Math.cos(b)*next,Math.sin(b)*next,0);}const geometry=new THREE.BufferGeometry();geometry.setAttribute('position',new THREE.Float32BufferAttribute(vertices,3));geometry.computeVertexNormals();const star=this.mesh(geometry,0xffd05e);const start=seat.position.clone().add(new THREE.Vector3(0,2.1,0));this.fx.add(star);this.tween(1200,t=>{star.position.copy(start);star.position.y+=t*.7;star.scale.setScalar(Math.sin(t*Math.PI));star.quaternion.copy(this.camera.quaternion);star.rotateZ(t*.6);},()=>this.remove(star));this.burst(start,0xffd05e);}
   play(e:GameEvent){
+    if(e.kind.startsWith('spectator')){this.spectatorFX.play(e);return;}
     if(e.kind.startsWith('jackaroo')){this.jackFX.play(e);return;}
     if(['wolf','bj','dart','pong'].some(prefix=>e.kind.startsWith(prefix))){this.clubFX.play(e);return;}
     if(['rooftopJump','soreLoserShot','charadeTurn'].includes(e.kind)){this.partyFX.play(e);return;}
@@ -143,7 +145,7 @@ export class GameScene {
     else{const g=this.actorMap.get(e.actor||'');if(g){const arms=g.userData.arms as THREE.Group[];this.tween(400,t=>arms.forEach(arm=>arm.rotation.x=.5-Math.sin(t*Math.PI)*.35));}}
   }
   animate=()=>{
-    requestAnimationFrame(this.animate);const now=performance.now();this.environment.animate(now);this.chaosFX.update();for(const t of [...this.tweens]){if(now<t.start)continue;const progress=Math.min(1,(now-t.start)/t.duration);t.step(progress);if(progress===1){this.tweens.splice(this.tweens.indexOf(t),1);t.done?.();}}
+    requestAnimationFrame(this.animate);const now=performance.now();this.environment.animate(now);this.spectatorFX.frame();this.chaosFX.update();for(const t of [...this.tweens]){if(now<t.start)continue;const progress=Math.min(1,(now-t.start)/t.duration);t.step(progress);if(progress===1){this.tweens.splice(this.tweens.indexOf(t),1);t.done?.();}}
     const pokerOffset=this.game==='poker'&&!!this.room&&this.room.phase!=='lobby',w=this.el.clientWidth,h=this.el.clientHeight;
     if(pokerOffset){if(!this.camera.view?.enabled||this.camera.view.fullWidth!==w||this.camera.view.fullHeight!==h)this.camera.setViewOffset(w,h,0,h*.23,w,h);}else if(this.camera.view?.enabled)this.camera.clearViewOffset();
     const angle=this.seatAngle(this.self);
