@@ -1,11 +1,11 @@
 import {randomUUID} from 'node:crypto';import type {Room,Action} from '../shared/types.js';import {MUSIC_QUEUE_LIMIT,musicPosition,type MusicTrack,type MusicState} from '../shared/music.js';
 const need=(ok:unknown,message:string)=>{if(!ok)throw Error(message);};
 const edits=new WeakMap<Room,Map<string,number>>();
-export function authorizeMusic(r:Room,id:string){need(r.players.some(p=>p.id===id&&p.connected),'Only seated players can control the shared music.');}
+export function authorizeMusic(r:Room,id:string){need(r.players.some(p=>p.id===id&&p.connected)||r.spectators?.some(p=>p.id===id&&p.connected),'Join this room to control its shared music.');}
 function throttle(r:Room,id:string){let m=edits.get(r);if(!m){m=new Map();edits.set(r,m);}need(Date.now()>=(m.get(id)||0),'Give the music controls a moment.');m.set(id,Date.now()+500);}
 function state(r:Room):MusicState{return r.music??={queue:[],playing:false,position:0,updatedAt:Date.now(),revision:0};}
 function next(r:Room){const m=state(r);m.current=m.queue.shift();m.position=0;m.updatedAt=Date.now();m.playing=!!m.current;m.revision++;}
-export function queueMusic(r:Room,id:string,track:MusicTrack){authorizeMusic(r,id);const m=state(r);need(m.queue.length<MUSIC_QUEUE_LIMIT,'The music queue is full (30 songs).');throttle(r,id);const p=r.players.find(p=>p.id===id)!;const song={...track,entry:randomUUID(),addedBy:id,addedByName:p.name};
+export function queueMusic(r:Room,id:string,track:MusicTrack){authorizeMusic(r,id);const m=state(r);need(m.queue.length<MUSIC_QUEUE_LIMIT,'The music queue is full (30 songs).');throttle(r,id);const p=(r.players.find(p=>p.id===id)||r.spectators?.find(p=>p.id===id))!;const song={...track,entry:randomUUID(),addedBy:id,addedByName:p.name};
  const begin=!m.current||!m.playing&&musicPosition(m,Date.now())>=m.current.duration;m.queue.push(song);if(begin)next(r);
 }
 export function handleMusic(r:Room,id:string,a:Action){authorizeMusic(r,id);need(['musicPlay','musicPause','musicSkip','musicRestart','musicRemove'].includes(a.type),'Unknown music control.');const m=state(r);

@@ -82,9 +82,9 @@ Non-host players can choose **Watch instead** in the lobby; spectators can **Joi
 
 ### Shared music
 
-Click **♫ Music** beside **Sound on/off** to open the room jukebox. Search for a song, artist or mood and choose **+ Queue**. Any connected seated player can contribute songs and use **Play**, **Pause**, **Restart song** or **Skip**; these controls affect the room. The first added song starts automatically, queued tracks play in order, and up to 30 songs can wait in the queue. Players can remove their own queued songs; the host can remove anyone’s queued entry.
+Click **♫ Music** beside **Sound on/off** to open the room jukebox. Search for a song, artist or mood and choose **+ Queue**. Any connected room member, including spectators, can contribute songs and use **Play**, **Pause**, **Restart song** or **Skip**; these controls affect the room. The first added song starts automatically, queued tracks play in order, and up to 30 songs can wait in the queue. Players can remove their own queued songs; the host can remove anyone’s queued entry.
 
-**Volume · only you** controls a separate music player in your browser and is remembered locally. Setting it to zero silences music for you without changing other players’ volume or the shared playback. The existing Sound button controls game effects separately. Closing the modal keeps music playing. If a browser blocks autoplay, open Music and tap **Enable music on this device**. Anyone connected to the server can search, including visitors before joining a room and spectators. Join a player seat to add songs or change shared playback. Spectators can listen and set their own volume.
+**Volume · only you** controls a separate music player in your browser and is remembered locally. Setting it to zero silences music for you without changing other players’ volume or the shared playback. The existing Sound button controls game effects separately. Closing the modal keeps music playing. If a browser blocks autoplay, open Music and tap **Enable music on this device**. Anyone connected to the server can search, including visitors before joining a room and spectators. Before joining a table, **+ Queue** starts a personal listening queue with working play, pause, skip, restart and removal controls. These songs play only for you. Joining a table clears the personal queue and switches to that room’s shared music; it does not silently broadcast your personal picks. Spectators can also contribute to and control the shared music queue.
 
 Playback follows a server timeline, including for late joins and reconnects; browsers correct noticeable drift. Network buffering can cause small timing differences. Disconnecting pauses that client until it reconnects, and leaving a room stops its local player. The queue continues through games, lobby changes, restarts and Time Warp. Server shutdown clears the queue with the other in-memory room data.
 
@@ -877,7 +877,7 @@ Marble ownership, fixed entrances and partners remain unchanged by hand swaps. A
 - **Shield die face:** blocks chaos penalties, chance coin gambles, Robin Hood and dare penalties for that modifier round; ordinary gameplay rules and losses still apply.
 - **Fixed-size games:** no random extra cards are created in Tarneeb, Hold’em, Blackjack or Solitaire. Double card pickups apply only to Bluff/free sandbox and are capped to prevent uncontrolled deck growth. Final party and cash-game winners are recalculated from chaos-adjusted actual standings.
 
-Validated with the production client/server build and **352 automated tests**, including all preset/rule compatibility combinations, supported die profiles, real resource transfers, exact checkout, redemption, fixed deck integrity, role privacy, wagering escrow and final-hand penalties. Restart the server and refresh clients to load the new rule policy together. Existing in-memory rooms disappear when their server stops.
+Validated with the production client/server build and **356 automated tests**, including all preset/rule compatibility combinations, supported die profiles, real resource transfers, exact checkout, redemption, fixed deck integrity, role privacy, wagering escrow and final-hand penalties. Restart the server and refresh clients to load the new rule policy together. Existing in-memory rooms disappear when their server stops.
 
 ## Development
 
@@ -926,11 +926,15 @@ Rooms are in memory. Restarting the server clears games. Disconnected rooms expi
 
 ## Verification
 
-The current gameplay update passed the production client/server build and **352 automated tests**. Coverage includes all preset/rule compatibility combinations, supported die profiles, real resource transfers, fixed deck integrity, exact darts checkout, Pong redemption, wagering escrow, secret-role privacy, reconnects and final-hand penalties. Run `npm run build` before `npm test`, since integration tests use the production build.
+The current gameplay update passed the production client/server build and **356 automated tests**. Coverage includes all preset/rule compatibility combinations, supported die profiles, real resource transfers, fixed deck integrity, exact darts checkout, Pong redemption, wagering escrow, secret-role privacy, reconnects and final-hand penalties. Run `npm run build` before `npm test`, since integration tests use the production build.
 
 Browser checks cover room creation, joining, private hands, card play and bluff calls, camera switching, negotiations, host editing, direct aiming, actual standings, compatible-only chaos controls and the per-game Info reference.
 
 ## Release history
+
+### v0.20.1 · Music queue access fix
+
+Fixed the remaining disabled queue controls: the home screen now supports personal listening, and spectators can contribute to room music. Added coverage for personal playback and queue transitions, and verified actual audio from the same Juice WRLD search both before joining and in a shared room. Build and all 356 tests pass.
 
 ### v0.20 · Shared room music
 

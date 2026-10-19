@@ -3,10 +3,10 @@ type Media=Pick<HTMLAudioElement,'src'|'volume'|'paused'|'currentTime'|'readySta
 export function musicVolume(value:unknown){const n=Number(value);return value===null||value===undefined||!Number.isFinite(n)?.35:Math.max(0,Math.min(1,n));}
 /** A separate media element and local preference; never sends volume to the room. */
 export class MusicPlayback {
- room?:View;connected=true;blocked=false;problem='';private offset=0;private key='';private revision=-1;private pending=false;
+ room?:Pick<View,'code'|'music'|'serverNow'>;connected=true;blocked=false;problem='';private offset=0;private key='';private revision=-1;private pending=false;
  constructor(readonly media:Media=new Audio(),private storage:Pick<Storage,'getItem'|'setItem'>=localStorage){let value:string|null=null;try{value=storage.getItem('house-music-volume');}catch{}media.volume=musicVolume(value);media.preload='metadata';media.addEventListener('loadedmetadata',()=>this.sync(true));media.addEventListener('error',()=>{if(this.key)this.problem='This stream could not load here. Try another song or skip.';});}
  setVolume(value:number){this.media.volume=musicVolume(value);try{this.storage.setItem('house-music-volume',String(this.media.volume));}catch{}}
- update(room:View|undefined,connected=true){this.room=room;this.connected=connected;this.offset=(room?.serverNow||Date.now())-Date.now();this.sync();}
+ update(room:Pick<View,'code'|'music'|'serverNow'>|undefined,connected=true){this.room=room;this.connected=connected;this.offset=(room?.serverNow||Date.now())-Date.now();this.sync();}
  enable(){this.blocked=false;this.sync();}
  sync(force=false){const m=this.room?.music,c=m?.current,key=c?this.room!.code+':'+c.entry:'';
   if(key!==this.key){this.media.pause();this.key=key;this.revision=-1;this.pending=false;this.problem='';if(c)this.media.src=musicStream(c.id);else{this.media.removeAttribute('src');this.media.load();}}
