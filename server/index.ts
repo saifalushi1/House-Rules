@@ -106,6 +106,14 @@ wss.on('connection', (ws, req) => {
             if (!s || s.socket !== ws)
                 throw new Error('Connect before joining.');
             s.lastSeen = Date.now();
+            // Catalog discovery is read-only and does not require a player seat.
+            if(msg.type==='musicSearch'){
+                if(musicLookupBusy||Date.now()<musicLookupAt)throw Error('Wait a moment before another music search.');
+                if(typeof msg.query!=='string'||msg.query.trim().length<2||msg.query.length>100)throw Error('Search with 2–100 characters.');
+                musicLookupAt=Date.now()+800;musicLookupBusy=true;
+                try{const tracks=await searchMusic(msg.query.trim());if(s.socket===ws)send(ws,{type:'musicResults',request:msg.request,tracks});}finally{musicLookupBusy=false;}
+                return;
+            }
             if (msg.type === 'create' || msg.type === 'join' || msg.type === 'watch') {
                 if (s.room)
                     throw new Error('Leave your current room first.');
@@ -136,12 +144,9 @@ wss.on('connection', (ws, req) => {
             const r = rooms.get(s.room || '');
             if (!r)
                 throw new Error('Join a room first.');
-            if(msg.type==='musicSearch'||msg.type==='musicAdd'){
-                authorizeMusic(r,s.id);if(musicLookupBusy||msg.type==='musicSearch'&&Date.now()<musicLookupAt)throw Error('Wait a moment before another music search or add.');musicLookupAt=Date.now()+800;musicLookupBusy=true;
-                try{
-                    if(msg.type==='musicSearch'){if(typeof msg.query!=='string'||msg.query.trim().length<2||msg.query.length>100)throw Error('Search with 2–100 characters.');const tracks=await searchMusic(msg.query.trim());if(s.room!==r.code||s.socket!==ws||rooms.get(r.code)!==r)return;authorizeMusic(r,s.id);send(ws,{type:'musicResults',request:msg.request,tracks});}
-                    else{if(typeof msg.track!=='string')throw Error('Choose a song from search.');const track=await getMusicTrack(msg.track);if(s.room!==r.code||s.socket!==ws||!rooms.has(r.code))return;queueMusic(r,s.id,track);broadcast(r);}
-                }finally{musicLookupBusy=false;}
+            if(msg.type==='musicAdd'){
+                authorizeMusic(r,s.id);if(musicLookupBusy)throw Error('Wait a moment before adding another song.');musicLookupBusy=true;
+                try{if(typeof msg.track!=='string')throw Error('Choose a song from search.');const track=await getMusicTrack(msg.track);if(s.room!==r.code||s.socket!==ws||rooms.get(r.code)!==r)return;queueMusic(r,s.id,track);broadcast(r);}finally{musicLookupBusy=false;}
                 return;
             }
             if(msg.type==='takeSeat'||msg.type==='spectate'){
