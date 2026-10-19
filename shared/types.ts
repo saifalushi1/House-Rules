@@ -78,8 +78,8 @@ export const games: Record<Game, {
     cards: { name: 'Card sandbox', category: 'CARDS', description: 'A deck, a table, and whatever rules your group invents.', icon: '♣', players: '1–8' },
     charades: { name: 'Charades', category: 'PARTY', description: 'Pair up. Beat the clock. Act it out without words.', icon: '✦', players: '2, 4, 6, 8' },
     trivia: {name:'Trivia',category:'PARTY',description:'Everyone plays, or choose a master. Race for the point.',icon:'★',players:'2–8'},
-    property: { name: 'Block Party', category: 'TABLETOP', description: 'Buy the neighborhood. Collect rent. Make questionable deals.', icon: '⌂', players: '2–8' },
-    life: { name: 'Life Paths', category: 'TABLETOP', description: 'Choose your path, chase a career, and see where life takes you.', icon: '⚑', players: '2–8' }
+    property: { name: 'Monopoly', category: 'TABLETOP', description: 'Buy the neighborhood. Collect rent. Make questionable deals.', icon: '⌂', players: '2–8' },
+    life: { name: 'The Game of Life', category: 'TABLETOP', description: 'Choose your path, chase a career, and see where life takes you.', icon: '⚑', players: '2–8' }
 };
 export interface Player {
     id: string;

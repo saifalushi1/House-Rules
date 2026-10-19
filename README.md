@@ -82,14 +82,16 @@ Use it with trusted friends. Room codes are lightweight invite gates, not accoun
 | Trivia | 2–8 players; everyone competes with automatic questions, or a volunteer trivia master hosts. Ten categories with 100 questions each, timed rounds and free-for-all/turn-based answers. |
 | Scribble | 2–8 players; rotating drawers choose secret words, share a live drawing canvas, and score points for timed guesses. |
 | D&D tabletop | 1–8 people; original simplified d20 adventure with a dungeon master, four classes, character sheets, an 8×8 battle map, dice, initiative, spells, combat, XP and gold. |
-| Block Party | 2–8 players; original simplified property-trading game: 24 spaces, two dice, purchases, rent, tax pot, events, property sell-back, bankruptcy, and net-worth win. |
-| Life Paths | 2–8 players; original simplified life-path game: one die, career selection, safe/risky choices, events, cash, and round-limit win. |
+| Monopoly | 2–8 players; original simplified property-trading game: 24 spaces, two dice, purchases, rent, tax pot, events, property sell-back, bankruptcy, and net-worth win. |
+| The Game of Life | 2–8 players; original simplified life-path game: one die, career selection, safe/risky choices, events, cash, and round-limit win. |
 
 The board presets are small original games inspired by property-trading and life-journey mechanics. They are not full reproductions of Monopoly or The Game of Life: no auctions, mortgages, house-building systems, or full career/family simulation yet. Cash and player-to-player property trades are now supported.
 
 Tarneeb uses the common scoring variation: a made bid scores tricks won, an unbid sweep scores 16, a made bid of 13 scores 26, a failed bid subtracts the contract, and defenders score their tricks when the contract fails. Regional rules vary. Reference: [Pagat's Tarneeb rules](https://www.pagat.com/auctionwhist/tarneeb.html).
 
 ## Game guides
+
+Use **Spin the wheel** above the game shelf to randomly select one of the 15 games, or choose a preset manually. The wheel selects a game without starting it; hosts can review and apply the rules in the lobby. Chat follows the latest message automatically; scrolling up pauses this until you scroll back to the bottom.
 
 Choose a preset on the game shelf, configure its rules in the lobby and apply the draft before starting. The host can restart, end early or return everyone to the lobby. The [Rules section](#rules) documents optional modifiers and overrides.
 
@@ -274,8 +276,8 @@ Open **House rules → Chaos** before starting, enable compatible rules, adjust 
 | Card sandbox · free sandbox | Robin Hood | Preserve the mode’s turn, wager, scoring or team structure. |
 | Charades | None | All effects have direct adapters. |
 | Trivia · free-for-all | Seat Roulette | Preserve the mode’s turn, wager, scoring or team structure. |
-| Block Party | None | All effects have direct adapters. |
-| Life Paths | None | All effects have direct adapters. |
+| Monopoly | None | All effects have direct adapters. |
+| The Game of Life | None | All effects have direct adapters. |
 | Trivia · turns with master | None | All effects have direct adapters. |
 | Card sandbox · Solitaire | Winner Takes It, Hot Potato, Seat Roulette, Cyclone, Double or Nothing, Chaos Die, Blackout, Robin Hood, Banned Word, Dare Wheel | Keep the fixed puzzle deck intact. |
 
@@ -712,7 +714,7 @@ Marble ownership, fixed entrances and partners remain unchanged by hand swaps. A
 </details>
 
 <details>
-<summary><strong>Block Party</strong></summary>
+<summary><strong>Monopoly</strong></summary>
 
 | Rule | Direct effect |
 | --- | --- |
@@ -747,7 +749,7 @@ Marble ownership, fixed entrances and partners remain unchanged by hand swaps. A
 </details>
 
 <details>
-<summary><strong>Life Paths</strong></summary>
+<summary><strong>The Game of Life</strong></summary>
 
 | Rule | Direct effect |
 | --- | --- |
@@ -1087,11 +1089,11 @@ Tarneeb shows the ace-versus-trump challenge countdown. The ace holder can choos
 
 Actions now have original synthesized sounds and corresponding 3D feedback: cards flutter, dice tumble to the real values, tokens hop space by space and pulse at their current square, money actions sparkle, and charades actors gesture. All card presets animate shuffling and individual cards being dealt at the start and on a Tarneeb redeal. Inputs pause during setup and dice/token movement so turns cannot race the animation. Sound starts after your first click or keypress, as required by browsers; use Sound on/off in the header to mute immediately.
 
-Block Party and Life Paths use the entire content width. Board zoom shows a close overhead view; switch it off to see the whole table. Roll at table and Pass at table keep the action controls beside the 3D view. First person hides your own avatar so its head and hat cannot clip into the camera.
+Monopoly and The Game of Life use the entire content width. Board zoom shows a close overhead view; switch it off to see the whole table. Roll at table and Pass at table keep the action controls beside the 3D view. First person hides your own avatar so its head and hat cannot clip into the camera.
 
 #### Negotiations
 
-In Block Party, open Make a deal. Choose a player, cash amounts, and the properties each side will exchange. Any connected, solvent player can negotiate without waiting for their turn. Offers expire after 90 seconds. Only the recipient can accept or refuse, and the sender can cancel. The server rechecks balances and ownership at acceptance and makes the entire exchange together. A stale offer transfers nothing.
+In Monopoly, open Make a deal. Choose a player, cash amounts, and the properties each side will exchange. Any connected, solvent player can negotiate without waiting for their turn. Offers expire after 90 seconds. Only the recipient can accept or refuse, and the sender can cancel. The server rechecks balances and ownership at acceptance and makes the entire exchange together. A stale offer transfers nothing.
 
 The Property negotiations toggle enables trading. Refusal slap controls whether rejecting an offer sends the recipient's avatar over to deliver a cartoon slap to the sender. Refusal does not change cash, ownership, or turns.
 

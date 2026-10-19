@@ -1,3 +1,5 @@
+import {followChat} from './chat-scroll';
+import {spinGameWheel} from './game-wheel';
 import {jackPlay,jackSettings,bindJack,pickJackMarble} from './jackaroo-ui';
 import './jackaroo.css';
 import {clubGames,clubSettings,clubPlay,bindClub} from './club-ui';
@@ -26,6 +28,7 @@ let room: View | undefined, id = '', connected = false, socket: WebSocket, draft
 let pendingCreate: Rules | undefined;
 let shelfOpen=true, rulesOpen=true, chatOpen=true, handListOpen=false, layoutInstance=-1;
 let infoTab='games';
+let chatFollower:ReturnType<typeof followChat>|undefined,chatRoom='';
 let camera = 'third', reconnectTimer: ReturnType<typeof setTimeout>, scene: GameScene | undefined, help = false;
 const audio = new GameAudio();
 let seenEvent = 0, eventRoom = '', effectTimer: ReturnType<typeof setTimeout>;
@@ -108,7 +111,7 @@ function render() {
     chaosHud(room,id);
     presentEvents();
 }
-function renderSidebar() { document.querySelector('#sidebar')!.innerHTML = `<a class="brand" href="/" aria-label="House Rules home"><span class="brand-mark">H<span>R</span></span><span>HOUSE<br>RULES<span class="brand-dot">.</span></span></a><div class="side-label">YOUR GAME SHELF <span>${Object.keys(games).length}</span></div><div class="filters">${['all', 'cards', 'party', 'tabletop'].map(f => `<button data-filter="${f}" class="${filter === f ? 'active' : ''}">${f === 'all' ? 'All games' : f[0].toUpperCase() + f.slice(1)}</button>`).join('')}</div><nav aria-label="Game presets">${Object.entries(games).filter(([, g]) => filter === 'all' || g.category.toLowerCase() === filter).map(([key, g]) => `<button class="game-item ${draft.game === key ? 'active' : ''}" data-game="${key}" ${room && (room.host !== id || room.phase !== 'lobby') ? 'disabled' : ''}><span class="game-icon ${key}">${g.icon}</span><span><strong>${g.name}</strong><small>${g.category} <b>·</b> ${g.players} PLAYERS</small></span><span class="game-arrow">↗</span></button>`).join('')}</nav><div class="side-bottom"><div class="tiny-dice">⚄</div><strong>The best rule?<br>Make it your own.</strong><p>Familiar games. Unfamiliar twists.<br>Entirely your table.</p><button class="text-btn" data-action="help">Info <span>↗</span></button></div>`; }
+function renderSidebar() { document.querySelector('#sidebar')!.innerHTML = `<a class="brand" href="/" aria-label="House Rules home"><span class="brand-mark">H<span>R</span></span><span>HOUSE<br>RULES<span class="brand-dot">.</span></span></a><button class="spin-game-button" data-action="spinGame" ${locked()?'disabled':''}><span>◉</span> Spin the wheel<small>Pick a random game</small></button><div class="side-label">YOUR GAME SHELF <span>${Object.keys(games).length}</span></div><div class="filters">${['all', 'cards', 'party', 'tabletop'].map(f => `<button data-filter="${f}" class="${filter === f ? 'active' : ''}">${f === 'all' ? 'All games' : f[0].toUpperCase() + f.slice(1)}</button>`).join('')}</div><nav aria-label="Game presets">${Object.entries(games).filter(([, g]) => filter === 'all' || g.category.toLowerCase() === filter).map(([key, g]) => `<button class="game-item ${draft.game === key ? 'active' : ''}" data-game="${key}" ${room && (room.host !== id || room.phase !== 'lobby') ? 'disabled' : ''}><span class="game-icon ${key}">${g.icon}</span><span><strong>${g.name}</strong><small>${g.category} <b>·</b> ${g.players} PLAYERS</small></span><span class="game-arrow">↗</span></button>`).join('')}</nav><div class="side-bottom"><div class="tiny-dice">⚄</div><strong>The best rule?<br>Make it your own.</strong><p>Familiar games. Unfamiliar twists.<br>Entirely your table.</p><button class="text-btn" data-action="help">Info <span>↗</span></button></div>`; }
 function renderHeader() {
   const live = !!room && room.phase !== 'lobby';
   document.querySelector('header')!.innerHTML=`<div class="header-left">${button('☰ Games','toggleShelf',false,'shelf-toggle '+(shelfOpen?'active':''))}<div class="breadcrumb">${live?esc(games[room!.rules.game].name):'Game room'} <span>/</span> <strong>${live?'Round '+room!.round:room?'The living room':'Create your night'}</strong></div></div><div class="header-right">${room?.host===id&&live?`<div class="host-controls">${button('Restart','restartAsk',false,'secondary')}${room.phase==='playing'?button('End game','endAsk',false,'secondary'):''}${button('Lobby','resetAsk',false,'text-btn')}</div>`:''}${button('Chat','toggleChat',false,'chat-toggle')}<button class="sound-control" data-action="sound" aria-label="${audio.muted?'Enable sound':'Mute sound'}">${audio.muted?'♬ Sound off':'♫ Sound on'}</button><span class="connection ${connected?'online':''}"><i></i>${connected?'Connected':'Reconnecting'}</span>${button('Info','help',false,'help-btn')}</div>`;
@@ -254,12 +257,23 @@ function renderPlay() {
     updateTimers();
 }
 function renderActivity() {
-  const old = document.querySelector<HTMLElement>('.activity-log');
-  const scroll = old?.scrollTop||0, atBottom=!old||old.scrollHeight-old.scrollTop-old.clientHeight<35;
-  const quiet=!!room?.werewolf&&room.phase==='playing'&&(!room.werewolf.alive.includes(id)||room.werewolf.phase==='night');
-  const format = new Intl.DateTimeFormat(undefined,{hour:'2-digit',minute:'2-digit'});
-  document.querySelector('#activity')!.innerHTML=room?`<section class="activity"><div class="activity-heading"><h3>Table talk <span>ROOM ${room.code}</span></h3></div><div class="activity-log" role="log" aria-live="polite" aria-label="Table conversation">${room.messages.map((message,i)=>`<p data-message-id="${message.id}" class="${i===room!.messages.length-1?'latest':''}"><time>${esc(format.format(message.at))}</time><span>${esc(message.text)}</span></p>`).join('')}</div><form id="chat-form"><input id="chat" maxlength="240" aria-label="Table message" placeholder="${quiet?'Quiet until daylight / observe if eliminated':'A little table talk…'}" ${quiet?'disabled':''}><button aria-label="Send table message" ${quiet?'disabled':''}>↗</button></form></section>`:'<section class="activity waiting-chat"><h3>Table talk</h3><p>Your people, your conversation. Host or join a table to get the night started.</p></section>';
-  const log=document.querySelector<HTMLElement>('.activity-log');if(log)log.scrollTop=atBottom?log.scrollHeight:scroll;
+ const activity=document.querySelector<HTMLElement>('#activity')!;
+ if(!room){chatFollower?.destroy();chatFollower=undefined;chatRoom='';activity.innerHTML='<section class="activity waiting-chat"><h3>Table talk</h3><p>Your people, your conversation. Host or join a table to get the night started.</p></section>';return;}
+ if(chatRoom!==room.code||!chatFollower){
+  chatFollower?.destroy();chatRoom=room.code;
+  activity.innerHTML='<section class="activity"><div class="activity-heading"><h3>Table talk <span>ROOM '+esc(room.code)+'</span></h3></div><div class="activity-log" role="log" aria-live="polite" aria-label="Table conversation"></div><form id="chat-form"><input id="chat" maxlength="240" aria-label="Table message"><button aria-label="Send table message">↗</button></form></section>';
+  chatFollower=followChat(activity.querySelector<HTMLElement>('.activity-log')!);
+ }
+ const quiet=!!room.werewolf&&room.phase==='playing'&&(!room.werewolf.alive.includes(id)||room.werewolf.phase==='night');
+ const input=activity.querySelector<HTMLInputElement>('#chat')!;input.disabled=quiet;input.placeholder=quiet?'Quiet until daylight / observe if eliminated':'A little table talk…';activity.querySelector<HTMLButtonElement>('form button')!.disabled=quiet;
+ const format=new Intl.DateTimeFormat(undefined,{hour:'2-digit',minute:'2-digit'});
+ chatFollower.update(room.messages.map((message,i)=>`<p data-message-id="${message.id}" class="${i===room!.messages.length-1?'latest':''}"><time>${esc(format.format(message.at))}</time><span>${esc(message.text)}</span></p>`).join(''));
+}
+function chooseGame(game:Game){
+ if(locked())return;draft.game=game;
+ draft.maxPlayers=['jackaroo','tarneeb'].includes(game)?4:8;
+ if(['jackaroo','tarneeb','poker'].includes(game))draft.decks=1;
+ selected.clear();render();
 }
 function renderPeekQuickEvent(){
     let layer=document.querySelector<HTMLElement>("#peek-quick-event");
@@ -280,17 +294,7 @@ app.addEventListener('click', async (e) => {
         filter = el.dataset.filter;
         renderSidebar();
     }
-    if (el.dataset.game) {
-        draft.game = el.dataset.game as Game;
-        if (draft.game === 'tarneeb') {
-            draft.maxPlayers = 4;
-            draft.decks = 1;
-        }
-        else
-            draft.maxPlayers = 8;
-        selected.clear();
-        render();
-    }
+    if (el.dataset.game) chooseGame(el.dataset.game as Game);
     if (el.dataset.tab) {
         rulesTab = el.dataset.tab;
         renderRules();
@@ -320,6 +324,7 @@ app.addEventListener('click', async (e) => {
     const action = el.dataset.action;
     if (!action)
         return;
+    if(action==='spinGame'){spinGameWheel(document.querySelector<HTMLElement>('#modal-root')!,chooseGame,()=>!locked());return;}
     if(action.startsWith('chaos')){if(action==='chaosYes'||action==='chaosNo')send({type:'chaosVote',yes:action==='chaosYes'});else if(action==='chaosReportWord')send({type:action,target:(document.querySelector('#chaos-offender') as HTMLSelectElement)?.value});else send({type:action});return;}
     if (action === 'toggleShelf'){shelfOpen=!shelfOpen;applyLayout();renderHeader();return;}
     if (action === 'toggleRules'){rulesOpen=!rulesOpen;applyLayout();return;}
