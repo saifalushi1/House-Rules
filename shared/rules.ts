@@ -39,7 +39,7 @@ export function validateRules(input: unknown): Rules {
     require(['rentMultiplier','dartsAimSpeed','pongAimSpeed'].includes(key) || Number.isInteger(value), 'Use a whole number.');
     (r as unknown as Record<string, unknown>)[key] = value;
   }
-  for (const key of ['jackarooSplitSeven','jackarooFiveAny','jackarooRedQueenBurn','jackarooTenBurn','jackarooKingSweep','jackarooProtectedStart','wolfSeer','wolfDoctor','wolfReveal','wolfRepeatSave','blackjackSideBets','blackjackHitSoft17','dartsDoubleOut','pongRedemption','pongBallsBack','rooftopAntics','soreLoser','allowTrading', 'tradeSlaps', 'boxingDuels', 'allowPeeking', 'catchPeeking', 'followSuit', 'reverseTurns', 'allowSkipping', 'freeParking']) {
+  for (const key of ['jackarooSplitSeven','jackarooFiveAny','jackarooTenBurn','jackarooKingSweep','jackarooProtectedStart','wolfSeer','wolfDoctor','wolfReveal','wolfRepeatSave','blackjackSideBets','blackjackHitSoft17','dartsDoubleOut','pongRedemption','pongBallsBack','rooftopAntics','soreLoser','allowTrading', 'tradeSlaps', 'boxingDuels', 'allowPeeking', 'catchPeeking', 'followSuit', 'reverseTurns', 'allowSkipping', 'freeParking']) {
     require(typeof x[key] === 'boolean', 'Invalid toggle.');
     (r as unknown as Record<string, unknown>)[key] = x[key];
   }

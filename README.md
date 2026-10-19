@@ -106,16 +106,16 @@ Select a private card, choose a legal move and click **Play selected move**. Cli
 | 4 | Move four backwards on the track, including a shortcut from your start. Never move backwards out of safety. |
 | 5 | Move a controlled marble five, or another player’s unprotected track marble. |
 | 7 | Move seven on one marble or divide all seven steps between two. If the first segment finishes your fourth marble, the remainder may help your partner. |
-| 10 | Move ten, or make the next player holding cards burn one. |
+| 10 | Move ten, or make the next player holding cards burn one and lose their turn. |
 | Jack | Swap a controlled track marble with another color; protected starts and safe lanes are excluded. |
-| Queen | Black moves twelve; red forces a card burn. |
+| Queen | Move twelve forward, regardless of suit or color. |
 | King | Enter a reserve marble, or move thirteen and capture unprotected marbles along the path, including your own. |
 
 Land on an opposing track marble to send it to reserve. Your own marbles block ordinary movement. With start protection enabled, a marble on its own entrance cannot be passed, captured or swapped until it moves. Safety moves cannot overshoot or jump a marble already in that lane. Captures do not remove a player from the game.
 
 One 52-card deck is dealt **4, 4, then 5 cards per player**; the dealer advances after the stock is exhausted and the discard pile is shuffled. Play a legal card if any exists. When stuck, **Discard · no legal move** burns your selected card. Forced burns and stuck-hand timeouts choose a random card. Empty hands sit out until the next deal. The turn timer auto-plays a legal move or burns if stuck, so disconnected seats cannot stall the game. The host may restart, end early or return to the lobby.
 
-In **Game rules**, set **10–120 seconds per turn** (default 40), split sevens, moving other track marbles with fives, red-Queen burns, optional ten burns, King sweeps and start protection. With the Queen toggle off, every Queen moves twelve. Turning off the other special effects restores single-marble sevens, controlled-only fives, movement-only tens or non-sweeping Kings respectively. There are no jokers or mandatory partner-card exchanges in this preset. Peeking uses the existing one-second slap/four-second reveal/eight-play cooldown and excludes teammates.
+In **Game rules**, set **10–120 seconds per turn** (default 40), split sevens, moving other track marbles with fives, optional ten burns, King sweeps and start protection. Every Queen moves twelve; there is no Queen-burn option. Turning off the other special effects restores single-marble sevens, controlled-only fives, movement-only tens or non-sweeping Kings respectively. There are no jokers or mandatory partner-card exchanges in this preset. Peeking uses the existing one-second slap/four-second reveal/eight-play cooldown and excludes teammates.
 
 This is a configurable house variant; regional card effects differ. References: [Jackaroo World manual](https://www.jackarooworld.com/pdfs/Jackaroo-World-Manual.pdf) and [House Jackaroo’s variant reference](https://playjackaroo.com/rules). The board, code, graphics and sounds are original to this project.
 
@@ -848,7 +848,7 @@ Marble ownership, fixed entrances and partners remain unchanged by hand swaps. A
 - **Shield die face:** blocks chaos penalties, chance coin gambles, Robin Hood and dare penalties for that modifier round; ordinary gameplay rules and losses still apply.
 - **Fixed-size games:** no random extra cards are created in Tarneeb, Hold’em, Blackjack or Solitaire. Double card pickups apply only to Bluff/free sandbox and are capped to prevent uncontrolled deck growth. Final party and cash-game winners are recalculated from chaos-adjusted actual standings.
 
-Validated with the production client/server build and **316 automated tests**, including all preset/rule compatibility combinations, supported die profiles, real resource transfers, exact checkout, redemption, fixed deck integrity, role privacy, wagering escrow and final-hand penalties. Restart the server and refresh clients to load the new rule policy together. Existing in-memory rooms disappear when their server stops.
+Validated with the production client/server build and **317 automated tests**, including all preset/rule compatibility combinations, supported die profiles, real resource transfers, exact checkout, redemption, fixed deck integrity, role privacy, wagering escrow and final-hand penalties. Restart the server and refresh clients to load the new rule policy together. Existing in-memory rooms disappear when their server stops.
 
 ## Development
 
@@ -897,7 +897,7 @@ Rooms are in memory. Restarting the server clears games. Disconnected rooms expi
 
 ## Verification
 
-The v0.18 gameplay update passed the production client/server build and **316 automated tests**. Coverage includes all preset/rule compatibility combinations, supported die profiles, real resource transfers, fixed deck integrity, exact darts checkout, Pong redemption, wagering escrow, secret-role privacy, reconnects and final-hand penalties. Run `npm run build` before `npm test`, since integration tests use the production build.
+The v0.18 gameplay update passed the production client/server build and **317 automated tests**. Coverage includes all preset/rule compatibility combinations, supported die profiles, real resource transfers, fixed deck integrity, exact darts checkout, Pong redemption, wagering escrow, secret-role privacy, reconnects and final-hand penalties. Run `npm run build` before `npm test`, since integration tests use the production build.
 
 Browser checks cover room creation, joining, private hands, card play and bluff calls, camera switching, negotiations, host editing, direct aiming, actual standings, compatible-only chaos controls and the per-game Info reference.
 

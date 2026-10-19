@@ -34,9 +34,7 @@ export function jackMoves(j:JackarooState,ids:string[],r:Rules,actor:string,card
  const name=(m:JackMarble)=>'Marble '+(m.index+1)+(m.owner!==actor?' · '+(m.owner===owner?'partner':'seat '+(ids.indexOf(m.owner)+1)):'');
  if(card.rank===1||card.rank===13)for(const m of own)if(m.pos===-1)add('enter',[{marble:m.id,count:0}],'Enter '+name(m));
  if(card.rank===11){for(const a of own.filter(m=>m.pos>=0&&m.pos<64))for(const b of j.marbles.filter(m=>m.owner!==owner&&m.pos>=0&&m.pos<64))add('swap',[{marble:a.id,count:0}],name(a)+' ↔ '+name(b),b.id);return moves;}
- const redQueen=card.rank===12&&(card.suit==='♥'||card.suit==='♦')&&r.jackarooRedQueenBurn;
- if(redQueen||card.rank===10&&r.jackarooTenBurn)add('burn',[],'Force next player to burn one card');
- if(redQueen)return moves;
+ if(card.rank===10&&r.jackarooTenBurn)add('burn',[],'Force next player to burn one card and lose their turn');
  const counts=card.rank===1?[1,11]:[card.rank===4?-4:card.rank];
  const candidates=card.rank===5&&r.jackarooFiveAny?j.marbles.filter(m=>m.owner===owner||m.pos>0&&m.pos<64):own;
  for(const m of candidates)if(m.pos>=0)for(const count of counts)add('move',[{marble:m.id,count}],name(m)+' · '+(count<0?'back ':'forward ')+Math.abs(count));
