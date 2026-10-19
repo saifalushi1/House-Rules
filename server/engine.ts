@@ -1,3 +1,4 @@
+import {handleMusic,tickMusic} from './music.js';
 import {handleSpectator,removeSpectator} from './spectators.js';
 import {initJackaroo,handleJackaroo,tickJackaroo,skipJackaroo} from './jackaroo.js';
 import {normalizeChaos} from '../shared/chaos-policy.js';
@@ -549,5 +550,5 @@ function forceChaosActionInternal(r:Room,id:string){
 }
 
 export function view(r:Room,id:string):View{return blackoutView(r,id,rawView(r,id),rawView);}
-export function act(r:Room,id:string,a:Action){const before=traceBlackout(r);try{if(r.spectators?.some(s=>s.id===id)||a.type.startsWith('spectator'))return handleSpectator(r,id,a);return actPresented(r,id,a);}finally{recordBlackout(r,before,id,a.type==='chat');}}
-export function tick(r:Room){const before=traceBlackout(r);try{return tickInternalChaos(r);}finally{recordBlackout(r,before);}}
+export function act(r:Room,id:string,a:Action){const before=traceBlackout(r);try{if(a.type.startsWith('music'))return handleMusic(r,id,a);if(r.spectators?.some(s=>s.id===id)||a.type.startsWith('spectator'))return handleSpectator(r,id,a);return actPresented(r,id,a);}finally{recordBlackout(r,before,id,a.type==='chat');}}
+export function tick(r:Room){const before=traceBlackout(r);try{const musicChanged=tickMusic(r);return tickInternalChaos(r)||musicChanged;}finally{recordBlackout(r,before);}}

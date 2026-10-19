@@ -109,6 +109,7 @@ export interface Tile {
     owner?: string;
 }
 export interface Room {
+ music?:import('./music.js').MusicState;
  spectators?:import('./spectators.js').Spectator[];spectatorGhost?:import('./spectators.js').SpectatorGhost;
  jackaroo?:JackarooState;
  werewolf?:WerewolfState;blackjack?:BlackjackState;darts?:DartsState;pong?:PongState;

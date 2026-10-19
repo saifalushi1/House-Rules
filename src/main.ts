@@ -1,3 +1,4 @@
+import {RoomMusic} from './music-player';
 import {spectatorPanel,audiencePanel} from './spectator-ui';
 import {followChat} from './chat-scroll';
 import {spinGameWheel} from './game-wheel';
@@ -32,11 +33,12 @@ let infoTab='games';
 let chatFollower:ReturnType<typeof followChat>|undefined,chatRoom='';
 let camera = 'third', reconnectTimer: ReturnType<typeof setTimeout>, scene: GameScene | undefined, help = false;
 const audio = new GameAudio();
+const music = new RoomMusic(send);
 let seenEvent = 0, eventRoom = '', effectTimer: ReturnType<typeof setTimeout>;
-document.addEventListener('pointerdown', () => void audio.unlock(), {capture:true});
-document.addEventListener('keydown', () => void audio.unlock(), {capture:true});
+document.addEventListener('pointerdown', () => {void audio.unlock();music.enable();}, {capture:true});
+document.addEventListener('keydown', () => {void audio.unlock();music.enable();}, {capture:true});
 const app = document.querySelector<HTMLDivElement>('#app')!;
-app.innerHTML = `<div class="shell"><aside class="sidebar" id="sidebar"></aside><main><header id="header"></header><div class="workspace"><section class="table-area"><div id="intro"></div><div class="stage"><div class="stage-top" id="stage-top"></div><div id="scene" aria-label="Low polygon multiplayer game table"></div><div id="stage-bottom"></div><div id="effects-layer" aria-live="polite"></div></div><div id="play-panel"></div></section><aside class="right-rail"><button id="rules-toggle" data-action="toggleRules"></button><section class="rules-panel" id="rules-panel"></section><section id="audience-panel"></section><div id="activity"></div></aside></div><footer><span>MADE FOR GAME NIGHT. BUILT FOR YOUR RULES.</span><span>SELF-HOSTED <i></i> VERSION 0.19</span></footer></main></div><div id="toast" role="status" aria-live="polite"></div><div id="modal-root"></div>`;
+app.innerHTML = `<div class="shell"><aside class="sidebar" id="sidebar"></aside><main><header id="header"></header><div class="workspace"><section class="table-area"><div id="intro"></div><div class="stage"><div class="stage-top" id="stage-top"></div><div id="scene" aria-label="Low polygon multiplayer game table"></div><div id="stage-bottom"></div><div id="effects-layer" aria-live="polite"></div></div><div id="play-panel"></div></section><aside class="right-rail"><button id="rules-toggle" data-action="toggleRules"></button><section class="rules-panel" id="rules-panel"></section><section id="audience-panel"></section><div id="activity"></div></aside></div><footer><span>MADE FOR GAME NIGHT. BUILT FOR YOUR RULES.</span><span>SELF-HOSTED <i></i> VERSION 0.20</span></footer></main></div><div id="toast" role="status" aria-live="polite"></div><div id="modal-root"></div>`;
 try {
     scene = new GameScene(document.querySelector('#scene')!);scene.onAim=send;
 }
@@ -80,12 +82,12 @@ function connect() { clearTimeout(reconnectTimer); socket = new WebSocket(`${loc
     peek = [];
     history.replaceState(null, '', location.pathname);
     render();
-} if (msg.type === 'error')
-    toast(msg.message); if (msg.type === 'peek') {
+} if(msg.type==='musicResults')music.resultsMessage(msg);
+if (msg.type === 'error'){music.error(msg.message);toast(msg.message);} if (msg.type === 'peek') {
     peek = msg.cards;
     renderPlay();
     setTimeout(() => { peek = []; renderPlay(); }, Math.max(0, msg.expires - Date.now()));
-} }; socket.onclose = () => { connected = false; renderHeader(); reconnectTimer = setTimeout(connect, 1800); }; socket.onerror = () => socket.close(); }
+} }; socket.onclose = () => { connected = false;music.update(room,id,false); renderHeader(); reconnectTimer = setTimeout(connect, 1800); }; socket.onerror = () => socket.close(); }
 const button = (label: string, action: string, disabled = false, cls = '') => `<button class="${cls}" data-action="${action}" ${disabled ? 'disabled' : ''}>${label}</button>`;
 function render() {
     const focus = document.activeElement as HTMLInputElement | HTMLTextAreaElement | null;
@@ -94,6 +96,7 @@ function render() {
     const drafts = new Map(['spectator-target','bj-bet','bj-pair','bj-trio','scribble-award-target','sore-loser-target','poker-raise','chat','guess','trivia-answer','player-name','room-code','scribble-guess','rpg-name','rpg-inventory','rpg-notes','rpg-narrative','rpg-enemy-name','rpg-enemy-x','rpg-enemy-y','rpg-enemy-hp','rpg-enemy-ac','rpg-target','rpg-die','rpg-ability'].map(key => [key, (document.getElementById(key) as HTMLInputElement | null)?.value]));
     if(room?.phase==='lobby') resetTradeDraft();
     applyLayout();
+    music.update(room,id,connected);
     renderSidebar(); renderHeader(); renderIntro(); renderStage(); renderRules(); renderPlay(); renderActivity();document.querySelector('#audience-panel')!.innerHTML=audiencePanel(room,id);
     for (const [key, value] of drafts) {
         const field = document.getElementById(key) as HTMLInputElement | null;
@@ -115,7 +118,7 @@ function render() {
 function renderSidebar() { document.querySelector('#sidebar')!.innerHTML = `<a class="brand" href="/" aria-label="House Rules home"><span class="brand-mark">H<span>R</span></span><span>HOUSE<br>RULES<span class="brand-dot">.</span></span></a><button class="spin-game-button" data-action="spinGame" ${locked()?'disabled':''}><span>◉</span> Spin the wheel<small>Pick a random game</small></button><div class="side-label">YOUR GAME SHELF <span>${Object.keys(games).length}</span></div><div class="filters">${['all', 'cards', 'party', 'tabletop'].map(f => `<button data-filter="${f}" class="${filter === f ? 'active' : ''}">${f === 'all' ? 'All games' : f[0].toUpperCase() + f.slice(1)}</button>`).join('')}</div><nav aria-label="Game presets">${Object.entries(games).filter(([, g]) => filter === 'all' || g.category.toLowerCase() === filter).map(([key, g]) => `<button class="game-item ${draft.game === key ? 'active' : ''}" data-game="${key}" ${room && (room.host !== id || room.phase !== 'lobby') ? 'disabled' : ''}><span class="game-icon ${key}">${g.icon}</span><span><strong>${g.name}</strong><small>${g.category} <b>·</b> ${g.players} PLAYERS</small></span><span class="game-arrow">↗</span></button>`).join('')}</nav><div class="side-bottom"><div class="tiny-dice">⚄</div><strong>The best rule?<br>Make it your own.</strong><p>Familiar games. Unfamiliar twists.<br>Entirely your table.</p><button class="text-btn" data-action="help">Info <span>↗</span></button></div>`; }
 function renderHeader() {
   const live = !!room && room.phase !== 'lobby';
-  document.querySelector('header')!.innerHTML=`<div class="header-left">${button('☰ Games','toggleShelf',false,'shelf-toggle '+(shelfOpen?'active':''))}<div class="breadcrumb">${live?esc(games[room!.rules.game].name):'Game room'} <span>/</span> <strong>${live?'Round '+room!.round:room?'The living room':'Create your night'}</strong></div></div><div class="header-right">${room?.host===id&&live?`<div class="host-controls">${button('Restart','restartAsk',false,'secondary')}${room.phase==='playing'?button('End game','endAsk',false,'secondary'):''}${button('Lobby','resetAsk',false,'text-btn')}</div>`:''}${button('Chat','toggleChat',false,'chat-toggle')}<button class="sound-control" data-action="sound" aria-label="${audio.muted?'Enable sound':'Mute sound'}">${audio.muted?'♬ Sound off':'♫ Sound on'}</button><span class="connection ${connected?'online':''}"><i></i>${connected?'Connected':'Reconnecting'}</span>${button('Info','help',false,'help-btn')}</div>`;
+  document.querySelector('header')!.innerHTML=`<div class="header-left">${button('☰ Games','toggleShelf',false,'shelf-toggle '+(shelfOpen?'active':''))}<div class="breadcrumb">${live?esc(games[room!.rules.game].name):'Game room'} <span>/</span> <strong>${live?'Round '+room!.round:room?'The living room':'Create your night'}</strong></div></div><div class="header-right">${room?.host===id&&live?`<div class="host-controls">${button('Restart','restartAsk',false,'secondary')}${room.phase==='playing'?button('End game','endAsk',false,'secondary'):''}${button('Lobby','resetAsk',false,'text-btn')}</div>`:''}${button('Chat','toggleChat',false,'chat-toggle')}<button class="sound-control" data-action="sound" aria-label="${audio.muted?'Enable sound':'Mute sound'}">${audio.muted?'♬ Sound off':'♫ Sound on'}</button><button class="music-button" data-action="music" aria-label="Open music player">♫ Music</button><span class="connection ${connected?'online':''}"><i></i>${connected?'Connected':'Reconnecting'}</span>${button('Info','help',false,'help-btn')}</div>`;
 }
 function renderIntro() { const g = games[draft.game]; document.querySelector('#intro')!.innerHTML = `<div class="eyebrow"><span></span> YOUR TABLE. YOUR RULES.</div><div class="intro-title"><h1>${room ? esc(g.name) : 'Good friends.<br><em>Questionable rules.</em>'}</h1><span class="edition">THE GAME NIGHT<br>SANDBOX</span></div><p>${room ? esc(g.description) : 'Pick a classic. Bend the rules. Make a night of it.'}</p>`; }
 function renderStage() {
@@ -341,6 +344,7 @@ app.addEventListener('click', async (e) => {
       document.querySelector('#modal-root')!.innerHTML=`<div class="modal-backdrop"><div class="modal" role="dialog" aria-modal="true"><h2>${restart?'Restart this game?':'End this game early?'}</h2><p>${restart?'Everyone starts a fresh game with the same rules. Current hands, points, cash and properties reset.':'This ends the current game for everyone without declaring a winner.'}</p>${button(restart?'Restart now':'End game now',restart?'confirmRestart':'confirmEnd',false,'primary')}${button('Keep playing','closeHelp',false,'secondary')}</div></div>`;return;
     }
     if(action==='confirmRestart'||action==='confirmEnd'){document.querySelector('#modal-root')!.innerHTML='';send({type:action==='confirmRestart'?'restart':'endGame'});return;}
+    if(action==='music'){music.toggle();return;}
     if (action === 'sound') { audio.toggle(); renderHeader(); return; }
     if (action === 'boardZoom') { if(scene) scene.closeBoard = !scene.closeBoard; renderStage(); return; }
     if (action === 'help') {

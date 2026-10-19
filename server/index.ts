@@ -1,3 +1,5 @@
+import {authorizeMusic,queueMusic} from './music.js';
+import {searchMusic,getMusicTrack} from './music-provider.js';
 import {addSpectator,removeSpectator} from './spectators.js';
 import { createServer } from 'node:http';
 import { readFile, stat } from 'node:fs/promises';
@@ -58,13 +60,13 @@ wss.on('connection', (ws, req) => {
     let token = '';
     let count = 0;
     let window = Date.now();
-    let alive = true;
+    let alive = true,musicLookupAt=0,musicLookupBusy=false;
     ws.on('pong', () => alive = true);
     const heartbeat = setInterval(() => { if (!alive) {
         ws.terminate();
         return;
     } alive = false; ws.ping(); }, 30000);
-    ws.on('message', raw => {
+    ws.on('message', async raw => {
         try {
             if (Date.now() - window > 1000) {
                 window = Date.now();
@@ -134,6 +136,14 @@ wss.on('connection', (ws, req) => {
             const r = rooms.get(s.room || '');
             if (!r)
                 throw new Error('Join a room first.');
+            if(msg.type==='musicSearch'||msg.type==='musicAdd'){
+                authorizeMusic(r,s.id);if(musicLookupBusy||msg.type==='musicSearch'&&Date.now()<musicLookupAt)throw Error('Wait a moment before another music search or add.');musicLookupAt=Date.now()+800;musicLookupBusy=true;
+                try{
+                    if(msg.type==='musicSearch'){if(typeof msg.query!=='string'||msg.query.trim().length<2||msg.query.length>100)throw Error('Search with 2–100 characters.');const tracks=await searchMusic(msg.query.trim());if(s.room!==r.code||s.socket!==ws||rooms.get(r.code)!==r)return;authorizeMusic(r,s.id);send(ws,{type:'musicResults',request:msg.request,tracks});}
+                    else{if(typeof msg.track!=='string')throw Error('Choose a song from search.');const track=await getMusicTrack(msg.track);if(s.room!==r.code||s.socket!==ws||!rooms.has(r.code))return;queueMusic(r,s.id,track);broadcast(r);}
+                }finally{musicLookupBusy=false;}
+                return;
+            }
             if(msg.type==='takeSeat'||msg.type==='spectate'){
                 if(r.phase!=='lobby')throw Error('Change roles in the lobby after this game.');
                 if(msg.type==='takeSeat'){const spectator=r.spectators?.find(p=>p.id===s.id);if(!spectator)throw Error('Join the audience first.');if(r.players.length>=r.rules.maxPlayers)throw Error('That table is full.');r.players.push(player(s.id,spectator.name,r.players.length));removeSpectator(r,s.id);}

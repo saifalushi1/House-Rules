@@ -6,7 +6,7 @@ Your table. Your rules. A browser-based game night for friends.
 
 1. [About House Rules](#about-house-rules) — what the game-night website does.
 2. [How to run](#how-to-run) — Windows launcher and terminal setup.
-3. [Play with friends](#play-with-friends) — local Wi-Fi, internet access and [spectators](#spectators).
+3. [Play with friends](#play-with-friends) — local Wi-Fi, internet access, [spectators](#spectators) and [shared music](#shared-music).
 4. [Available games](#available-games) — all 15 presets and player counts.
 5. [Game guides](#game-guides) — setup, controls and scoring.
 6. [Rules](#rules) — [house settings](#house-settings), [chaos overview](#chaos-rule-overview), [compatibility](#compatibility-at-a-glance), [per-game effects and die faces](#full-rule-effects-and-die-faces-by-preset), and [timing safeguards](#timing-penalties-and-limits).
@@ -19,7 +19,7 @@ Your table. Your rules. A browser-based game night for friends.
 
 **House Rules** is a self-hosted, browser-based TypeScript game-night sandbox for friends. One person runs the server, hosts a room and chooses a game; everyone else joins through a browser with an invite or room code. The host can customize supported rules and add optional chaos modifiers that change real cards, scores, chips, turns and other game resources.
 
-The website includes **15 game presets**, a low-poly 3D table, animated avatars, first- and third-person cameras, private hands, shared chat, action sounds and seven backgrounds. Trivia contains 1,000 questions across ten categories; pair Charades contains 1,900 prompts across 19 categories. Restart, early ending and lobby controls keep the group in control of the session.
+The website includes **15 game presets**, a low-poly 3D table, animated avatars, first- and third-person cameras, private hands, shared chat, action sounds, shared music and seven backgrounds. Trivia contains 1,000 questions across ten categories; pair Charades contains 1,900 prompts across 19 categories. Restart, early ending and lobby controls keep the group in control of the session.
 
 It runs from your machine and uses a persistent Node.js/WebSocket server for live rooms. Rooms exist in memory and disappear when the server stops. Use your existing group call for voice or video. Written house agreements are notes for the group; supported toggles and parameters drive the automated behavior.
 
@@ -79,6 +79,18 @@ During a game, spectators can use two reactions:
 One ghost can occupy the dance floor at a time. Both cooldowns are enforced by the server and survive reconnecting, leaving/rejoining with the same session, restarts and Time Warp. Reactions affect only presentation. Spectators cannot play cards, guess for points, vote, change rules or trigger chaos modifiers. They can chat, except during an active Werewolf game, when the audience stays silent.
 
 Non-host players can choose **Watch instead** in the lobby; spectators can **Join as player** when a seat opens. Roles stay fixed during a match, and the host keeps a player seat. Spectators may leave at any time. The host can expand **Audience** to remove a spectator during a game or in the lobby.
+
+### Shared music
+
+Click **♫ Music** beside **Sound on/off** to open the room jukebox. Search for a song, artist or mood and choose **+ Queue**. Any connected seated player can contribute songs and use **Play**, **Pause**, **Restart song** or **Skip**; these controls affect the room. The first added song starts automatically, queued tracks play in order, and up to 30 songs can wait in the queue. Players can remove their own queued songs; the host can remove anyone’s queued entry.
+
+**Volume · only you** controls a separate music player in your browser and is remembered locally. Setting it to zero silences music for you without changing other players’ volume or the shared playback. The existing Sound button controls game effects separately. Closing the modal keeps music playing. If a browser blocks autoplay, open Music and tap **Enable music on this device**. Spectators can listen and set their own volume, but cannot change shared playback or search/add songs.
+
+Playback follows a server timeline, including for late joins and reconnects; browsers correct noticeable drift. Network buffering can cause small timing differences. Disconnecting pauses that client until it reconnects, and leaving a room stops its local player. The queue continues through games, lobby changes, restarts and Time Warp. Server shutdown clears the queue with the other in-memory room data.
+
+The catalog uses [Audius](https://audius.co/), which advertises free, ad-free listening, through its [public track/search/stream APIs](https://docs.audius.co/sdk/tracks/). This integration currently needs no subscription, Discord bot, API key or additional server software. Only publicly streamable, ungated tracks are offered; paid, gated, deleted and unavailable tracks are excluded. The available catalog differs from YouTube or Spotify, so some songs and artists will not be found. Audio streams directly from Audius to each browser; the game server manages search metadata and playback state. If a stream becomes unavailable, try another song or skip it.
+
+The suggested [Uzox repository](https://github.com/uzox/uzox) describes an outdated Discord bot requiring Discord/Lavalink setup and advertises paid full hosting. House Rules uses Audius directly for browser playback instead.
 
 ## Available games
 
@@ -865,7 +877,7 @@ Marble ownership, fixed entrances and partners remain unchanged by hand swaps. A
 - **Shield die face:** blocks chaos penalties, chance coin gambles, Robin Hood and dare penalties for that modifier round; ordinary gameplay rules and losses still apply.
 - **Fixed-size games:** no random extra cards are created in Tarneeb, Hold’em, Blackjack or Solitaire. Double card pickups apply only to Bluff/free sandbox and are capped to prevent uncontrolled deck growth. Final party and cash-game winners are recalculated from chaos-adjusted actual standings.
 
-Validated with the production client/server build and **340 automated tests**, including all preset/rule compatibility combinations, supported die profiles, real resource transfers, exact checkout, redemption, fixed deck integrity, role privacy, wagering escrow and final-hand penalties. Restart the server and refresh clients to load the new rule policy together. Existing in-memory rooms disappear when their server stops.
+Validated with the production client/server build and **352 automated tests**, including all preset/rule compatibility combinations, supported die profiles, real resource transfers, exact checkout, redemption, fixed deck integrity, role privacy, wagering escrow and final-hand penalties. Restart the server and refresh clients to load the new rule policy together. Existing in-memory rooms disappear when their server stops.
 
 ## Development
 
@@ -914,11 +926,15 @@ Rooms are in memory. Restarting the server clears games. Disconnected rooms expi
 
 ## Verification
 
-The current gameplay update passed the production client/server build and **340 automated tests**. Coverage includes all preset/rule compatibility combinations, supported die profiles, real resource transfers, fixed deck integrity, exact darts checkout, Pong redemption, wagering escrow, secret-role privacy, reconnects and final-hand penalties. Run `npm run build` before `npm test`, since integration tests use the production build.
+The current gameplay update passed the production client/server build and **352 automated tests**. Coverage includes all preset/rule compatibility combinations, supported die profiles, real resource transfers, fixed deck integrity, exact darts checkout, Pong redemption, wagering escrow, secret-role privacy, reconnects and final-hand penalties. Run `npm run build` before `npm test`, since integration tests use the production build.
 
 Browser checks cover room creation, joining, private hands, card play and bluff calls, camera switching, negotiations, host editing, direct aiming, actual standings, compatible-only chaos controls and the per-game Info reference.
 
 ## Release history
+
+### v0.20 · Shared room music
+
+Added the Music button, Audius search, validated shared queues, shared play/pause/restart/skip, local-only volume and autoplay recovery. Music persists through game lifecycle changes and Time Warp. New automated tests cover queue/timeline behavior, provider filtering, local volume isolation, stale controls, reconnects and permission changes during asynchronous adds. Browser checks verified real playback in two clients, a late join, guest queue additions, shared pause/skip/restart, independent volume and continued playback after closing the modal. Build and all 352 tests pass.
 
 ### v0.19 · Spectator audience
 
