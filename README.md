@@ -90,6 +90,15 @@ Playback follows a server timeline, including for late joins and reconnects; bro
 
 Music uses a host-configured **Invidious or Piped** instance for search and audio streaming. There is no hardcoded public instance, public-instance rotation, YouTube API key requirement or automatic fallback to the official YouTube player. Native audio stays separate from game effects and keeps playing when the modal closes. Use **Seek · shared playback** to change the song position for everyone.
 
+**No existing instance? Private Windows launcher:**
+
+1. Install [Docker Desktop for Windows x86_64](https://docs.docker.com/desktop/setup/install/windows-install/), complete its WSL 2 setup if requested, then open Docker Desktop and accept its first-run agreement yourself. Wait for the Linux engine to be running. A Windows reboot may be required. Docker Desktop is free for personal use; Invidious recommends at least 20 GB disk space and 2 GB free RAM for its services, in addition to the game and Docker's system requirements.
+2. Double-click **Start Music Service.cmd**. On its first run, it generates private secrets, downloads a pinned set of official database bootstrap files, and starts the official Invidious, Companion and PostgreSQL containers. Its only published port is `127.0.0.1:3001`; the companion and database remain on the private container network.
+3. After Invidious responds to its health check, the launcher backs up an existing game `.env` into the ignored `.music` folder and sets `MUSIC_PROVIDER=invidious` and `MUSIC_API_URL=http://127.0.0.1:3001`. Other settings are retained. Restart House Rules when your current match is finished, refresh the browsers, and try searching for a song.
+4. Use **Stop Music Service.cmd** to stop only this music stack. Its database and secrets are retained. Starting it again does not require reconfiguring the game. The stack uses the dedicated Docker project `house-rules-music` and Docker volumes for data; `.music/` is excluded from Git.
+
+The launcher checks prerequisites before changing files and does not install Docker, accept agreements, reboot Windows, or restart an active game. Validate prerequisites without starting anything with `powershell -NoProfile -ExecutionPolicy Bypass -File scripts/Start-Music-Service.ps1 -Check`. The service setup has been prepared and its missing-prerequisite path checked; a real container start requires Docker/WSL to be installed. Self-hosting still cannot guarantee that YouTube will serve every search or song. See the maintained [Invidious installation guide](https://docs.invidious.io/installation/) for service updates and troubleshooting.
+
 **Required host setup:** copy `.env.example` to `.env`, choose a backend, and supply its API base URL:
 
 ```dotenv
@@ -98,7 +107,7 @@ MUSIC_API_URL=http://127.0.0.1:3001
 MUSIC_STREAM_ORIGINS=
 ```
 
-For Piped, set `MUSIC_PROVIDER=piped` and use the **backend API** URL, not its frontend page. The URL above is an example, not an included running service. A working instance must be installed separately or provided by the host. For Windows self-hosting, follow the maintained [Invidious installation guide](https://docs.invidious.io/installation/) (Docker Desktop/WSL and Invidious Companion) or [Piped self-hosting guide](https://docs.piped.video/docs/self-hosting/). Docker or an instance is not installed automatically by House Rules. Restart the game server after editing the configuration.
+For Piped, set `MUSIC_PROVIDER=piped` and use the **backend API** URL, not its frontend page. The URL above is an example, not an included running service. A working instance can be started with the private launcher above, or provided by the host. For Windows self-hosting, follow the maintained [Invidious installation guide](https://docs.invidious.io/installation/) (Docker Desktop/WSL and Invidious Companion) or [Piped self-hosting guide](https://docs.piped.video/docs/self-hosting/). Starting the game alone does not install Docker or start a music instance. Restart the game server after editing the configuration.
 
 If the instance serves audio through a separate companion/proxy origin, add that exact trusted origin to `MUSIC_STREAM_ORIGINS`, separated by commas for multiple origins. The configured API origin and HTTPS YouTube media CDN subdomains are already allowed. Example: `MUSIC_STREAM_ORIGINS=http://127.0.0.1:8282,https://music-proxy.example.com`. Keep backend administration private; visitors cannot choose the backend or arbitrary relay URLs.
 
