@@ -113,10 +113,12 @@ wss.on('connection', (ws, req) => {
             s.lastSeen = Date.now();
             // Catalog discovery is read-only and does not require a player seat.
             if(msg.type==='musicSearch'){
-                if(musicLookupBusy||Date.now()<musicLookupAt)throw Error('Wait a moment before another music search.');
-                if(typeof msg.query!=='string'||msg.query.trim().length<2||msg.query.length>500)throw Error('Search with 2–500 characters.');
-                musicLookupAt=Date.now()+800;musicLookupBusy=true;
-                try{const tracks=await searchMusic(msg.query.trim());if(s.socket===ws)send(ws,{type:'musicResults',request:msg.request,tracks});}finally{musicLookupBusy=false;}
+                try{
+                    if(musicLookupBusy||Date.now()<musicLookupAt)throw Error('Wait a moment before another music search.');
+                    if(typeof msg.query!=='string'||msg.query.trim().length<2||msg.query.length>500)throw Error('Search with 2–500 characters.');
+                    musicLookupAt=Date.now()+800;musicLookupBusy=true;
+                    try{const tracks=await searchMusic(msg.query.trim());if(s.socket===ws)send(ws,{type:'musicResults',request:msg.request,tracks});}finally{musicLookupBusy=false;}
+                }catch(error){if(s.socket===ws)send(ws,{type:'musicError',request:msg.request,message:(error as Error).message});}
                 return;
             }
             if (msg.type === 'create' || msg.type === 'join' || msg.type === 'watch') {
