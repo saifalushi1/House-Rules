@@ -1,6 +1,7 @@
 import {authorizeMusic,queueMusic} from './music.js';
 import {searchMusic,getMusicTrack} from './music-provider.js';
 import {addSpectator,removeSpectator} from './spectators.js';
+import {existsSync} from 'node:fs';
 import { createServer } from 'node:http';
 import { readFile, stat } from 'node:fs/promises';
 import { resolve, extname, sep } from 'node:path';
@@ -9,6 +10,8 @@ import { networkInterfaces } from 'node:os';
 import { WebSocketServer, WebSocket } from 'ws';
 import { act, makeRoom, note, player, tick, view } from './engine.js';
 import type { Action, Room } from '../shared/types.js';
+// Native Node .env loading keeps the host's YouTube search key server-side.
+if (existsSync('.env')) process.loadEnvFile('.env');
 const rooms = new Map<string, Room>();
 const sessions = new Map<string, {
     id: string;
@@ -109,7 +112,7 @@ wss.on('connection', (ws, req) => {
             // Catalog discovery is read-only and does not require a player seat.
             if(msg.type==='musicSearch'){
                 if(musicLookupBusy||Date.now()<musicLookupAt)throw Error('Wait a moment before another music search.');
-                if(typeof msg.query!=='string'||msg.query.trim().length<2||msg.query.length>100)throw Error('Search with 2–100 characters.');
+                if(typeof msg.query!=='string'||msg.query.trim().length<2||msg.query.length>500)throw Error('Search with 2–500 characters.');
                 musicLookupAt=Date.now()+800;musicLookupBusy=true;
                 try{const tracks=await searchMusic(msg.query.trim());if(s.socket===ws)send(ws,{type:'musicResults',request:msg.request,tracks});}finally{musicLookupBusy=false;}
                 return;

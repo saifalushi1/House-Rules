@@ -8,9 +8,11 @@ function next(r:Room){const m=state(r);m.current=m.queue.shift();m.position=0;m.
 export function queueMusic(r:Room,id:string,track:MusicTrack){authorizeMusic(r,id);const m=state(r);need(m.queue.length<MUSIC_QUEUE_LIMIT,'The music queue is full (30 songs).');throttle(r,id);const p=(r.players.find(p=>p.id===id)||r.spectators?.find(p=>p.id===id))!;const song={...track,entry:randomUUID(),addedBy:id,addedByName:p.name};
  const begin=!m.current||!m.playing&&musicPosition(m,Date.now())>=m.current.duration;m.queue.push(song);if(begin)next(r);
 }
-export function handleMusic(r:Room,id:string,a:Action){authorizeMusic(r,id);need(['musicPlay','musicPause','musicSkip','musicRestart','musicRemove'].includes(a.type),'Unknown music control.');const m=state(r);
+export function handleMusic(r:Room,id:string,a:Action){authorizeMusic(r,id);need(['musicPlay','musicPause','musicSkip','musicRestart','musicRemove','musicSeek','musicEnded'].includes(a.type),'Unknown music control.');const m=state(r);
  if(a.type==='musicRemove'){const at=m.queue.findIndex(q=>q.entry===a.entry);need(at>=0,'That queued song has changed.');need(r.host===id||m.queue[at]?.addedBy===id,'Remove your own songs, or ask the host.');throttle(r,id);m.queue.splice(at,1);return;}
- need(m.current&&a.entry===m.current.entry,'The current song changed. Try again.');throttle(r,id);
+ if(a.type==='musicEnded'){if(!m.current||a.entry!==m.current.entry||a.revision!==m.revision||!m.playing)return;const pos=musicPosition(m,Date.now());if(m.current.durationKnown!==false&&pos<m.current.duration-5)return;if(m.queue.length)next(r);else{m.position=m.current.duration;m.updatedAt=Date.now();m.playing=false;m.revision++;}return;}
+ need(m.current&&a.entry===m.current.entry,'The current song changed. Try again.');if(a.revision!==undefined)need(a.revision===m.revision,'Playback changed. Try again.');throttle(r,id);
+ if(a.type==='musicSeek'){const position=a.position;need(typeof position==='number'&&Number.isFinite(position)&&position>=0&&position<=m.current!.duration,'Choose a valid song position.');m.position=position as number;m.updatedAt=Date.now();m.revision++;return;}
  if(a.type==='musicSkip'){next(r);return;}
  const now=Date.now(),position=musicPosition(m,now);m.position=a.type==='musicRestart'||a.type==='musicPlay'&&position>=m.current!.duration?0:position;m.updatedAt=now;m.playing=a.type!=='musicPause';m.revision++;
 }

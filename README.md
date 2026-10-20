@@ -88,9 +88,17 @@ Click **♫ Music** beside **Sound on/off** to open the room jukebox. Search for
 
 Playback follows a server timeline, including for late joins and reconnects; browsers correct noticeable drift. Network buffering can cause small timing differences. Disconnecting pauses that client until it reconnects, and leaving a room stops its local player. The queue continues through games, lobby changes, restarts and Time Warp. Server shutdown clears the queue with the other in-memory room data.
 
-The catalog uses [Audius](https://audius.co/), which advertises free, ad-free listening, through its [public track/search/stream APIs](https://docs.audius.co/sdk/tracks/). This integration currently needs no subscription, Discord bot, API key or additional server software. Only publicly streamable, ungated tracks are offered; paid, gated, deleted and unavailable tracks are excluded. The available catalog differs from YouTube or Spotify, so some songs and artists will not be found. Audio streams directly from Audius to each browser; the game server manages search metadata and playback state. If a stream becomes unavailable, try another song or skip it.
+Music now uses the official visible [YouTube IFrame player](https://developers.google.com/youtube/iframe_api_reference). Paste a YouTube video link into the search box and choose **Search**, then **+ Queue**; link imports work without a search key. The video stays visible in a small dock when the controls close. YouTube may show ads or restrict videos by region, age or embedding settings. House Rules does not extract audio, remove ads or require a paid subscription; availability depends on YouTube and each listener. Buffering, ads and browser autoplay restrictions mean playback is approximate rather than sample-accurate. A locally blocked video does not automatically skip it for everyone; use shared Skip to choose another.
 
-The suggested [Uzox repository](https://github.com/uzox/uzox) describes an outdated Discord bot requiring Discord/Lavalink setup and advertises paid full hosting. House Rules uses Audius directly for browser playback instead.
+**Enable song/artist search:** create a Google Cloud project, enable **YouTube Data API v3**, create an API key, then copy `.env.example` to `.env` in the project folder and set:
+
+```dotenv
+YOUTUBE_API_KEY=your_youtube_data_api_key
+```
+
+Restart the server after setting the key. Restrict the key to YouTube Data API v3 (and your server IP if appropriate); it stays on the server and is never sent to players. Search uses YouTube's API quota; no key or exhausted quota produces an explanation instead of unusable results. Without a key, use the link option. Search results filter out videos YouTube marks as non-embeddable, age-restricted, live or over six hours. Link imports use YouTube oEmbed metadata; the player discovers their duration and embedding availability when loaded. Their queue advances when a connected listener finishes; with no listeners they have a six-hour safety limit.
+
+Play, pause, skip, restart, queue edits and seeking through the video controls use the room server. Volume and device autoplay permission stay local. Simultaneous end/skip reports refer to a unique queue entry and revision, so delayed reports cannot advance or rewind a newer song. Pausing or leaving one disconnected browser does not pause everyone else. The YouTube player needs an ordinary HTTP/HTTPS page with its referrer intact; allow YouTube in browser content blockers if it fails to load. See [Google's API setup guide](https://developers.google.com/youtube/v3/getting-started) for keys and quota.
 
 ## Available games
 
@@ -877,7 +885,7 @@ Marble ownership, fixed entrances and partners remain unchanged by hand swaps. A
 - **Shield die face:** blocks chaos penalties, chance coin gambles, Robin Hood and dare penalties for that modifier round; ordinary gameplay rules and losses still apply.
 - **Fixed-size games:** no random extra cards are created in Tarneeb, Hold’em, Blackjack or Solitaire. Double card pickups apply only to Bluff/free sandbox and are capped to prevent uncontrolled deck growth. Final party and cash-game winners are recalculated from chaos-adjusted actual standings.
 
-Validated with the production client/server build and **356 automated tests**, including all preset/rule compatibility combinations, supported die profiles, real resource transfers, exact checkout, redemption, fixed deck integrity, role privacy, wagering escrow and final-hand penalties. Restart the server and refresh clients to load the new rule policy together. Existing in-memory rooms disappear when their server stops.
+Validated with the production client/server build and **360 automated tests**, including all preset/rule compatibility combinations, supported die profiles, real resource transfers, exact checkout, redemption, fixed deck integrity, role privacy, wagering escrow and final-hand penalties. Restart the server and refresh clients to load the new rule policy together. Existing in-memory rooms disappear when their server stops.
 
 ## Development
 
@@ -926,11 +934,15 @@ Rooms are in memory. Restarting the server clears games. Disconnected rooms expi
 
 ## Verification
 
-The current gameplay update passed the production client/server build and **356 automated tests**. Coverage includes all preset/rule compatibility combinations, supported die profiles, real resource transfers, fixed deck integrity, exact darts checkout, Pong redemption, wagering escrow, secret-role privacy, reconnects and final-hand penalties. Run `npm run build` before `npm test`, since integration tests use the production build.
+The current gameplay update passed the production client/server build and **360 automated tests**. Coverage includes all preset/rule compatibility combinations, supported die profiles, real resource transfers, fixed deck integrity, exact darts checkout, Pong redemption, wagering escrow, secret-role privacy, reconnects and final-hand penalties. Run `npm run build` before `npm test`, since integration tests use the production build.
 
 Browser checks cover room creation, joining, private hands, card play and bluff calls, camera switching, negotiations, host editing, direct aiming, actual standings, compatible-only chaos controls and the per-game Info reference.
 
 ## Release history
+
+### v0.21 · YouTube room music
+
+Replaced the Audius catalog and audio streams with the official visible YouTube player. Added key-free video-link imports, server-side YouTube Data API search, shared native play/pause/seek controls, guarded queue advancement and local volume/autoplay recovery. Verified a real Lucid Dreams embed, shared room controls, the production build and all 360 tests. The server reads an optional ignored `.env` file; `.env.example` documents search setup.
 
 ### v0.20.1 · Music queue access fix
 
