@@ -1,3 +1,4 @@
+import {musicHTTP} from './music-http.js';
 import {authorizeMusic,queueMusic} from './music.js';
 import {searchMusic,getMusicTrack} from './music-provider.js';
 import {addSpectator,removeSpectator} from './spectators.js';
@@ -10,7 +11,7 @@ import { networkInterfaces } from 'node:os';
 import { WebSocketServer, WebSocket } from 'ws';
 import { act, makeRoom, note, player, tick, view } from './engine.js';
 import type { Action, Room } from '../shared/types.js';
-// Native Node .env loading keeps the host's YouTube search key server-side.
+// Native Node .env loading keeps music backend configuration on the host.
 if (existsSync('.env')) process.loadEnvFile('.env');
 const rooms = new Map<string, Room>();
 const sessions = new Map<string, {
@@ -22,6 +23,7 @@ const sessions = new Map<string, {
 const root = resolve('dist');
 const mime: Record<string, string> = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.css': 'text/css', '.svg': 'image/svg+xml', '.png': 'image/png', '.ico': 'image/x-icon' };
 const server = createServer(async (req, res) => { try {
+    if (await musicHTTP(req,res)) return;
     if (req.url === '/health') {
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.end(JSON.stringify({ status: 'ok', rooms: rooms.size }));

@@ -1,4 +1,4 @@
-export interface MusicTrack {id:string;title:string;artist:string;duration:number;permalink:string;durationKnown?:boolean}
+export interface MusicTrack {id:string;title:string;artist:string;duration:number;permalink:string;durationKnown?:boolean;source?:'invidious'|'piped'|'youtube';playbackUrl?:string}
 export interface QueuedSong extends MusicTrack {entry:string;addedBy:string;addedByName:string}
 export interface MusicState {current?:QueuedSong;queue:QueuedSong[];playing:boolean;position:number;updatedAt:number;revision:number}
 export const MUSIC_QUEUE_LIMIT=30;

@@ -57,5 +57,10 @@
 
 /* Keep the official video visible even with the music modal closed. */
 #youtube-music-dock{position:fixed;right:12px;bottom:12px;width:320px;z-index:46;border:1px solid #697452;border-radius:8px;background:#17251b;box-shadow:0 8px 36px #0008;overflow:hidden}#youtube-music-dock[hidden]{display:none}#youtube-music-dock iframe{display:block;width:100%;height:200px;border:0}.youtube-dock-label{padding:8px 12px;font-size:9px;letter-spacing:1.5px;color:#ddc08e}
-@media(min-width:1100px){.music-modal{margin-right:344px;width:min(820px,calc(100vw - 390px))}}
-@media(max-width:1099px){#music-root .modal-backdrop{align-items:flex-start;padding-top:12px}.music-modal{height:calc(100dvh - 270px);max-height:calc(100dvh - 270px);overflow:auto;padding:18px;width:calc(100vw - 24px)}.music-modal .music-columns{overflow:visible;min-height:160px;flex-shrink:0}.music-modal #music-results,.music-modal #music-queue{max-height:220px;flex:auto}.music-modal .music-now-card{padding:10px}.music-modal .music-disc{display:none}#youtube-music-dock{width:min(320px,calc(100vw - 24px))}}
+@media(min-width:1100px){body.has-youtube-music .music-modal{margin-right:344px;width:min(820px,calc(100vw - 390px))}}
+@media(max-width:1099px){body.has-youtube-music #music-root .modal-backdrop{align-items:flex-start;padding-top:12px}body.has-youtube-music .music-modal{height:calc(100dvh - 270px);max-height:calc(100dvh - 270px);overflow:auto;padding:18px;width:calc(100vw - 24px)}.music-modal .music-columns{overflow:visible;min-height:160px;flex-shrink:0}.music-modal #music-results,.music-modal #music-queue{max-height:220px;flex:auto}.music-modal .music-now-card{padding:10px}.music-modal .music-disc{display:none}#youtube-music-dock{width:min(320px,calc(100vw - 24px))}}
+
+.music-seek-label{display:block;font-size:10px;color:#b3c0a1;margin:0 0 4px}#music-seek{width:100%;accent-color:#ddbc80;margin:0 0 10px}body:not(.has-youtube-music) .music-modal{margin-right:0}
+
+/* Preserve a usable search/queue area on shorter laptop screens. */
+@media(min-width:601px) and (max-height:850px){.music-modal{overflow-y:auto}.music-modal .music-columns{flex:0 0 250px;min-height:250px}.music-modal #music-results,.music-modal #music-queue{max-height:none;min-height:75px}}

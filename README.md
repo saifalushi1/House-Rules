@@ -88,17 +88,25 @@ Click **♫ Music** beside **Sound on/off** to open the room jukebox. Search for
 
 Playback follows a server timeline, including for late joins and reconnects; browsers correct noticeable drift. Network buffering can cause small timing differences. Disconnecting pauses that client until it reconnects, and leaving a room stops its local player. The queue continues through games, lobby changes, restarts and Time Warp. Server shutdown clears the queue with the other in-memory room data.
 
-Music now uses the official visible [YouTube IFrame player](https://developers.google.com/youtube/iframe_api_reference). Paste a YouTube video link into the search box and choose **Search**, then **+ Queue**; link imports work without a search key. The video stays visible in a small dock when the controls close. YouTube may show ads or restrict videos by region, age or embedding settings. House Rules does not extract audio, remove ads or require a paid subscription; availability depends on YouTube and each listener. Buffering, ads and browser autoplay restrictions mean playback is approximate rather than sample-accurate. A locally blocked video does not automatically skip it for everyone; use shared Skip to choose another.
+Music uses a host-configured **Invidious or Piped** instance for search and audio streaming. There is no hardcoded public instance, public-instance rotation, YouTube API key requirement or automatic fallback to the official YouTube player. Native audio stays separate from game effects and keeps playing when the modal closes. Use **Seek · shared playback** to change the song position for everyone.
 
-**Enable song/artist search:** create a Google Cloud project, enable **YouTube Data API v3**, create an API key, then copy `.env.example` to `.env` in the project folder and set:
+**Required host setup:** copy `.env.example` to `.env`, choose a backend, and supply its API base URL:
 
 ```dotenv
-YOUTUBE_API_KEY=your_youtube_data_api_key
+MUSIC_PROVIDER=invidious
+MUSIC_API_URL=http://127.0.0.1:3001
+MUSIC_STREAM_ORIGINS=
 ```
 
-Restart the server after setting the key. Restrict the key to YouTube Data API v3 (and your server IP if appropriate); it stays on the server and is never sent to players. Search uses YouTube's API quota; no key or exhausted quota produces an explanation instead of unusable results. Without a key, use the link option. Search results filter out videos YouTube marks as non-embeddable, age-restricted, live or over six hours. Link imports use YouTube oEmbed metadata; the player discovers their duration and embedding availability when loaded. Their queue advances when a connected listener finishes; with no listeners they have a six-hour safety limit.
+For Piped, set `MUSIC_PROVIDER=piped` and use the **backend API** URL, not its frontend page. The URL above is an example, not an included running service. A working instance must be installed separately or provided by the host. For Windows self-hosting, follow the maintained [Invidious installation guide](https://docs.invidious.io/installation/) (Docker Desktop/WSL and Invidious Companion) or [Piped self-hosting guide](https://docs.piped.video/docs/self-hosting/). Docker or an instance is not installed automatically by House Rules. Restart the game server after editing the configuration.
 
-Play, pause, skip, restart, queue edits and seeking through the video controls use the room server. Volume and device autoplay permission stay local. Simultaneous end/skip reports refer to a unique queue entry and revision, so delayed reports cannot advance or rewind a newer song. Pausing or leaving one disconnected browser does not pause everyone else. The YouTube player needs an ordinary HTTP/HTTPS page with its referrer intact; allow YouTube in browser content blockers if it fails to load. See [Google's API setup guide](https://developers.google.com/youtube/v3/getting-started) for keys and quota.
+If the instance serves audio through a separate companion/proxy origin, add that exact trusted origin to `MUSIC_STREAM_ORIGINS`, separated by commas for multiple origins. The configured API origin and HTTPS YouTube media CDN subdomains are already allowed. Example: `MUSIC_STREAM_ORIGINS=http://127.0.0.1:8282,https://music-proxy.example.com`. Keep backend administration private; visitors cannot choose the backend or arbitrary relay URLs.
+
+Search songs/artists or paste a YouTube video link, then choose **+ Queue**. Invidious/Piped metadata supplies titles, artists and durations; the server validates playable audio on queueing and refreshes short-lived stream URLs when needed. All listeners request audio through House Rules using signed, expiring track links. The relay forwards single HTTP byte ranges for seeking and checks allowed origins at every redirect. Consequently friends only need the normal game/tunnel URL; they do not need access to the host’s localhost instance or separate CORS configuration. Streaming increases the host machine’s bandwidth usage.
+
+Missing configuration, unavailable/blocked instances and unsupported streams produce an explanation rather than silently switching providers. These alternative frontends avoid the official advertising player, but a self-hosted instance can still break or be blocked by YouTube; reliable playback is not guaranteed. The integration does not automatically skip an unavailable song for everyone. Live streams, paid/premium entries and tracks over six hours are excluded. Playback follows the same server timeline, and volume/autoplay permission remain local.
+
+The previous official YouTube embed can be explicitly selected with `MUSIC_PROVIDER=youtube`. Only that mode uses `YOUTUBE_API_KEY` for song search, supports key-free oEmbed link imports, and keeps a visible video dock with possible ads. It is never used as an automatic fallback. See [YouTube API setup](https://developers.google.com/youtube/v3/getting-started) if choosing that optional mode.
 
 ## Available games
 
@@ -885,7 +893,7 @@ Marble ownership, fixed entrances and partners remain unchanged by hand swaps. A
 - **Shield die face:** blocks chaos penalties, chance coin gambles, Robin Hood and dare penalties for that modifier round; ordinary gameplay rules and losses still apply.
 - **Fixed-size games:** no random extra cards are created in Tarneeb, Hold’em, Blackjack or Solitaire. Double card pickups apply only to Bluff/free sandbox and are capped to prevent uncontrolled deck growth. Final party and cash-game winners are recalculated from chaos-adjusted actual standings.
 
-Validated with the production client/server build and **360 automated tests**, including all preset/rule compatibility combinations, supported die profiles, real resource transfers, exact checkout, redemption, fixed deck integrity, role privacy, wagering escrow and final-hand penalties. Restart the server and refresh clients to load the new rule policy together. Existing in-memory rooms disappear when their server stops.
+Validated with the production client/server build and **368 automated tests**, including all preset/rule compatibility combinations, supported die profiles, real resource transfers, exact checkout, redemption, fixed deck integrity, role privacy, wagering escrow and final-hand penalties. Restart the server and refresh clients to load the new rule policy together. Existing in-memory rooms disappear when their server stops.
 
 ## Development
 
@@ -934,11 +942,15 @@ Rooms are in memory. Restarting the server clears games. Disconnected rooms expi
 
 ## Verification
 
-The current gameplay update passed the production client/server build and **360 automated tests**. Coverage includes all preset/rule compatibility combinations, supported die profiles, real resource transfers, fixed deck integrity, exact darts checkout, Pong redemption, wagering escrow, secret-role privacy, reconnects and final-hand penalties. Run `npm run build` before `npm test`, since integration tests use the production build.
+The current gameplay update passed the production client/server build and **368 automated tests**. Coverage includes all preset/rule compatibility combinations, supported die profiles, real resource transfers, fixed deck integrity, exact darts checkout, Pong redemption, wagering escrow, secret-role privacy, reconnects and final-hand penalties. Run `npm run build` before `npm test`, since integration tests use the production build.
 
 Browser checks cover room creation, joining, private hands, card play and bluff calls, camera switching, negotiations, host editing, direct aiming, actual standings, compatible-only chaos controls and the per-game Info reference.
 
 ## Release history
+
+### v0.22 · Configurable Piped / Invidious music
+
+Added private-instance search and server-relayed native audio with shared seeking, signed track links, range support, redirect/origin checks and expiring-stream refresh. Invidious is the default; the host supplies an instance URL. Piped is also supported. No public instance or automatic official-player fallback is configured. The official YouTube player is an explicit opt-in. The production build and all 368 tests pass. Two browser clients verified shared seeking and pause at the same position using a local test stream; real upstream playback requires a working instance.
 
 ### v0.21 · YouTube room music
 

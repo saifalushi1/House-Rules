@@ -2,6 +2,7 @@ import {test} from 'node:test';import assert from 'node:assert/strict';
 import {makeRoom,player,start,act,tick,view} from '../server/engine.js';import {addSpectator} from '../server/spectators.js';
 import {queueMusic,tickMusic} from '../server/music.js';import {normalizeMusicTrack,searchMusic,getMusicTrack} from '../server/music-provider.js';import {musicPosition,musicVideo,type MusicTrack} from '../shared/music.js';
 import {MusicPlayback,musicVolume} from '../src/music-playback.js';
+process.env.MUSIC_PROVIDER='youtube';
 const song=(id='ABC'):MusicTrack=>({id,title:'Song '+id,artist:'Artist',duration:60,permalink:'https://audius.co/artist/'+id});
 function room(){const r=makeRoom('MUSIC','p0');r.players=[player('p0','Host',0),player('p1','Guest',1)];return r;}
 test('adding starts the first song and preserves FIFO ordering and unique queue entries',t=>{let now=100000;t.mock.method(Date,'now',()=>now);const r=room();queueMusic(r,'p0',song());now+=1000;queueMusic(r,'p1',song('DEF'));queueMusic(r,'p0',song('GHI'));assert.equal(r.music!.current!.id,'ABC');assert.deepEqual(r.music!.queue.map(s=>s.id),['DEF','GHI']);assert.equal(r.music!.queue[0].addedByName,'Guest');assert.equal(new Set([r.music!.current!,...r.music!.queue].map(s=>s.entry)).size,3);});
