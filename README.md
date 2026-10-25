@@ -7,7 +7,7 @@ Your table. Your rules. A browser-based game night for friends.
 1. [About House Rules](#about-house-rules) — what the game-night website does.
 2. [How to run](#how-to-run) — Windows launcher and terminal setup.
 3. [Play with friends](#play-with-friends) — local Wi-Fi, internet access, [spectators](#spectators) and [shared music](#shared-music).
-4. [Available games](#available-games) — all 15 presets and player counts.
+4. [Available games](#available-games) — all 17 presets and player counts.
 5. [Game guides](#game-guides) — setup, controls and scoring.
 6. [Rules](#rules) — [house settings](#house-settings), [chaos overview](#chaos-rule-overview), [compatibility](#compatibility-at-a-glance), [per-game effects and die faces](#full-rule-effects-and-die-faces-by-preset), and [timing safeguards](#timing-penalties-and-limits).
 7. [Development](#development) — editing, building and testing.
@@ -19,7 +19,7 @@ Your table. Your rules. A browser-based game night for friends.
 
 **House Rules** is a self-hosted, browser-based TypeScript game-night sandbox for friends. One person runs the server, hosts a room and chooses a game; everyone else joins through a browser with an invite or room code. The host can customize supported rules and add optional chaos modifiers that change real cards, scores, chips, turns and other game resources.
 
-The website includes **15 game presets**, a low-poly 3D table, animated avatars, first- and third-person cameras, private hands, shared chat, action sounds, shared music and seven backgrounds. Trivia contains 1,000 questions across ten categories; pair Charades contains 1,900 prompts across 19 categories. Restart, early ending and lobby controls keep the group in control of the session.
+The website includes **17 game presets**, a low-poly 3D table, animated avatars, first- and third-person cameras, private hands, shared chat, action sounds, shared music and seven backgrounds. Trivia contains 1,000 questions across ten categories; pair Charades contains 1,900 prompts across 19 categories. Restart, early ending and lobby controls keep the group in control of the session.
 
 It runs from your machine and uses a persistent Node.js/WebSocket server for live rooms. Rooms exist in memory and disappear when the server stops. Use your existing group call for voice or video. Written house agreements are notes for the group; supported toggles and parameters drive the automated behavior.
 
@@ -121,6 +121,8 @@ The previous official YouTube embed can be explicitly selected with `MUSIC_PROVI
 
 | Preset | Playable behavior |
 | --- | --- |
+| Sudoku | 1–8 players; generated unique 9×9 boards, private pencil notes, shared timed turns, difficulty and match timer. |
+| Wordle | 1–8 players; same secret word, six private guesses each, duplicate-aware clues, scored solves and 1–10 words per match. |
 | Jackaroo | Exactly four players; opposite-seat partnerships, private 4–4–5 card deals, four marbles each, captures, swaps, split sevens, safe lanes and partner assistance on a shared polygon board. |
 | Werewolf / Mafia | 4–8 players; hidden roles, night/day phases, seer/doctor abilities, discussion, voting and faction victory. |
 | Blackjack | 1–8 players; automatic dealer, hit/stand/double, play chips, Perfect Pairs and 21+3 side bets. |
@@ -143,7 +145,7 @@ Tarneeb uses the common scoring variation: a made bid scores tricks won, an unbi
 
 ## Game guides
 
-Use **Spin the wheel** above the game shelf to randomly select one of the 15 games, or choose a preset manually. The wheel selects a game without starting it; hosts can review and apply the rules in the lobby. Chat follows the latest message automatically; scrolling up pauses this until you scroll back to the bottom.
+Use **Spin the wheel** above the game shelf to randomly select one of the 17 games, or choose a preset manually. The wheel selects a game without starting it; hosts can review and apply the rules in the lobby. Chat follows the latest message automatically; scrolling up pauses this until you scroll back to the bottom.
 
 Choose a preset on the game shelf, configure its rules in the lobby and apply the draft before starting. The host can restart, end early or return everyone to the lobby. The [Rules section](#rules) documents optional modifiers and overrides.
 
@@ -315,6 +317,7 @@ Open **House rules → Chaos** before starting, enable compatible rules, adjust 
 
 | Preset | Hidden rules | Reason |
 | --- | --- | --- |
+| Sudoku / Wordle | Blackout, Time Warp; opponent effects also hidden in solo play | Keep readable clues, validated cells, private guesses, fixed attempt limits and irreversible feedback intact. |
 | Jackaroo | Seat Roulette, Double or Nothing, Chaos Die, Robin Hood, Blackout | Keep fixed entrances, exact marble movement, visible legal choices and the eight-marble team objective intact. |
 | Werewolf / Mafia | Winner Takes It, Seat Roulette, Cyclone, Double or Nothing, Chaos Die, Robin Hood, Time Warp | Preserve hidden roles, simultaneous phases and faction victory. |
 | Blackjack | Time Warp | Preserve the mode’s turn, wager, scoring or team structure. |
@@ -902,7 +905,38 @@ Marble ownership, fixed entrances and partners remain unchanged by hand swaps. A
 - **Shield die face:** blocks chaos penalties, chance coin gambles, Robin Hood and dare penalties for that modifier round; ordinary gameplay rules and losses still apply.
 - **Fixed-size games:** no random extra cards are created in Tarneeb, Hold’em, Blackjack or Solitaire. Double card pickups apply only to Bluff/free sandbox and are capped to prevent uncontrolled deck growth. Final party and cash-game winners are recalculated from chaos-adjusted actual standings.
 
-Validated with the production client/server build and **375 automated tests**, including all preset/rule compatibility combinations, supported die profiles, real resource transfers, exact checkout, redemption, fixed deck integrity, role privacy, wagering escrow and final-hand penalties. Restart the server and refresh clients to load the new rule policy together. Existing in-memory rooms disappear when their server stops.
+Validated with the production client/server build and **414 automated tests**, including all preset/rule compatibility combinations, supported die profiles, real resource transfers, exact checkout, redemption, fixed deck integrity, role privacy, wagering escrow and final-hand penalties. Restart the server and refresh clients to load the new rule policy together. Existing in-memory rooms disappear when their server stops.
+
+### Sudoku and Wordle
+
+Both presets support **1–8 players**, turn timers, solo play, early ending, restart, spectators, first/third-person views, tabletop boards, sounds and feedback animations. Their accepted actions and scores are validated by the room server; stale or out-of-turn submissions cannot score twice.
+
+**Sudoku:** a generated 9×9 shared board with exactly one solution. Choose easy, medium or hard, seconds per turn and a match time limit. Select an empty cell and a digit: correct placements earn one point, mistakes lose one point and leave the cell blank. Every attempt advances the turn. Private pencil notes are local annotations, with no score or shared state. The completed grid or match deadline ends play; the highest score wins, with shared wins on ties. The server never sends the solution array to players or spectators.
+
+**Wordle:** every player receives the same secret five-letter word and has six private attempts, taking turns to submit guesses. Green means the right letter/place, gold means the letter appears elsewhere, and gray means no unmatched copy remains. Duplicate letters use the remaining letter counts after greens. A solve scores 6 down to 1 points based on attempts used. Invalid or repeated words do not consume attempts; passing or timing out uses an attempt with no letter feedback. Solved/out players are skipped in the turn order. After everyone finishes, a six-second reveal shows the answer, then the next word begins. Set 1–10 words per match; highest total wins. Answers do not repeat within a match. The accepted-guess dictionary has 12,653 five-letter words; answers come from a separate curated common-word pool. [Dictionary source/license](server/PUZZLE-DATA-LICENSE.md).
+
+### Puzzle chaos compatibility
+
+All twelve rules have been reviewed for both games. Unsupported toggles are hidden in the lobby and normalized off on the server, including imported rules. Solo play also hides effects that need opponents.
+
+| Rule | Sudoku | Wordle |
+| --- | --- | --- |
+| Hot Potato | Explosion forfeits the active cell-placement opportunity. No cell is filled automatically. | Explosion consumes one of the active player’s six attempts, without revealing letters. |
+| Seat Roulette | Shuffle physical seats and future turn order; keep the active turn and shared grid. | Shuffle seats/future turns; private guesses, attempts and solved status stay with their owners. |
+| Cyclone | Rotate actual player scores at a safe turn boundary; keep all cells and notes. | Rotate actual player scores; preserve private guesses, attempt limits and clues. |
+| Double or Nothing | At the configured random chance, double or erase a positive correct-cell score gain. | At the configured random chance, double or erase a positive solve award. |
+| Chaos Die | Applicable faces change scoring, future order, fuse, taxes, score rotation, seats, dares, bonus points or shields. Roll at each completed circuit of player turns. | Same compatible score/turn effects, rolled at each new word. Guess limits, answers and letter feedback stay fixed. |
+| Table Flip | A lowest scorer rolls a d6 and ends the entire game with no winner. | Same; no winner and no ordinary final score award. |
+| Blackout | Hidden: the public grid must stay readable. | Hidden: private letter clues must stay readable, and opponents’ guesses are already concealed. |
+| Robin Hood | A gaining leader pays one actual point to last place. | A gaining leader pays one actual point to last place. |
+| Banned Word | Typed chat slips or host-reported spoken slips cost one actual point. | Chat, accepted typed guess or host-reported spoken slips cost one actual point. A banned word can therefore penalize a valid guess. |
+| Dare Wheel | Mistakes, passes, timeouts and chaos penalties spin a host dare. | Exhausted guesses, passes, timeouts and chaos penalties spin a host dare. Ordinary unsuccessful guesses remain part of the puzzle loop; rejected dictionary entries are not penalized. |
+| Time Warp | Hidden: validated digit feedback cannot be unseen. | Hidden: letter feedback cannot be unseen or safely rewound. |
+| Winner Takes It | Boxing winner takes the opponent’s positive score; grid, solution and private notes stay intact. | Boxing winner takes the opponent’s positive score; guesses, attempt limits and clues stay intact. |
+
+Puzzle **Chaos Die** faces are: **1** double positive gains, **2** erase positive gains, **3** reverse future turns, **4** half-length Hot Potato fuse, **5** leader tax, **7/8** rotate scores left/right, **9** shuffle seats/future turns, **10** dare everyone, **11** give each scoring player one point, **12** shield against chaos penalties/coin gambles/taxes. **6 (Blackout)** is excluded. In solo play, reverse order, tax, score rotation and seat shuffling are excluded too. All die faces preserve Sudoku validity and Wordle’s secret word, six-attempt limit and duplicate-letter logic.
+
+Challenge offers and boxing pause puzzle clocks, including Sudoku’s match deadline. Dares block the next manual action until acknowledged, while automatic timeouts still work. Final winners use the resulting chaos-adjusted scores, including the final cell/solve award.
 
 ## Development
 
@@ -951,11 +985,15 @@ Rooms are in memory. Restarting the server clears games. Disconnected rooms expi
 
 ## Verification
 
-The current gameplay update passed the production client/server build and **375 automated tests**. Coverage includes all preset/rule compatibility combinations, supported die profiles, real resource transfers, fixed deck integrity, exact darts checkout, Pong redemption, wagering escrow, secret-role privacy, reconnects and final-hand penalties. Run `npm run build` before `npm test`, since integration tests use the production build.
+The current gameplay update passed the production client/server build and **414 automated tests**. Coverage includes all preset/rule compatibility combinations, supported die profiles, real resource transfers, fixed deck integrity, exact darts checkout, Pong redemption, wagering escrow, secret-role privacy, reconnects and final-hand penalties. Run `npm run build` before `npm test`, since integration tests use the production build.
 
 Browser checks cover room creation, joining, private hands, card play and bluff calls, camera switching, negotiations, host editing, direct aiming, actual standings, compatible-only chaos controls and the per-game Info reference.
 
 ## Release history
+
+### v0.23 · Sudoku and Wordle
+
+Added two solo/multiplayer puzzle presets with 3D table boards, accessible controls, timers, generated unique Sudoku grids, a server-only accepted-word dictionary and private Wordle feedback. Reviewed all twelve chaos rules, added score/turn effects, and hide Blackout/Time Warp plus opponent-only effects in solo play. Added puzzle integrity, privacy, final scoring, lifecycle, die-face and resource-transfer regression checks. Production build and all 414 tests pass; both games were also checked in the browser, including two-client Wordle privacy.
 
 ### v0.22.1 · Search while typing
 
