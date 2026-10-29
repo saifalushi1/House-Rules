@@ -7,7 +7,7 @@ Your table. Your rules. A browser-based game night for friends.
 1. [About House Rules](#about-house-rules) — what the game-night website does.
 2. [How to run](#how-to-run) — Windows launcher and terminal setup.
 3. [Play with friends](#play-with-friends) — local Wi-Fi, internet access, [spectators](#spectators) and [shared music](#shared-music).
-4. [Available games](#available-games) — all 17 presets and player counts.
+4. [Available games](#available-games) — all 18 presets and player counts.
 5. [Game guides](#game-guides) — setup, controls and scoring.
 6. [Rules](#rules) — [house settings](#house-settings), [chaos overview](#chaos-rule-overview), [compatibility](#compatibility-at-a-glance), [per-game effects and die faces](#full-rule-effects-and-die-faces-by-preset), and [timing safeguards](#timing-penalties-and-limits).
 7. [Development](#development) — editing, building and testing.
@@ -19,7 +19,7 @@ Your table. Your rules. A browser-based game night for friends.
 
 **House Rules** is a self-hosted, browser-based TypeScript game-night sandbox for friends. One person runs the server, hosts a room and chooses a game; everyone else joins through a browser with an invite or room code. The host can customize supported rules and add optional chaos modifiers that change real cards, scores, chips, turns and other game resources.
 
-The website includes **17 game presets**, a low-poly 3D table, animated avatars, first- and third-person cameras, private hands, shared chat, action sounds, shared music and seven backgrounds. Trivia contains 1,000 questions across ten categories; pair Charades contains 1,900 prompts across 19 categories. Restart, early ending and lobby controls keep the group in control of the session.
+The website includes **18 game presets**, a low-poly 3D table, animated avatars, first- and third-person cameras, private hands, shared chat, action sounds, shared music and seven backgrounds. Trivia contains 1,000 questions across ten categories; pair Charades contains 1,900 prompts across 19 categories. Restart, early ending and lobby controls keep the group in control of the session.
 
 It runs from your machine and uses a persistent Node.js/WebSocket server for live rooms. Rooms exist in memory and disappear when the server stops. Use your existing group call for voice or video. Written house agreements are notes for the group; supported toggles and parameters drive the automated behavior.
 
@@ -121,6 +121,7 @@ The previous official YouTube embed can be explicitly selected with `MUSIC_PROVI
 
 | Preset | Playable behavior |
 | --- | --- |
+| Pool | 8-ball (1 practice player / 2 opponents), 9-ball (1–8), Cutthroat (3); server physics, aiming, ball-in-hand fouls and races to 1–5 racks. |
 | Sudoku | 1–8 players; generated unique 9×9 boards, private pencil notes, shared timed turns, difficulty and match timer. |
 | Wordle | 1–8 players; same secret word, six private guesses each, duplicate-aware clues, scored solves and 1–10 words per match. |
 | Jackaroo | Exactly four players; opposite-seat partnerships, private 4–4–5 card deals, four marbles each, captures, swaps, split sevens, safe lanes and partner assistance on a shared polygon board. |
@@ -319,6 +320,7 @@ Open **House rules → Chaos** before starting, enable compatible rules, adjust 
 
 | Preset | Hidden rules | Reason |
 | --- | --- | --- |
+| Pool | Winner Takes It, Cyclone, Double or Nothing, Robin Hood, Blackout | Fixed ball ownership, visible aiming geometry and rack objectives. Compatible die faces change turns or penalties. |
 | Sudoku / Wordle | Blackout, Time Warp; opponent effects also hidden in solo play | Keep readable clues, validated cells, private guesses, fixed attempt limits and irreversible feedback intact. |
 | Jackaroo | Seat Roulette, Double or Nothing, Chaos Die, Robin Hood, Blackout | Keep fixed entrances, exact marble movement, visible legal choices and the eight-marble team objective intact. |
 | Werewolf / Mafia | Winner Takes It, Seat Roulette, Cyclone, Double or Nothing, Chaos Die, Robin Hood, Time Warp | Preserve hidden roles, simultaneous phases and faction victory. |
@@ -907,7 +909,7 @@ Marble ownership, fixed entrances and partners remain unchanged by hand swaps. A
 - **Shield die face:** blocks chaos penalties, chance coin gambles, Robin Hood and dare penalties for that modifier round; ordinary gameplay rules and losses still apply.
 - **Fixed-size games:** no random extra cards are created in Tarneeb, Hold’em, Blackjack or Solitaire. Double card pickups apply only to Bluff/free sandbox and are capped to prevent uncontrolled deck growth. Final party and cash-game winners are recalculated from chaos-adjusted actual standings.
 
-Validated with the production client/server build and **414 automated tests**, including all preset/rule compatibility combinations, supported die profiles, real resource transfers, exact checkout, redemption, fixed deck integrity, role privacy, wagering escrow and final-hand penalties. Restart the server and refresh clients to load the new rule policy together. Existing in-memory rooms disappear when their server stops.
+Validated with the production client/server build and **451 automated tests**, including all preset/rule compatibility combinations, supported die profiles, real resource transfers, exact checkout, redemption, fixed deck integrity, role privacy, wagering escrow and final-hand penalties. Restart the server and refresh clients to load the new rule policy together. Existing in-memory rooms disappear when their server stops.
 
 ### Sudoku and Wordle
 
@@ -939,6 +941,32 @@ All twelve rules have been reviewed for both games. Unsupported toggles are hidd
 Puzzle **Chaos Die** faces are: **1** double positive gains, **2** erase positive gains, **3** reverse future turns, **4** half-length Hot Potato fuse, **5** leader tax, **7/8** rotate scores left/right, **9** shuffle seats/future turns, **10** dare everyone, **11** give each scoring player one point, **12** shield against chaos penalties/coin gambles/taxes. **6 (Blackout)** is excluded. In solo play, reverse order, tax, score rotation and seat shuffling are excluded too. All die faces preserve Sudoku validity and Wordle’s secret word, six-attempt limit and duplicate-letter logic.
 
 Challenge offers and boxing pause puzzle clocks, including Sudoku’s match deadline. Dares block the next manual action until acknowledged, while automatic timeouts still work. Final winners use the resulting chaos-adjusted scores, including the final cell/solve award.
+
+### Pool · 8-ball, 9-ball and Cutthroat
+
+Choose **Pool → Game rules → Variation** before starting. These are playable house presets informed by the [WPA rules reference](https://wpapool.com/rules/), with the differences below stated explicitly. They are not tournament-certified simulations.
+
+| Variation | Players | Objective and turn rules |
+| --- | --- | --- |
+| 8-ball | 1 for practice, or 2 opponents | Table stays open after the break. A legal called pot assigns solids (1–7) or stripes (9–15); the opponent receives the other group. Clear your group, then pocket the 8 in the selected pocket. An early, fouled or incorrectly called 8 loses the rack. An 8 on the break is re-spotted. Uncalled group balls stay down but end the turn. Disable called pockets for a casual pot-any-pocket preset. |
+| 9-ball | 1–8 individual players | Hit the lowest numbered ball first, then legally pocket the 9 to win—even with a combination. A fouled 9 is re-spotted. Legal object-ball pots retain the shot; misses pass it. Solo play is practice. |
+| Cutthroat | Exactly 3 players | Lobby seats own fixed groups 1–5, 6–10 and 11–15. Hit opponents’ balls first and pocket them while protecting your five. Players with no surviving balls are skipped; the last surviving group wins. Optional foul restoration re-spots one pocketed ball per opposing group and can revive an eliminated player. |
+
+**Controls:** tap/click the 3D cloth or the aiming map to set direction, refine with the direction slider, set 5–100% power, choose a called pocket when applicable, and select **Strike cue ball**. The cue and dotted line preview your direction. After a foul, tap an unoccupied cloth position to place white, or shoot from its current position. Cushion and ball contact, friction, pockets and scratches are simulated by the server at a fixed step; all players receive the same animation frames. Shots lock until balls stop. The table stays visible above its controls, and the phone aiming map is optional.
+
+Set **1–5 racks to win**, a **15–180 second shot clock**, called pockets for 8-ball, and foul restoration for Cutthroat. Scratches, wrong first contact, no object contact, or no pocket/cushion after contact give the next shooter ball in hand. Passes, timeouts and Hot Potato also give ball in hand. Racks re-form after a short intermission; the breaker rotates. There is no wagering. House presets omit spin/english, jump/massé shots, push-outs, tournament break requirements and three-consecutive-foul rack losses.
+
+| Chaos rule | Pool behavior |
+| --- | --- |
+| Hot Potato | Explosion forfeits the active stationary shot and gives the next player ball in hand. Never interrupts rolling balls. |
+| Seat Roulette | Changes seats and future shooting order between shots. Ball groups retain their owners; eliminated Cutthroat players are still skipped. |
+| Chaos Die | Only compatible faces: **3** reverse future order, **4** half-length Hot Potato fuse, **9** seat/order shuffle, **10** dare everyone, **12** shield chaos penalties. Solo excludes faces 3 and 9. Physics, ball counts and rack objectives stay intact. |
+| Table Flip | A lowest current player may roll the d6 and end the match with no winner. Cutthroat uses surviving balls; other pool modes use legal pot counts. Waits for balls to settle. |
+| Banned Word | Queues one forfeited shot for the offender, including when their next turn is later. The next shooter receives ball in hand. Shield blocks this chaos penalty. |
+| Dare Wheel | Fouls, misses and forfeited shots spin a dare. The offender must acknowledge completion before their next manual action. |
+| Time Warp | Majority vote restores the complete previous public shot/placement: ball positions, groups, fouls, turn and rack results. Wait for the balls to settle; the vote pauses the shot clock. A subsequent action, timeout or rack reset replaces/invalidates the opportunity. |
+| Winner Takes It, Cyclone, Double or Nothing, Robin Hood, Blackout | Hidden: transferring scores/hands, multiplying pocketed balls or hiding aiming geometry would break pool’s fixed ball ownership and rack objectives. |
+
 
 ## Development
 
@@ -987,11 +1015,17 @@ Rooms are in memory. Restarting the server clears games. Disconnected rooms expi
 
 ## Verification
 
-The current gameplay update passed the production client/server build and **414 automated tests**. Coverage includes all preset/rule compatibility combinations, supported die profiles, real resource transfers, fixed deck integrity, exact darts checkout, Pong redemption, wagering escrow, secret-role privacy, reconnects and final-hand penalties. Run `npm run build` before `npm test`, since integration tests use the production build.
+The current gameplay update passed the production client/server build and **451 automated tests**. Coverage includes all preset/rule compatibility combinations, supported die profiles, real resource transfers, fixed deck integrity, exact darts checkout, Pong redemption, wagering escrow, secret-role privacy, reconnects and final-hand penalties. Run `npm run build` before `npm test`, since integration tests use the production build.
 
 Browser checks cover room creation, joining, private hands, card play and bluff calls, camera switching, negotiations, host editing, direct aiming, actual standings, compatible-only chaos controls and the per-game Info reference.
 
 ## Release history
+
+### v0.24 · Pool
+
+Production build and all **451 tests** pass, including 35 pool-specific physics, foul, victory, clock, lifecycle, spectator and chaos checks. Browser checks covered a real 9-ball break, two-client 8-ball and turn handoff, three-client Cutthroat, direct 3D table aiming, and mobile chat/game separation.
+
+Added server-authoritative 8-ball, 9-ball and three-player Cutthroat, low-poly ball/cue animation, shared shot playback, pockets and fouls, optional called pockets and foul restoration, solo practice, rack races, mobile aiming and compatible chaos effects. Rules and limitations are documented above.
 
 ### Mobile layout and compact chaos controls
 

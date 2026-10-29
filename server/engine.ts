@@ -1,3 +1,4 @@
+import {initPool,handlePool,tickPool,skipPool,validatePoolPlayers} from './pool.js';
 import {initPuzzle,handlePuzzle,tickPuzzle,skipPuzzle,puzzleView} from './puzzles.js';
 import {handleMusic,tickMusic} from './music.js';
 import {handleSpectator,removeSpectator} from './spectators.js';
@@ -49,8 +50,8 @@ function validateClub(r:Room,rules:Rules=r.rules){if(rules.game==='jackaroo')nee
 export function start(r: Room) {
 validateClub(r);
     need(r.phase === 'lobby', 'Return to the lobby before starting.');
-    normalizeChaos(r.rules,r.players.length);
-    const min = ['sudoku','wordle','cards','rpg','blackjack','darts'].includes(r.rules.game) ? 1 : 2;
+    validatePoolPlayers(r);normalizeChaos(r.rules,r.players.length);
+    const min = ['pool','sudoku','wordle','cards','rpg','blackjack','darts'].includes(r.rules.game) ? 1 : 2;
     need(r.rules.game!=='cards'||r.rules.cardLayout!=='solitaire'||r.players.length===1,'Solitaire needs exactly one player.');
     need(r.players.length >= min, `This game needs at least ${min} players.`);
     need(r.players.every(p => p.connected), 'Wait for disconnected players or remove them.');
@@ -59,7 +60,7 @@ validateClub(r);
     need(r.rules.game!=='trivia'||r.rules.triviaHostMode==='everyone'||r.players.some(p=>p.id===r.triviaMaster&&p.connected),'Choose a trivia master before starting.');
     if(r.rules.game==='charades')prepareCharadeTeams(r);
     r.retaliated=[];r.finishEffectsDone=false;r.endReason=undefined;r.charadeSession=undefined;
-    r.puzzle=undefined;r.jackaroo=undefined;r.werewolf=undefined;r.blackjack=undefined;r.darts=undefined;r.pong=undefined;r.chaos=undefined;r.poker=undefined;r.trivia=undefined;r.solitaire=undefined;r.scribble=undefined;r.raid=undefined;
+    r.pool=undefined;r.puzzle=undefined;r.jackaroo=undefined;r.werewolf=undefined;r.blackjack=undefined;r.darts=undefined;r.pong=undefined;r.chaos=undefined;r.poker=undefined;r.trivia=undefined;r.solitaire=undefined;r.scribble=undefined;r.raid=undefined;
     r.charadeMatchEnds=r.rules.game==='charades'?Date.now()+r.rules.charadeMatchSeconds*1000:0;r.charadeCorrect=Array(r.players.length/2|0).fill(0);r.charadeScores=Array(r.players.length/2|0).fill(0);
     r.bluffPlays = 0; r.tradeOffers = []; r.clash = undefined; r.duel = undefined; r.deniedTrumps = []; r.busyUntil = 0; r.rollDice = [];
     r.spectatorGhost=undefined;
@@ -97,7 +98,7 @@ validateClub(r);
     }
     else if (r.rules.game === 'charades')initCharades(r);
     if(r.rules.game==='jackaroo')initJackaroo(r);if(r.rules.game==='werewolf')initWerewolf(r);if(r.rules.game==='blackjack')initBlackjack(r);if(r.rules.game==='darts')initDarts(r);if(r.rules.game==='beerpong')initPong(r);if(r.rules.game==='poker')initPoker(r);
-    initPuzzle(r);
+    initPool(r);initPuzzle(r);
     if(r.rules.game==='trivia')initializeTrivia(r);
     if(r.rules.game==='scribble')initScribble(r);
     if(r.rules.game==='rpg')initRpg(r);
@@ -118,7 +119,7 @@ function tickInternal(r: Room) {
     if (r.phase !== 'playing'){if(r.busyUntil&&r.busyUntil<=Date.now()){r.busyUntil=0;return true;}return false;}
     if(tickRaid(r))return true;
     if(r.raid)return false;
-    if(tickPuzzle(r)||tickJackaroo(r)||tickWerewolf(r)||tickBlackjack(r)||tickDarts(r)||tickPong(r))return true;
+    if(tickPool(r)||tickPuzzle(r)||tickJackaroo(r)||tickWerewolf(r)||tickBlackjack(r)||tickDarts(r)||tickPong(r))return true;
     if(tickPoker(r))return true;
     if(tickScribble(r))return true;
     if(tickTrivia(r))return true;
@@ -134,14 +135,14 @@ function tickInternal(r: Room) {
     }
     return interactionChanged || peekChanged;
 }
-function tickInternalChaos(r:Room){const before=chaosBefore(r);const changed=r.chaos?.vote?false:tickInternal(r);if(changed){invalidateChaos(r);chaosAfter(r,before);}const chaosChanged=tickChaos(r);const forced=takeChaosForcedAction(r);if(forced){forceChaosAction(r,forced);return true;}finishEffects(r);return chaosChanged||changed;}
+function tickInternalChaos(r:Room){const before=chaosBefore(r);const changed=r.chaos?.vote?false:tickInternal(r);if(changed){if(!(before.poolPhase==='rolling'&&r.pool?.phase!=='rolling'))invalidateChaos(r);chaosAfter(r,before);}const chaosChanged=tickChaos(r);const forced=takeChaosForcedAction(r);if(forced){forceChaosAction(r,forced);return true;}finishEffects(r);return chaosChanged||changed;}
 function actInternal(r: Room, id: string, a: Action): {
     peek?: Card[];
 } | void {
     const p = r.players.find(p => p.id === id);
     need(p, 'Join this room first.');
     if(handleAftermath(r,id,a)||handleCharades(r,id,a)||handlePeek(r,id,a))return;
-    if(handlePuzzle(r,id,a)||handleJackaroo(r,id,a)||handleWerewolf(r,id,a)||handleBlackjack(r,id,a)||handleDarts(r,id,a)||handlePong(r,id,a)||handlePoker(r,id,a)||handleSolitaire(r,id,a)||handleScribble(r,id,a)||handleRpg(r,id,a))return;
+    if(handlePool(r,id,a)||handlePuzzle(r,id,a)||handleJackaroo(r,id,a)||handleWerewolf(r,id,a)||handleBlackjack(r,id,a)||handleDarts(r,id,a)||handlePong(r,id,a)||handlePoker(r,id,a)||handleSolitaire(r,id,a)||handleScribble(r,id,a)||handleRpg(r,id,a))return;
     if(handleTrivia(r,p,a))return;
     if (a.type === 'endGame') {
         need(r.host === id && r.phase === 'playing', 'Only the host can end an active game.');
@@ -158,7 +159,7 @@ validateClub(r);
         need(r.rules.game!=='cards'||r.rules.cardLayout!=='solitaire'||r.players.length===1,'Solitaire needs exactly one player.');
         need(r.host === id && r.phase !== 'lobby', 'Only the host can restart a started game.');
         need(r.players.every(q => q.connected), 'Wait for disconnected players or return to the lobby to remove them.');
-        need(r.players.length >= (['sudoku','wordle','cards','rpg','blackjack','darts'].includes(r.rules.game) ? 1 : 2), 'Invite enough players first.');
+        need(r.players.length >= (['pool','sudoku','wordle','cards','rpg','blackjack','darts'].includes(r.rules.game) ? 1 : 2), 'Invite enough players first.');
         need(r.rules.game !== 'tarneeb' || r.players.length === 4, 'Tarneeb needs four players.');
         need(r.rules.game !== 'cards' || r.rules.handSize * r.players.length <= 52 * r.rules.decks, 'The deck is too small.');
         need(r.rules.game !== 'charades' || [2,4,6,8].includes(r.players.length), 'Charades needs 2, 4, 6 or 8 players in pairs.');
@@ -190,7 +191,7 @@ validateClub(r);
             need(proposed.maxPlayers >= r.players.length, 'Remove players before lowering room capacity.');
             if (proposed.game === 'cards')
                 need(proposed.handSize * r.players.length <= 52 * proposed.decks, 'The deck is too small for these starting hands.');
-            need(r.players.length >= (['sudoku','wordle','cards','rpg','blackjack','darts'].includes(proposed.game) ? 1 : 2), 'Invite more players before starting.');
+            need(r.players.length >= (['pool','sudoku','wordle','cards','rpg','blackjack','darts'].includes(proposed.game) ? 1 : 2), 'Invite more players before starting.');
             need(r.players.every(p => p.connected), 'Wait for disconnected players or remove them.');
             need(proposed.game !== 'tarneeb' || r.players.length === 4, 'Tarneeb needs exactly four players.');
             need(proposed.game !== "charades" || [2,4,6,8].includes(r.players.length), "Charades needs 2, 4, 6 or 8 players in pairs.");
@@ -502,7 +503,7 @@ function actPresented(r: Room, id: string, a: Action): { peek?: Card[] } | void 
 
     if(['endGame','restart','lobby'].includes(a.type))invalidateChaos(r);
     if(a.type==='scribbleStroke'||a.type==='soreLoserShot'||a.type.startsWith('charade')||r.rules.game==='charades'&&['guess','award','skip'].includes(a.type)||['peek','catch'].includes(a.type))return result;
-    if(['puzzle','jackaroo','trivia','poker','wolf','bj','dart','pong'].some(prefix=>a.type.startsWith(prefix)))return result;
+    if(['pool','puzzle','jackaroo','trivia','poker','wolf','bj','dart','pong'].some(prefix=>a.type.startsWith(prefix)))return result;
     if (['tradeOffer','tradeAccept','tradeReject','tradeCancel','box','allowTrump','punch'].includes(a.type)) return result;
     let kind = a.type === 'bid' && a.value === 0 && !allPassed ? 'bidPass' : a.type;
     const data: Record<string, unknown> = {};
@@ -532,6 +533,7 @@ function forceChaosAction(r:Room,id:string){return withChaosForce(r,()=>forceCha
 function forceChaosActionInternal(r:Room,id:string){
  if(r.phase!=='playing'||r.players[r.turn]?.id!==id)return;
  const p=r.players[r.turn];let action:Action|undefined;
+ if(r.pool){const before=chaosBefore(r);skipPool(r,id,true);chaosAfter(r,before,'hotSkip');return;}
  if(r.puzzle){const before=chaosBefore(r);skipPuzzle(r,id,true);chaosAfter(r,before,'hotSkip');return;}
  if(r.jackaroo){const before=chaosBefore(r);skipJackaroo(r,id,'Hot Potato · card burned');chaosAfter(r,before,'hotSkip');return;}
  if(r.werewolf||r.blackjack||r.darts||r.pong){const before=chaosBefore(r);if(r.werewolf)skipWerewolf(r,id);if(r.blackjack)forfeitBlackjack(r,id);if(r.darts)skipDarts(r,id);if(r.pong)skipPong(r,id);chaosAfter(r,before,'hotSkip');finishEffects(r);return;}
