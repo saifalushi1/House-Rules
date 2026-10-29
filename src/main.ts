@@ -15,7 +15,7 @@ import './party.css';
 import {pokerSettings,pokerPlay,bindPoker} from './poker-ui';
 import './poker.css';
 import {backgrounds,expansionSettings,expansionPlay,expansionLobby,mountExpansion,bindExpansion,raidHtml,rpgPick} from './expansion-ui';
-import {chaosFields,chaosHud} from './chaos-ui';
+import {chaosFields,chaosControls} from './chaos-ui';
 import {tickChaosAudio} from './chaos-audio';
 import {triviaCategories,easyQuestionCounts} from "../shared/trivia";
 import {charadeCategories} from "../shared/charades";
@@ -95,7 +95,7 @@ function render() {
     const focus = document.activeElement as HTMLInputElement | HTMLTextAreaElement | null;
     const focusId = focus?.id;
     const position = focus && 'selectionStart' in focus ? focus.selectionStart : null;
-    const drafts = new Map(['spectator-target','bj-bet','bj-pair','bj-trio','scribble-award-target','sore-loser-target','poker-raise','chat','guess','trivia-answer','player-name','room-code','scribble-guess','rpg-name','rpg-inventory','rpg-notes','rpg-narrative','rpg-enemy-name','rpg-enemy-x','rpg-enemy-y','rpg-enemy-hp','rpg-enemy-ac','rpg-target','rpg-die','rpg-ability'].map(key => [key, (document.getElementById(key) as HTMLInputElement | null)?.value]));
+    const drafts = new Map(['chaos-offender','spectator-target','bj-bet','bj-pair','bj-trio','scribble-award-target','sore-loser-target','poker-raise','chat','guess','trivia-answer','player-name','room-code','scribble-guess','rpg-name','rpg-inventory','rpg-notes','rpg-narrative','rpg-enemy-name','rpg-enemy-x','rpg-enemy-y','rpg-enemy-hp','rpg-enemy-ac','rpg-target','rpg-die','rpg-ability'].map(key => [key, (document.getElementById(key) as HTMLInputElement | null)?.value]));
     if(room?.phase==='lobby') resetTradeDraft();
     applyLayout();
     music.update(room,id,connected);
@@ -114,7 +114,6 @@ function render() {
     applyLayout();
     mountExpansion(room,id,send);
     document.querySelector('#raid-hud')?.remove();if(room&&room.phase==='playing'&&room.rules.chaosRaid&&room.players.length>1&&!room.spectating){const hud=document.createElement('div');hud.id='raid-hud';hud.innerHTML=raidHtml(room,id);document.querySelector('.stage')!.append(hud);}
-    chaosHud(room?.spectating?undefined:room,id);
     presentEvents();
 }
 function renderSidebar() { document.querySelector('#sidebar')!.innerHTML = `<a class="brand" href="/" aria-label="House Rules home"><span class="brand-mark">H<span>R</span></span><span>HOUSE<br>RULES<span class="brand-dot">.</span></span></a><button class="spin-game-button" data-action="spinGame" ${locked()?'disabled':''}><span>◉</span> Spin the wheel<small>Pick a random game</small></button><div class="side-label">YOUR GAME SHELF <span>${Object.keys(games).length}</span></div><div class="filters">${['all', 'cards', 'party', 'tabletop'].map(f => `<button data-filter="${f}" class="${filter === f ? 'active' : ''}">${f === 'all' ? 'All games' : f[0].toUpperCase() + f.slice(1)}</button>`).join('')}</div><nav aria-label="Game presets">${Object.entries(games).filter(([, g]) => filter === 'all' || g.category.toLowerCase() === filter).map(([key, g]) => `<button class="game-item ${draft.game === key ? 'active' : ''}" data-game="${key}" ${room && (room.host !== id || room.phase !== 'lobby') ? 'disabled' : ''}><span class="game-icon ${key}">${g.icon}</span><span><strong>${g.name}</strong><small>${g.category} <b>·</b> ${g.players} PLAYERS</small></span><span class="game-arrow">↗</span></button>`).join('')}</nav><div class="side-bottom"><div class="tiny-dice">⚄</div><strong>The best rule?<br>Make it your own.</strong><p>Familiar games. Unfamiliar twists.<br>Entirely your table.</p><button class="text-btn" data-action="help">Info <span>↗</span></button></div>`; }
@@ -167,7 +166,7 @@ function renderRules() {
     if(rulesTab==='game'&&clubGames.includes(draft.game))fields=clubSettings(draft,locked());
     if(rulesTab==='game'&&draft.game==='poker')fields=pokerSettings(draft,locked());
     if(rulesTab==='game'&&['scribble','rpg'].includes(draft.game))fields=expansionSettings(draft,locked());
-    if(rulesTab==='chaos')fields=chaosFields(draft,locked(),room?.players.length);
+    if(rulesTab==='chaos')fields=chaosControls(room,id)+chaosFields(draft,locked(),room?.players.length);
     if (rulesTab === 'notes')
         fields = `<div class="rules-section-title">YOUR HOUSE CONTRACT</div>${textfield('customNotes', 'Rules everyone agrees to', 'e.g. Winner picks the next game. No table talk after a bid.', true)}<p class="rule-callout">Written rules and funny penalties are carried out by your group. Toggles and parameters are enforced by the game.</p><div class="rules-section-title">SAVE YOUR RECIPE</div>${button('↓ Export rules', 'export', false, 'secondary full')}<label class="import-label">↑ Import rules<input type="file" id="import-rules" accept="application/json,.json" ${locked() ? 'disabled' : ''}></label>`;
     document.querySelector('#rules-panel')!.innerHTML = `<div class="rules-heading"><span class="rules-icon">☷</span><div><h2>House rules</h2><p>A classic, with your signature.</p></div><span class="rule-count">${draft.allowPeeking ? '✦' : '◈'}</span></div><div class="rule-tabs">${['general', 'game', 'chaos', 'notes'].map(t => `<button data-tab="${t}" class="${rulesTab === t ? 'active' : ''}">${t === 'general' ? 'The basics' : t === 'game' ? 'Game rules' : t==='chaos'?'Chaos':'Custom'}</button>`).join('')}</div><div class="rule-fields">${fields}</div><div class="rules-bottom"><span><i class="${locked() ? 'locked' : ''}"></i>${locked() ? room?.phase === 'lobby' ? 'Host controls the rules' : 'Rules locked during play' : room ? 'Changes apply to everyone' : 'Set the tone before you host'}</span>${room?.host === id && room.phase === 'lobby' ? button('Apply house rules ↗', 'apply', false, 'primary full') : !room ? '<div class="rules-tip">A little chaos makes a great story.</div>' : ''}</div>`;

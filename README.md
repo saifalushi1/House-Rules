@@ -296,7 +296,9 @@ All rules retain their action animations and synthesized sounds: fuse/explosion,
 
 ### Chaos rule overview
 
-Open **House rules → Chaos** before starting, enable compatible rules, adjust their parameters and apply the draft. During play, expand **✹ Chaos** on the left side of the table for actual standings, timers, modifiers, dares and voting. **Info → Modifiers & custom rules** shows the reference for the current game and player count.
+During play, open **House rules → Chaos** for live controls such as completing dares, Table Flip, rewind voting and reporting banned-word slips. Chaos controls stay in the rules rail; no separate collapsible box covers the table.
+
+Open **House rules → Chaos** before starting, enable compatible rules, adjust their parameters and apply the draft. During play, use the same **Chaos** tab for actual standings, timers, modifiers, dares and voting. **Info → Modifiers & custom rules** shows the reference for the current game and player count.
 
 | Rule | Gameplay behavior | Animation and sound |
 | --- | --- | --- |
