@@ -296,9 +296,9 @@ All rules retain their action animations and synthesized sounds: fuse/explosion,
 
 ### Chaos rule overview
 
-During play, open **House rules → Chaos** for live controls such as completing dares, Table Flip, rewind voting and reporting banned-word slips. Chaos controls stay in the rules rail; no separate collapsible box covers the table.
+During play, open **✹ Chaos** immediately left of **Overview / My seat** for Winner Takes It challenges, dare completion, Table Flip, rewind voting and banned-word reporting. The closed dropdown matches the camera buttons; its controls open only when requested. On phones, Chat and Rules are closed by default and open one at a time in a dock below the game, with a Close button. Game controls sit below the 3D scene, rather than covering it.
 
-Open **House rules → Chaos** before starting, enable compatible rules, adjust their parameters and apply the draft. During play, use the same **Chaos** tab for actual standings, timers, modifiers, dares and voting. **Info → Modifiers & custom rules** shows the reference for the current game and player count.
+Open **House rules → Chaos** before starting, enable compatible rules, adjust their parameters and apply the draft. During play, use the compact **✹ Chaos** dropdown for actual standings, timers, modifiers, dares and voting. **Info → Modifiers & custom rules** shows the reference for the current game and player count.
 
 | Rule | Gameplay behavior | Animation and sound |
 | --- | --- | --- |
@@ -992,6 +992,14 @@ The current gameplay update passed the production client/server build and **414 
 Browser checks cover room creation, joining, private hands, card play and bluff calls, camera switching, negotiations, host editing, direct aiming, actual standings, compatible-only chaos controls and the per-game Info reference.
 
 ## Release history
+
+### Mobile layout and compact chaos controls
+
+Live chaos actions share a camera-sized dropdown immediately left of Overview / My seat. Winner Takes It no longer has a separate floating panel. Pending challenges, dares and votes mark the button; the dropdown stays closed until clicked, preserves its state through room updates, and closes with Escape or an outside click. Active boxing moves appear with the game controls.
+
+At widths up to 900 px, chat/rules start closed, open one at a time below the game, and have an explicit Close button. Portrait game controls sit below the scene; short landscape layouts place them beside it. Resizing across the mobile breakpoint clears floating panels. Mobile Wordle uses the device keyboard rather than cramped on-screen keys.
+
+Browser checks covered Card sandbox, challenge acceptance/boxing, Scribble and Wordle at 390×844, narrow 320×568, landscape 740×390 and 844×390, tablet 768×1024, and desktop 1280×720. Checked panel separation, horizontal overflow, dropdown bounds and button sizing. Production build and all 414 automated game tests pass. These are browser viewport checks, not physical-device tests.
 
 ### v0.23 · Sudoku and Wordle
 

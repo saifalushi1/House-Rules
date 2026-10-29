@@ -24,13 +24,15 @@ import { socialHTML, tradeDraft, resetTradeDraft } from './social';
 import type { GameEvent } from '../shared/types';
 import { validateRules, orderCards } from '../shared/rules';
 import './style.css';
+import './mobile-layout.css';
 import { GameScene } from './scene';
 import { defaults, games, type Action, type Card, type Game, type Rules, type View } from '../shared/types';
 const esc = (value: unknown) => String(value ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]!));
 const rank = (r: number) => ({ 1: 'A', 11: 'J', 12: 'Q', 13: 'K' }[r] || String(r));
 let room: View | undefined, id = '', connected = false, socket: WebSocket, draft: Rules = { ...defaults }, filter = 'all', rulesTab = 'general', selected = new Set<string>(), peek: Card[] = [];
 let pendingCreate: Rules | undefined;
-let shelfOpen=true, rulesOpen=true, chatOpen=true, handListOpen=false, layoutInstance=-1;
+let shelfOpen=true, rulesOpen=true, chatOpen=true, handListOpen=false, layoutInstance=-1, chaosOpen=false;
+const mobileLayout=matchMedia('(max-width:900px)');
 let infoTab='games';
 let chatFollower:ReturnType<typeof followChat>|undefined,chatRoom='';
 let camera = 'third', reconnectTimer: ReturnType<typeof setTimeout>, scene: GameScene | undefined, help = false;
@@ -40,7 +42,7 @@ let seenEvent = 0, eventRoom = '', effectTimer: ReturnType<typeof setTimeout>;
 document.addEventListener('pointerdown', () => {void audio.unlock();music.enable();}, {capture:true});
 document.addEventListener('keydown', () => {void audio.unlock();music.enable();}, {capture:true});
 const app = document.querySelector<HTMLDivElement>('#app')!;
-app.innerHTML = `<div class="shell"><aside class="sidebar" id="sidebar"></aside><main><header id="header"></header><div class="workspace"><section class="table-area"><div id="intro"></div><div class="stage"><div class="stage-top" id="stage-top"></div><div id="scene" aria-label="Low polygon multiplayer game table"></div><div id="stage-bottom"></div><div id="effects-layer" aria-live="polite"></div></div><div id="play-panel"></div></section><aside class="right-rail"><button id="rules-toggle" data-action="toggleRules"></button><section class="rules-panel" id="rules-panel"></section><section id="audience-panel"></section><div id="activity"></div></aside></div><footer><span>MADE FOR GAME NIGHT. BUILT FOR YOUR RULES.</span><span>SELF-HOSTED <i></i> VERSION 0.23.0</span></footer></main></div><div id="toast" role="status" aria-live="polite"></div><div id="modal-root"></div>`;
+app.innerHTML = `<div class="shell"><aside class="sidebar" id="sidebar"></aside><main><header id="header"></header><div class="workspace"><section class="table-area"><div id="intro"></div><div class="stage"><div class="stage-top" id="stage-top"></div><div id="scene" aria-label="Low polygon multiplayer game table"></div><div id="stage-bottom"></div><div id="effects-layer" aria-live="polite"></div></div><div id="play-panel"></div></section><aside class="right-rail"><button class="rail-close" data-action="closeRail" aria-label="Close chat and rules">Close ×</button><button id="rules-toggle" data-action="toggleRules"></button><section class="rules-panel" id="rules-panel"></section><section id="audience-panel"></section><div id="activity"></div></aside></div><footer><span>MADE FOR GAME NIGHT. BUILT FOR YOUR RULES.</span><span>SELF-HOSTED <i></i> VERSION 0.23.0</span></footer></main></div><div id="toast" role="status" aria-live="polite"></div><div id="modal-root"></div>`;
 try {
     scene = new GameScene(document.querySelector('#scene')!);scene.onAim=send;
 }
@@ -63,7 +65,7 @@ function connect() { clearTimeout(reconnectTimer); socket = new WebSocket(`${loc
     const changed = JSON.stringify(room?.rules) !== JSON.stringify(msg.room.rules);
     room = msg.room;
     peek=room!.peek||[];
-    if(room!.phase === 'playing' && layoutInstance !== room!.gameInstance){ layoutInstance=room!.gameInstance;shelfOpen=false;rulesOpen=false;handListOpen=false;selected.clear();peek=[];chatOpen=innerWidth>760; }
+    if(room!.phase === 'playing' && layoutInstance !== room!.gameInstance){ layoutInstance=room!.gameInstance;chaosOpen=false;shelfOpen=false;rulesOpen=false;handListOpen=false;selected.clear();peek=[];chatOpen=!mobileLayout.matches; }
     if(room!.phase === 'lobby' && previousPhase !== 'lobby'){shelfOpen=true;rulesOpen=true;chatOpen=true;}
 
     if (first || changed)
@@ -95,7 +97,7 @@ function render() {
     const focus = document.activeElement as HTMLInputElement | HTMLTextAreaElement | null;
     const focusId = focus?.id;
     const position = focus && 'selectionStart' in focus ? focus.selectionStart : null;
-    const drafts = new Map(['chaos-offender','spectator-target','bj-bet','bj-pair','bj-trio','scribble-award-target','sore-loser-target','poker-raise','chat','guess','trivia-answer','player-name','room-code','scribble-guess','rpg-name','rpg-inventory','rpg-notes','rpg-narrative','rpg-enemy-name','rpg-enemy-x','rpg-enemy-y','rpg-enemy-hp','rpg-enemy-ac','rpg-target','rpg-die','rpg-ability'].map(key => [key, (document.getElementById(key) as HTMLInputElement | null)?.value]));
+    const drafts = new Map(['puzzle-word','raid-target','chaos-offender','spectator-target','bj-bet','bj-pair','bj-trio','scribble-award-target','sore-loser-target','poker-raise','chat','guess','trivia-answer','player-name','room-code','scribble-guess','rpg-name','rpg-inventory','rpg-notes','rpg-narrative','rpg-enemy-name','rpg-enemy-x','rpg-enemy-y','rpg-enemy-hp','rpg-enemy-ac','rpg-target','rpg-die','rpg-ability'].map(key => [key, (document.getElementById(key) as HTMLInputElement | null)?.value]));
     if(room?.phase==='lobby') resetTradeDraft();
     applyLayout();
     music.update(room,id,connected);
@@ -113,18 +115,17 @@ function render() {
     if (scene) {scene.mode = camera;scene.setSelected(selected);}
     applyLayout();
     mountExpansion(room,id,send);
-    document.querySelector('#raid-hud')?.remove();if(room&&room.phase==='playing'&&room.rules.chaosRaid&&room.players.length>1&&!room.spectating){const hud=document.createElement('div');hud.id='raid-hud';hud.innerHTML=raidHtml(room,id);document.querySelector('.stage')!.append(hud);}
     presentEvents();
 }
 function renderSidebar() { document.querySelector('#sidebar')!.innerHTML = `<a class="brand" href="/" aria-label="House Rules home"><span class="brand-mark">H<span>R</span></span><span>HOUSE<br>RULES<span class="brand-dot">.</span></span></a><button class="spin-game-button" data-action="spinGame" ${locked()?'disabled':''}><span>◉</span> Spin the wheel<small>Pick a random game</small></button><div class="side-label">YOUR GAME SHELF <span>${Object.keys(games).length}</span></div><div class="filters">${['all', 'cards', 'party', 'tabletop'].map(f => `<button data-filter="${f}" class="${filter === f ? 'active' : ''}">${f === 'all' ? 'All games' : f[0].toUpperCase() + f.slice(1)}</button>`).join('')}</div><nav aria-label="Game presets">${Object.entries(games).filter(([, g]) => filter === 'all' || g.category.toLowerCase() === filter).map(([key, g]) => `<button class="game-item ${draft.game === key ? 'active' : ''}" data-game="${key}" ${room && (room.host !== id || room.phase !== 'lobby') ? 'disabled' : ''}><span class="game-icon ${key}">${g.icon}</span><span><strong>${g.name}</strong><small>${g.category} <b>·</b> ${g.players} PLAYERS</small></span><span class="game-arrow">↗</span></button>`).join('')}</nav><div class="side-bottom"><div class="tiny-dice">⚄</div><strong>The best rule?<br>Make it your own.</strong><p>Familiar games. Unfamiliar twists.<br>Entirely your table.</p><button class="text-btn" data-action="help">Info <span>↗</span></button></div>`; }
 function renderHeader() {
   const live = !!room && room.phase !== 'lobby';
-  document.querySelector('header')!.innerHTML=`<div class="header-left">${button('☰ Games','toggleShelf',false,'shelf-toggle '+(shelfOpen?'active':''))}<div class="breadcrumb">${live?esc(games[room!.rules.game].name):'Game room'} <span>/</span> <strong>${live?'Round '+room!.round:room?'The living room':'Create your night'}</strong></div></div><div class="header-right">${room?.host===id&&live?`<div class="host-controls">${button('Restart','restartAsk',false,'secondary')}${room.phase==='playing'?button('End game','endAsk',false,'secondary'):''}${button('Lobby','resetAsk',false,'text-btn')}</div>`:''}${button('Chat','toggleChat',false,'chat-toggle')}<button class="sound-control" data-action="sound" aria-label="${audio.muted?'Enable sound':'Mute sound'}">${audio.muted?'♬ Sound off':'♫ Sound on'}</button><button class="music-button" data-action="music" aria-label="Open music player">♫ Music</button><span class="connection ${connected?'online':''}"><i></i>${connected?'Connected':'Reconnecting'}</span>${button('Info','help',false,'help-btn')}</div>`;
+  document.querySelector('header')!.innerHTML=`<div class="header-left">${button('☰ Games','toggleShelf',false,'shelf-toggle '+(shelfOpen?'active':''))}<div class="breadcrumb">${live?esc(games[room!.rules.game].name):'Game room'} <span>/</span> <strong>${live?'Round '+room!.round:room?'The living room':'Create your night'}</strong></div></div><div class="header-right">${room?.host===id&&live?`<div class="host-controls">${button('Restart','restartAsk',false,'secondary')}${room.phase==='playing'?button('End game','endAsk',false,'secondary'):''}${button('Lobby','resetAsk',false,'text-btn')}</div>`:''}<button class="mobile-rules-toggle" data-action="toggleRules" aria-expanded="${rulesOpen}">Rules</button><button class="chat-toggle" data-action="toggleChat" aria-expanded="${chatOpen}">Chat</button><button class="sound-control" data-action="sound" aria-label="${audio.muted?'Enable sound':'Mute sound'}">${audio.muted?'♬ Sound off':'♫ Sound on'}</button><button class="music-button" data-action="music" aria-label="Open music player">♫ Music</button><span class="connection ${connected?'online':''}"><i></i>${connected?'Connected':'Reconnecting'}</span>${button('Info','help',false,'help-btn')}</div>`;
 }
 function renderIntro() { const g = games[draft.game]; document.querySelector('#intro')!.innerHTML = `<div class="eyebrow"><span></span> YOUR TABLE. YOUR RULES.</div><div class="intro-title">${room ? '<h1>'+esc(g.name)+'</h1>' : ''}<span class="edition">THE GAME NIGHT<br>SANDBOX</span></div><p>${room ? esc(g.description) : 'Pick a classic. Bend the rules. Make a night of it.'}</p>`; }
 function renderStage() {
     const g = games[draft.game];
-    document.querySelector('#stage-top')!.innerHTML = `<div class="table-name"><span class="live-dot"></span><strong>${room ? room.phase === 'lobby' ? 'WAITING ROOM' : room.phase === 'finished' ? 'GAME COMPLETE' : 'AT THE TABLE' : 'YOUR NEXT GAME NIGHT'}</strong><span>${room ? `${room.players.length}/${room.rules.maxPlayers} seated` : 'Low-poly living room'}</span></div><div class="camera-switch" aria-label="Camera view">${['property','life','rpg'].includes(draft.game) ? `<button data-action="boardZoom" class="${scene?.closeBoard ? 'active' : ''}">⌕ Board zoom</button>` : ''}<button data-camera="third" class="${camera === 'third' ? 'active' : ''}" title="Third-person view">◈ Overview</button><button ${room?.spectating?'disabled':''} data-camera="first" class="${camera === 'first' ? 'active' : ''}" title="First-person view">◉ My seat</button></div>`;
+    document.querySelector('#stage-top')!.innerHTML = `<div class="table-name"><span class="live-dot"></span><strong>${room ? room.phase === 'lobby' ? 'WAITING ROOM' : room.phase === 'finished' ? 'GAME COMPLETE' : 'AT THE TABLE' : 'YOUR NEXT GAME NIGHT'}</strong><span>${room ? `${room.players.length}/${room.rules.maxPlayers} seated` : 'Low-poly living room'}</span></div><div class="stage-toolbar">${chaosMenu()}<div class="camera-switch" aria-label="Camera view">${['property','life','rpg'].includes(draft.game) ? `<button data-action="boardZoom" class="${scene?.closeBoard ? 'active' : ''}">⌕ Board zoom</button>` : ''}<button data-camera="third" class="${camera === 'third' ? 'active' : ''}" title="Third-person view">◈ Overview</button><button ${room?.spectating?'disabled':''} data-camera="first" class="${camera === 'first' ? 'active' : ''}" title="First-person view">◉ My seat</button></div></div>`;
     const deadline=room?.clash?.expires||room?.lastPlay?.expires;if(deadline)document.querySelector('.table-name')!.insertAdjacentHTML('beforeend',`<span class="challenge-clock">Call window <b data-countdown="${deadline}"></b></span>`);
     document.querySelector('#tarneeb-status')?.remove();
     if(room && draft.game==='tarneeb' && room.phase!=='lobby'){
@@ -166,7 +167,7 @@ function renderRules() {
     if(rulesTab==='game'&&clubGames.includes(draft.game))fields=clubSettings(draft,locked());
     if(rulesTab==='game'&&draft.game==='poker')fields=pokerSettings(draft,locked());
     if(rulesTab==='game'&&['scribble','rpg'].includes(draft.game))fields=expansionSettings(draft,locked());
-    if(rulesTab==='chaos')fields=chaosControls(room,id)+chaosFields(draft,locked(),room?.players.length);
+    if(rulesTab==='chaos')fields=chaosFields(draft,locked(),room?.players.length);
     if (rulesTab === 'notes')
         fields = `<div class="rules-section-title">YOUR HOUSE CONTRACT</div>${textfield('customNotes', 'Rules everyone agrees to', 'e.g. Winner picks the next game. No table talk after a bid.', true)}<p class="rule-callout">Written rules and funny penalties are carried out by your group. Toggles and parameters are enforced by the game.</p><div class="rules-section-title">SAVE YOUR RECIPE</div>${button('↓ Export rules', 'export', false, 'secondary full')}<label class="import-label">↑ Import rules<input type="file" id="import-rules" accept="application/json,.json" ${locked() ? 'disabled' : ''}></label>`;
     document.querySelector('#rules-panel')!.innerHTML = `<div class="rules-heading"><span class="rules-icon">☷</span><div><h2>House rules</h2><p>A classic, with your signature.</p></div><span class="rule-count">${draft.allowPeeking ? '✦' : '◈'}</span></div><div class="rule-tabs">${['general', 'game', 'chaos', 'notes'].map(t => `<button data-tab="${t}" class="${rulesTab === t ? 'active' : ''}">${t === 'general' ? 'The basics' : t === 'game' ? 'Game rules' : t==='chaos'?'Chaos':'Custom'}</button>`).join('')}</div><div class="rule-fields">${fields}</div><div class="rules-bottom"><span><i class="${locked() ? 'locked' : ''}"></i>${locked() ? room?.phase === 'lobby' ? 'Host controls the rules' : 'Rules locked during play' : room ? 'Changes apply to everyone' : 'Set the tone before you host'}</span>${room?.host === id && room.phase === 'lobby' ? button('Apply house rules ↗', 'apply', false, 'primary full') : !room ? '<div class="rules-tip">A little chaos makes a great story.</div>' : ''}</div>`;
@@ -182,7 +183,7 @@ function renderPlay() {
         return;
     }
     if(room.spectating){el.innerHTML=spectatorPanel(room,id)+puzzlePlay(room,id);updateTimers();return;}
-    if(room.raid&&room.raid.phase!=='offer'){const d=room.raid;el.innerHTML=`<div class="gameplay boxing-status"><strong>Winner Takes It · Boxing Club</strong><p>${d.phase==='ready'?'Get ready… moves unlock after the countdown.':d.phase==='fight'?'Choose secretly: jab beats hook, hook beats block, block beats jab.':`${esc(room.players.find(p=>p.id===d.from)?.name)}: ${esc(d.lastBeat?.a)} · ${esc(room.players.find(p=>p.id===d.to)?.name)}: ${esc(d.lastBeat?.b)}`}</p><span>Beat ${d.round}/3 · ${d.wins.join(' : ')} · <b data-countdown="${d.ends}"></b></span></div>`;return;}
+    if(room.raid&&room.raid.phase!=='offer'){const d=room.raid;el.innerHTML=`<div class="gameplay boxing-status"><strong>Winner Takes It · Boxing Club</strong><p>${d.phase==='ready'?'Get ready… moves unlock after the countdown.':d.phase==='fight'?'Choose secretly: jab beats hook, hook beats block, block beats jab.':`${esc(room.players.find(p=>p.id===d.from)?.name)}: ${esc(d.lastBeat?.a)} · ${esc(room.players.find(p=>p.id===d.to)?.name)}: ${esc(d.lastBeat?.b)}`}</p><span>Beat ${d.round}/3 · ${d.wins.join(' : ')} · <b data-countdown="${d.ends}"></b></span>${raidHtml(room,id)}</div>`;return;}
     const me = room.players.find(p => p.id === id), myTurn = room.players[room.turn]?.id === id, host = room.host === id;
     if (room.phase === 'lobby') {
         el.innerHTML = `<div class="lobby-panel"><div><small class="eyebrow">INVITE YOUR PEOPLE</small><div class="invite-code">${room.code} ${button('⧉ Copy invite', 'invite', false, 'text-btn')}</div><p>${g.name} · ${room.players.length} at the table · ${['jackaroo','tarneeb'].includes(draft.game) ? '4 needed · opposite seats are partners' : ['sudoku','wordle','cards','rpg','blackjack','darts'].includes(draft.game) ? '1–8 players' :draft.game==='werewolf'?'4–8 players':draft.game==='beerpong'?'2, 4, 6 or 8 · alternating seats form teams' : draft.game==='charades'?'2, 4, 6 or 8 · choose your pair below':'2–8 players'}</p></div><div class="lobby-actions">${button(host ? 'Start game →' : me?.ready ? 'Ready ✓' : 'I’m ready', '' + (host ? 'start' : 'ready'), !connected || (host&&draft.game==='jackaroo'&&room.players.length!==4) || (host&&draft.game==='werewolf'&&(room.players.length<4||draft.wolfCount*2>=room.players.length)) ||(host&&draft.game==='beerpong'&&![2,4,6,8].includes(room.players.length)) || (host && draft.game==='trivia' && (room.players.length<2||draft.triviaHostMode==='master'&&!room.triviaMaster)) || (host&&draft.game==='cards'&&draft.cardLayout==='solitaire'&&room.players.length!==1)||(host && draft.game==='charades' && ![2,4,6,8].includes(room.players.length)), 'primary')}${!host?button('Watch instead','spectate',false,'text-btn'):''}${button('Leave table', 'leave', false, 'text-btn')}</div></div>${draft.game==='trivia'&&draft.triviaHostMode==='master'?`<div class="trivia-lobby"><h3>Trivia master</h3><p>${room.triviaMaster?esc(room.players.find(p=>p.id===room!.triviaMaster)?.name)+' will ask the questions.':'One person volunteers to ask questions; everyone else competes.'}</p>${room.rules.game!=='trivia'?host?button('Apply Trivia rules','apply',false,'primary'):'Waiting for the host to apply Trivia rules.':button(room.triviaMaster===id?'Release master seat':'Volunteer as trivia master','triviaVolunteer',!!room.triviaMaster&&room.players.some(p=>p.id===room!.triviaMaster)&&room.triviaMaster!==id,'secondary')}</div>`:''}${charadeLobby(room,id)}${expansionLobby(room,id)}${draft.customNotes ? `<div class="house-contract"><strong>Tonight’s house contract</strong><p>${esc(draft.customNotes)}</p></div>` : ''}`;
@@ -336,11 +337,14 @@ app.addEventListener('click', async (e) => {
     if (!action)
         return;
     if(action==='spinGame'){spinGameWheel(document.querySelector<HTMLElement>('#modal-root')!,chooseGame,()=>!locked());return;}
+    if(action==='toggleChaos'){chaosOpen=!chaosOpen;if(chaosOpen&&mobileLayout.matches){chatOpen=false;rulesOpen=false;shelfOpen=false;applyLayout();renderHeader();}syncChaosMenu();return;}
+    if(action==='closeChaos'){chaosOpen=false;syncChaosMenu();return;}
+    if(action==='closeRail'){rulesOpen=false;chatOpen=false;applyLayout();renderHeader();return;}
     if(action.startsWith('chaos')){if(action==='chaosYes'||action==='chaosNo')send({type:'chaosVote',yes:action==='chaosYes'});else if(action==='chaosReportWord')send({type:action,target:(document.querySelector('#chaos-offender') as HTMLSelectElement)?.value});else send({type:action});return;}
     if(action==='takeSeat'||action==='spectate'){send({type:action});return;}
-    if (action === 'toggleShelf'){shelfOpen=!shelfOpen;applyLayout();renderHeader();return;}
-    if (action === 'toggleRules'){rulesOpen=!rulesOpen;applyLayout();return;}
-    if (action === 'toggleChat'){chatOpen=!chatOpen;applyLayout();return;}
+    if (action === 'toggleShelf'){shelfOpen=!shelfOpen;if(mobileLayout.matches&&shelfOpen){rulesOpen=false;chatOpen=false;chaosOpen=false;}applyLayout();syncChaosMenu();renderHeader();return;}
+    if (action === 'toggleRules'){rulesOpen=!rulesOpen;if(mobileLayout.matches){chatOpen=false;shelfOpen=false;chaosOpen=false;}applyLayout();syncChaosMenu();renderHeader();return;}
+    if (action === 'toggleChat'){chatOpen=!chatOpen;if(mobileLayout.matches){rulesOpen=false;shelfOpen=false;chaosOpen=false;}applyLayout();syncChaosMenu();renderHeader();return;}
     if (action === 'handList'){handListOpen=!handListOpen;applyLayout();renderPlay();return;}
     if (action === 'boardMap'){showBoard();return;}
     if (action === 'restartAsk' || action === 'endAsk') {
@@ -521,14 +525,14 @@ app.addEventListener('input', e=>{
 app.addEventListener('change',e=>{const input=e.target as HTMLSelectElement;if(input.id==='trade-partner'){tradeDraft.to=input.value;tradeDraft.wantTiles=[];renderPlay();}});
 app.addEventListener('submit',e=>{if((e.target as HTMLFormElement).id==='trade-form'){e.preventDefault();send({type:'tradeOffer',target:tradeDraft.to,giveCash:tradeDraft.giveCash,wantCash:tradeDraft.wantCash,giveTiles:tradeDraft.giveTiles,wantTiles:tradeDraft.wantTiles});}});
 app.addEventListener('toggle',e=>{const details=e.target as HTMLDetailsElement;if(details.matches?.('.negotiation details'))tradeDraft.open=details.open;},true);
-document.addEventListener('keydown',e=>{if(e.key==='Escape'){document.querySelector('#modal-root')!.innerHTML='';help=false;}});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){chaosOpen=false;syncChaosMenu();if(mobileLayout.matches){chatOpen=false;rulesOpen=false;shelfOpen=false;applyLayout();renderHeader();}document.querySelector('#modal-root')!.innerHTML='';help=false;}});
 
 
 function applyLayout() {
   const live=!!room&&room.phase!=='lobby', shell=document.querySelector('.shell')!;
-  shell.classList.toggle('live',live);shell.classList.toggle('shelf-hidden',!shelfOpen);shell.classList.toggle('rules-hidden',!rulesOpen);shell.classList.toggle('chat-hidden',!chatOpen);shell.classList.toggle('first-person',camera==='first');shell.classList.toggle('show-hand-list',handListOpen);
+  shell.classList.toggle('mobile-panel-open',mobileLayout.matches&&(rulesOpen||chatOpen));shell.classList.toggle('live',live);shell.classList.toggle('shelf-hidden',!shelfOpen);shell.classList.toggle('rules-hidden',!rulesOpen);shell.classList.toggle('chat-hidden',!chatOpen);shell.classList.toggle('first-person',camera==='first');shell.classList.toggle('show-hand-list',handListOpen);
   const stage=document.querySelector('.stage')!,panel=document.querySelector('#play-panel')!;
-  if(live){if(panel.parentElement!==stage)stage.append(panel);}else if(panel.parentElement===stage)stage.parentElement!.insertBefore(panel,stage.nextSibling);
+  if(live&&!mobileLayout.matches){if(panel.parentElement!==stage)stage.append(panel);}else if(panel.parentElement===stage)stage.parentElement!.insertBefore(panel,stage.nextSibling);
   const toggle=document.querySelector('#rules-toggle')!;toggle.textContent=(rulesOpen?'▾':'▸')+' House rules';toggle.setAttribute('aria-expanded',String(rulesOpen));
   document.querySelector('#rules-panel')!.setAttribute('aria-hidden',String(!rulesOpen));
 }
@@ -558,3 +562,12 @@ bindPoker(app,()=>room,send);
 bindExpansion(app,()=>room,()=>id,send,render);
 render();
 connect();
+
+function chaosMenu(){
+ if(!room?.chaos||room.phase==='lobby'||room.spectating)return '';
+ const attention=!!room.chaos.dares?.[id]||!!room.chaos.vote||room.raid?.to===id&&room.raid.phase==='offer';
+ return '<div class="chaos-menu"><button class="chaos-trigger" data-action="toggleChaos" aria-expanded="'+chaosOpen+'" aria-controls="chaos-popover">✹ Chaos ▾'+(attention?'<span class="chaos-attention" aria-label="Action waiting">●</span>':'')+'</button><div id="chaos-popover" class="chaos-popover" '+(chaosOpen?'':'hidden')+'><div class="chaos-popover-heading"><strong>Chaos actions</strong><button data-action="closeChaos" aria-label="Close chaos actions">×</button></div>'+(!room.raid||room.raid.phase==='offer'?raidHtml(room,id):'')+chaosControls(room,id)+'</div></div>';
+}
+function syncChaosMenu(){const menu=document.querySelector<HTMLElement>('#chaos-popover');if(menu)menu.hidden=!chaosOpen;document.querySelector('.chaos-trigger')?.setAttribute('aria-expanded',String(chaosOpen));}
+document.addEventListener('pointerdown',e=>{if(chaosOpen&&!(e.target as HTMLElement).closest('.chaos-menu')){chaosOpen=false;syncChaosMenu();}});
+mobileLayout.addEventListener('change',()=>{if(mobileLayout.matches&&room?.phase!=='lobby'){shelfOpen=false;rulesOpen=false;chatOpen=false;}chaosOpen=false;render();});
